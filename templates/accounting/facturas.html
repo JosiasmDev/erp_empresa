@@ -2,7 +2,25 @@
 {% load static %}
 {% block content %}
     <h1>Facturas</h1>
-    {% for factura in facturas %}
-        <p>Pedido: {{ factura.pedido.id }} - ${{ factura.monto }}</p>
-    {% endfor %}
+    <a href="{% url 'accounting_crear_factura' %}" class="btn">Crear Factura</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Pedido</th>
+                <th>Monto</th>
+                <th>Fecha</th>
+                <th>Pagada</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for factura in facturas %}
+                <tr>
+                    <td>{{ factura.pedido.id }}</td>
+                    <td>${{ factura.monto }}</td>
+                    <td>{{ factura.fecha }}</td>
+                    <td>{{ factura.pagada|yesno:"Sí,No" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

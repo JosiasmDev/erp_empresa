@@ -1,7 +1,26 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <h1>Campañas</h1>
-    {% for campana in campanas %}
-        <p>{{ campana.nombre }} - {{ campana.objetivo }}</p>
-    {% endfor %}
+    <a href="{% url 'marketing_crear_campana' %}" class="btn">Crear Campaña</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Objetivo</th>
+                <th>Fecha Envío</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for campana in campanas %}
+                <tr>
+                    <td>{{ campana.nombre }}</td>
+                    <td>{{ campana.objetivo }}</td>
+                    <td>{{ campana.fecha_envio }}</td>
+                    <td>{{ campana.estado }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

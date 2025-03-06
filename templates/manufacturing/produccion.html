@@ -1,7 +1,26 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <h1>Órdenes de Producción</h1>
-    {% for orden in ordenes %}
-        <p>{{ orden.producto.nombre }} - Cantidad: {{ orden.cantidad }}</p>
-    {% endfor %}
+    <a href="{% url 'manufacturing_crear_orden' %}" class="btn">Crear Orden</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Fecha Inicio</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for orden in ordenes %}
+                <tr>
+                    <td>{{ orden.producto.nombre }}</td>
+                    <td>{{ orden.cantidad }}</td>
+                    <td>{{ orden.fecha_inicio }}</td>
+                    <td>{{ orden.estado }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

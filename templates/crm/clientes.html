@@ -1,9 +1,26 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <h1>Clientes</h1>
-    <ul>
-    {% for cliente in clientes %}
-        <li>{{ cliente.nombre }} - {{ cliente.email }}</li>
-    {% endfor %}
-    </ul>
+    <a href="{% url 'crm_crear_cliente' %}" class="btn">Crear Cliente</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Fecha Registro</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+                <tr>
+                    <td>{{ cliente.nombre }}</td>
+                    <td>{{ cliente.email }}</td>
+                    <td>{{ cliente.telefono }}</td>
+                    <td>{{ cliente.fecha_registro }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

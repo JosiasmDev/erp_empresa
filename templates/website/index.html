@@ -1,8 +1,24 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <h1>Páginas del Website</h1>
-    {% for pagina in paginas %}
-        <h2>{{ pagina.titulo }}</h2>
-        <p>{{ pagina.contenido }}</p>
-    {% endfor %}
+    <a href="{% url 'website_crear_pagina' %}" class="btn">Crear Página</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Fecha</th>
+                <th>Publicada</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pagina in paginas %}
+                <tr>
+                    <td>{{ pagina.titulo }}</td>
+                    <td>{{ pagina.fecha }}</td>
+                    <td>{{ pagina.publicada|yesno:"Sí,No" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

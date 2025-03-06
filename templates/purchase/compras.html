@@ -1,7 +1,28 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <h1>Compras</h1>
-    {% for compra in compras %}
-        <p>{{ compra.producto.nombre }} - {{ compra.cantidad }} (Proveedor: {{ compra.proveedor }})</p>
-    {% endfor %}
+    <a href="{% url 'purchase_crear_compra' %}" class="btn">Crear Compra</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Proveedor</th>
+                <th>Costo</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for compra in compras %}
+                <tr>
+                    <td>{{ compra.producto.nombre }}</td>
+                    <td>{{ compra.cantidad }}</td>
+                    <td>{{ compra.proveedor }}</td>
+                    <td>${{ compra.costo }}</td>
+                    <td>{{ compra.fecha }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

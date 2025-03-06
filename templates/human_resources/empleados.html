@@ -1,7 +1,26 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <h1>Empleados</h1>
-    {% for empleado in empleados %}
-        <p>{{ empleado.nombre }} - {{ empleado.cargo }} - ${{ empleado.salario }}</p>
-    {% endfor %}
+    <a href="{% url 'hr_crear_empleado' %}" class="btn">Crear Empleado</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Cargo</th>
+                <th>Salario</th>
+                <th>Fecha Contratación</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for empleado in empleados %}
+                <tr>
+                    <td>{{ empleado.nombre }}</td>
+                    <td>{{ empleado.cargo }}</td>
+                    <td>${{ empleado.salario }}</td>
+                    <td>{{ empleado.fecha_contratacion }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

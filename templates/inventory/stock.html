@@ -1,7 +1,26 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <h1>Inventario</h1>
-    {% for movimiento in movimientos %}
-        <p>{{ movimiento.producto.nombre }} - {{ movimiento.cantidad }} ({{ movimiento.tipo }})</p>
-    {% endfor %}
+    <a href="{% url 'inventory_crear_movimiento' %}" class="btn">Registrar Movimiento</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movimiento in movimientos %}
+                <tr>
+                    <td>{{ movimiento.producto.nombre }}</td>
+                    <td>{{ movimiento.cantidad }}</td>
+                    <td>{{ movimiento.tipo }}</td>
+                    <td>{{ movimiento.fecha }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
