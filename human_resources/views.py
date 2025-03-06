@@ -1,3 +1,6 @@
 from django.shortcuts import render
+from .models import Empleado
 
-# Create your views here.
+def empleados(request):
+    empleados = Empleado.objects.all()
+    return render(request, 'human_resources/empleados.html', {'empleados': empleados})

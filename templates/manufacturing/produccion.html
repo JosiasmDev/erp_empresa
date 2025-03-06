@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Órdenes de Producción</h1>
+    {% for orden in ordenes %}
+        <p>{{ orden.producto.nombre }} - Cantidad: {{ orden.cantidad }}</p>
+    {% endfor %}
+{% endblock %}

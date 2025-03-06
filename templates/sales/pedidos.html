@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Pedidos</h1>
+    {% for pedido in pedidos %}
+        <p>Cliente: {{ pedido.cliente.nombre }} - Total: ${{ pedido.total }}</p>
+    {% endfor %}
+{% endblock %}

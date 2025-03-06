@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Inventario</h1>
+    {% for movimiento in movimientos %}
+        <p>{{ movimiento.producto.nombre }} - {{ movimiento.cantidad }} ({{ movimiento.tipo }})</p>
+    {% endfor %}
+{% endblock %}

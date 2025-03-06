@@ -1,3 +1,6 @@
 from django.shortcuts import render
+from .models import MovimientoStock
 
-# Create your views here.
+def stock(request):
+    movimientos = MovimientoStock.objects.all()
+    return render(request, 'inventory/stock.html', {'movimientos': movimientos})

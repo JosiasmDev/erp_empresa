@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Campañas</h1>
+    {% for campana in campanas %}
+        <p>{{ campana.nombre }} - {{ campana.objetivo }}</p>
+    {% endfor %}
+{% endblock %}

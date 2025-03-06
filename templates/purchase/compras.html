@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Compras</h1>
+    {% for compra in compras %}
+        <p>{{ compra.producto.nombre }} - {{ compra.cantidad }} (Proveedor: {{ compra.proveedor }})</p>
+    {% endfor %}
+{% endblock %}

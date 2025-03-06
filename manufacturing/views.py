@@ -1,3 +1,6 @@
 from django.shortcuts import render
+from .models import OrdenProduccion
 
-# Create your views here.
+def produccion(request):
+    ordenes = OrdenProduccion.objects.all()
+    return render(request, 'manufacturing/produccion.html', {'ordenes': ordenes})

@@ -1,3 +1,7 @@
 from django.db import models
+from ecommerce.models import Producto
 
-# Create your models here.
+class OrdenProduccion(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.IntegerField()
+    fecha_inicio = models.DateTimeField(auto_now_add=True)

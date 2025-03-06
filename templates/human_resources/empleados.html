@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Empleados</h1>
+    {% for empleado in empleados %}
+        <p>{{ empleado.nombre }} - {{ empleado.cargo }} - ${{ empleado.salario }}</p>
+    {% endfor %}
+{% endblock %}
