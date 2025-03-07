@@ -4,4 +4,4 @@ from .models import Compra
 class CompraForm(forms.ModelForm):
     class Meta:
         model = Compra
-        fields = ['producto', 'cantidad', 'proveedor', 'costo']
+        fields = ['pieza', 'cantidad', 'proveedor', 'costo']

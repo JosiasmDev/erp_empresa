@@ -4,4 +4,4 @@ from .models import MovimientoStock
 class MovimientoStockForm(forms.ModelForm):
     class Meta:
         model = MovimientoStock
-        fields = ['producto', 'cantidad', 'tipo']
+        fields = ['pieza', 'cantidad', 'tipo']

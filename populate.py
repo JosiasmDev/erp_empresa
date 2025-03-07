@@ -2,124 +2,114 @@ import os
 import django
 from faker import Faker
 import random
-from datetime import datetime, timedelta
 
-# Configurar Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'erp_empresa.settings')
 django.setup()
 
-# Importar modelos
+from ecommerce.models import Coche
 from website.models import Pagina
 from crm.models import Cliente
-from ecommerce.models import Producto
 from sales.models import Pedido, PedidoItem
 from human_resources.models import Empleado
 from manufacturing.models import OrdenProduccion
 from marketing_automation.models import Campana
-from inventory.models import MovimientoStock
+from inventory.models import Pieza, MovimientoStock
 from accounting.models import Factura
 from purchase.models import Compra
 
 fake = Faker()
 
-# Función para poblar datos
-def populate_data():
-    # 1. Website - 50 páginas
-    for _ in range(50):
-        Pagina.objects.create(
-            titulo=fake.sentence(nb_words=4),
-            contenido=fake.paragraph(nb_sentences=5)
-        )
+# Crear coches deportivos SAG
+coches = [
+    {'nombre': 'SAG Striker S', 'tamanio': 'Pequeño', 'precio_base': 45000, 'potencia': 300, 'velocidad_maxima': 250, 'descripcion': 'Un coupé deportivo compacto con diseño agresivo y motor eléctrico de alta respuesta.'},
+    {'nombre': 'SAG Arrow XS', 'tamanio': 'Pequeño', 'precio_base': 48000, 'potencia': 320, 'velocidad_maxima': 260, 'descripcion': 'Pequeño pero feroz, con aerodinámica optimizada y tracción total.'},
+    {'nombre': 'SAG Phantom M', 'tamanio': 'Mediano', 'precio_base': 75000, 'potencia': 450, 'velocidad_maxima': 290, 'descripcion': 'Un sedán deportivo de mediano tamaño con interiores lujosos y potencia brutal.'},
+    {'nombre': 'SAG Eclipse M', 'tamanio': 'Mediano', 'precio_base': 78000, 'potencia': 470, 'velocidad_maxima': 300, 'descripcion': 'Elegancia y fuerza combinadas en un diseño futurista de mediano tamaño.'},
+    {'nombre': 'SAG Titan G', 'tamanio': 'Grande', 'precio_base': 120000, 'potencia': 600, 'velocidad_maxima': 320, 'descripcion': 'Un SUV deportivo de gran tamaño con tecnología avanzada y rendimiento extremo.'},
+    {'nombre': 'SAG Vortex G', 'tamanio': 'Grande', 'precio_base': 125000, 'potencia': 620, 'velocidad_maxima': 330, 'descripcion': 'El rey de los SUVs deportivos, diseñado para conquistar cualquier terreno.'},
+]
 
-    # 2. CRM - 100 clientes
-    for _ in range(100):
-        Cliente.objects.create(
-            nombre=fake.name(),
-            email=fake.email(),
-            telefono=fake.phone_number()[:15]
-        )
+for coche_data in coches:
+    Coche.objects.create(
+        nombre=coche_data['nombre'],
+        tamanio=coche_data['tamanio'],
+        precio_base=coche_data['precio_base'],
+        potencia=coche_data['potencia'],
+        velocidad_maxima=coche_data['velocidad_maxima'],
+        descripcion=coche_data['descripcion'],
+        color='Negro',
+        rueda='19"'
+    )
 
-    # 3. E-commerce - 200 productos
-    for _ in range(200):
-        Producto.objects.create(
-            nombre=fake.word().capitalize() + " " + fake.word(),
-            precio=random.uniform(10, 1000),
-            stock=random.randint(0, 500)
-        )
+# Crear páginas para cada coche en el website
+for coche in Coche.objects.all():
+    Pagina.objects.create(
+        coche=coche,
+        titulo=f"{coche.nombre} - SAG",
+        contenido=f"Descubre el {coche.nombre}, un coche deportivo {coche.tamanio.lower()} con {coche.potencia} HP y una velocidad máxima de {coche.velocidad_maxima} km/h. {coche.descripcion}",
+        publicada=True
+    )
 
-    # 4. Human Resources - 50 empleados
-    for _ in range(50):
-        Empleado.objects.create(
-            nombre=fake.name(),
-            cargo=fake.job(),
-            salario=random.uniform(1000, 10000)
-        )
+# Crear clientes
+for _ in range(10):
+    Cliente.objects.create(
+        nombre=fake.name(),
+        email=fake.email(),
+        telefono=fake.phone_number()[:15]
+    )
 
-    # 5. Sales - 300 pedidos con ítems
-    clientes = Cliente.objects.all()
-    productos = Producto.objects.all()
-    for _ in range(300):
-        cliente = random.choice(clientes)
-        pedido = Pedido.objects.create(
-            cliente=cliente,
-            total=0,
-            fecha=fake.date_time_this_year()
-        )
-        for _ in range(random.randint(1, 5)):  # 1-5 ítems por pedido
-            producto = random.choice(productos)
-            cantidad = random.randint(1, 10)
-            PedidoItem.objects.create(
-                pedido=pedido,
-                producto=producto,
-                cantidad=cantidad
-            )
-        pedido.total = sum(item.producto.precio * item.cantidad for item in pedido.pedidoitem_set.all())
-        pedido.save()
+# Crear empleados
+for _ in range(5):
+    Empleado.objects.create(
+        nombre=fake.name(),
+        cargo=fake.job(),
+        salario=random.uniform(3000, 8000)
+    )
 
-    # 6. Manufacturing - 100 órdenes de producción
-    for _ in range(100):
-        OrdenProduccion.objects.create(
-            producto=random.choice(productos),
-            cantidad=random.randint(10, 100),
-            fecha_inicio=fake.date_time_this_year()
-        )
+# Crear campañas de marketing
+for _ in range(3):
+    Campana.objects.create(
+        nombre=fake.catch_phrase(),
+        objetivo=f"Promocionar {random.choice(coches)['nombre']}",
+        fecha_envio=fake.date_time_this_month(),
+        estado=random.choice(['Borrador', 'Enviada'])
+    )
 
-    # 7. Marketing Automation - 30 campañas
-    for _ in range(30):
-        Campana.objects.create(
-            nombre=fake.catch_phrase(),
-            objetivo=fake.sentence(),
-            fecha_envio=fake.date_time_this_month()
-        )
+# Crear pedidos y facturas
+clientes = Cliente.objects.all()
+for _ in range(5):
+    cliente = random.choice(clientes)
+    coche = random.choice(Coche.objects.all())
+    pedido = Pedido.objects.create(
+        cliente=cliente,
+        coche=coche,
+        color=random.choice(['Rojo', 'Negro', 'Azul']),
+        rueda=random.choice(['17"', '19"', '21"'])
+    )
+    PedidoItem.objects.create(pedido=pedido, coche=coche, cantidad=1)
+    pedido.calcular_total()
+    Factura.objects.create(pedido=pedido, monto=pedido.total, pagada=random.choice([True, False]))
 
-    # 8. Inventory - 500 movimientos de stock
-    for _ in range(500):
-        MovimientoStock.objects.create(
-            producto=random.choice(productos),
-            cantidad=random.randint(1, 50),
-            tipo=random.choice(['Entrada', 'Salida'])
-        )
+# Crear órdenes de producción
+for coche in Coche.objects.all():
+    OrdenProduccion.objects.create(coche=coche, cantidad=random.randint(5, 20))
 
-    # 9. Accounting - 200 facturas
-    pedidos = Pedido.objects.all()
-    for _ in range(200):
-        pedido = random.choice(pedidos)
-        Factura.objects.create(
-            pedido=pedido,
-            monto=pedido.total,
-            fecha=fake.date_time_this_year()
-        )
+# Crear piezas y movimientos
+piezas = ['Motor V6', 'Transmisión', 'Ruedas 19"', 'Batería Eléctrica']
+for pieza_nombre in piezas:
+    Pieza.objects.create(nombre=pieza_nombre, cantidad_disponible=random.randint(50, 200))
+for _ in range(20):
+    pieza = random.choice(Pieza.objects.all())
+    MovimientoStock.objects.create(pieza=pieza, cantidad=random.randint(10, 50), tipo=random.choice(['Entrada', 'Salida']))
 
-    # 10. Purchase - 150 compras
-    for _ in range(150):
-        Compra.objects.create(
-            producto=random.choice(productos),
-            cantidad=random.randint(5, 100),
-            proveedor=fake.company(),
-            fecha=fake.date_time_this_year()
-        )
+# Crear compras
+for _ in range(5):
+    pieza = random.choice(Pieza.objects.all())
+    Compra.objects.create(
+        pieza=pieza,
+        cantidad=random.randint(10, 50),
+        proveedor=fake.company(),
+        costo=random.uniform(100, 1000)
+    )
 
-    print("Datos ficticios creados exitosamente.")
-
-if __name__ == '__main__':
-    populate_data()
+print("Datos de SAG creados exitosamente.")

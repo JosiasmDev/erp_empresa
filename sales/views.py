@@ -12,7 +12,7 @@ def crear_pedido(request):
         form = PedidoForm(request.POST)
         if form.is_valid():
             pedido = form.save()
-            messages.success(request, 'Pedido creado exitosamente.')
+            messages.success(request, 'Pedido creado.')
             return redirect('sales_pedidos')
     else:
         form = PedidoForm()

@@ -1,7 +1,7 @@
 from django import forms
-from .models import Producto
+from .models import Coche
 
-class ProductoForm(forms.ModelForm):
+class CocheConfigForm(forms.ModelForm):
     class Meta:
-        model = Producto
-        fields = ['nombre', 'precio', 'stock', 'descripcion']
+        model = Coche
+        fields = ['nombre', 'tamanio', 'precio_base', 'potencia', 'velocidad_maxima', 'descripcion', 'color', 'rueda']

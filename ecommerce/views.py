@@ -1,19 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Producto
-from .forms import ProductoForm
+from .models import Coche
+from .forms import CocheConfigForm
 from django.contrib import messages
 
 def tienda(request):
-    productos = Producto.objects.all()
-    return render(request, 'ecommerce/tienda.html', {'productos': productos})
+    coches = Coche.objects.all()
+    return render(request, 'ecommerce/tienda.html', {'coches': coches})
 
-def crear_producto(request):
+def crear_coche(request):
     if request.method == 'POST':
-        form = ProductoForm(request.POST)
+        form = CocheConfigForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Producto creado.')
+            messages.success(request, 'Coche creado.')
             return redirect('ecommerce_tienda')
     else:
-        form = ProductoForm()
-    return render(request, 'ecommerce/crear_producto.html', {'form': form})
+        form = CocheConfigForm()
+    return render(request, 'ecommerce/crear_coche.html', {'form': form})
