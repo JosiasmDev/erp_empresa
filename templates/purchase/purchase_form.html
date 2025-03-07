@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Compra de {{ coche.nombre }}</h1>
+    <p>Precio base: {{ coche.precio_base }} €</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Siguiente</button>
+    </form>
+{% endblock %}

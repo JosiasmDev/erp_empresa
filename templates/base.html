@@ -1,23 +1,33 @@
-{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>ERP Empresa</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAG - {% block title %}{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-    <nav>
-        <a href="/website/">Website</a> |
-        <a href="/crm/">CRM</a> |
-        <a href="/ecommerce/">E-commerce</a> |
-        <a href="/sales/">Sales</a> |
-        <a href="/hr/">HR</a> |
-        <a href="/manufacturing/">Manufacturing</a> |
-        <a href="/marketing/">Marketing</a> |
-        <a href="/inventory/">Inventory</a> |
-        <a href="/accounting/">Accounting</a> |
-        <a href="/purchase/">Purchase</a>
-    </nav>
-    {% block content %}{% endblock %}
+    <div class="header">
+        <div class="nav-buttons">
+            <a href="{% url 'website_index' %}" class="btn">Clientes</a>
+            <a href="#" class="btn">Empleados</a> <!-- Añadir vista si es necesario -->
+        </div>
+        <img src="{% static 'images/sag_logo.jpg' %}" alt="SAG Logo" class="logo">
+        <nav class="menu">
+            <select onchange="window.location.href=this.value">
+                <option value="">Menú</option>
+                <option value="{% url 'website_index' %}">Inicio</option>
+                <option value="{% url 'website_coche_detalle' 1 %}">Eclipse</option>
+                <option value="{% url 'website_coche_detalle' 2 %}">Arrow</option>
+                <option value="#">Configuración</option>
+                <option value="#">Contacto</option>
+            </select>
+        </nav>
+    </div>
+    {% block content %}
+    {% endblock %}
 </body>
 </html>

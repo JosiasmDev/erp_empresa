@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ coche.nombre }} - SAG{% endblock %}
+{% block content %}
+    <div class="coche-config-container">
+        <div class="config-options">
+            <h1>{{ coche.nombre }}</h1>
+            <p>{% if coche.nombre == "Arrow" %}Nuevo SAG Arrow desde 29.900 euros{% else %}Nuevo SAG Eclipse desde 34.900 euros{% endif %}</p>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <p>Precio base: <span id="base-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
+                <p>Precio total: <span id="total-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
+                <button type="submit" class="btn">Actualizar Configuración</button>
+                <a href="{% url 'purchase_form' coche.id %}" class="btn">Comprar</a>
+            </form>
+        </div>
+        <div class="coche-3d-container">
+            <div id="coche-3d-scene"></div>
+        </div>
+    </div>
+
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, 400 / 600, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(400, 600);
+        renderer.setClearColor(0x333333);
+        document.getElementById('coche-3d-scene').appendChild(renderer.domElement);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 3, 5);
+        scene.add(directionalLight);
+
+        const loader = new THREE.GLTFLoader();
+        const modelPath = '{% static "3d_models/"|add:model_filename %}';
+        const fallbackPath = '{% static "3d_models/generic_car.glb" %}';
+
+        console.log('Intentando cargar:', modelPath);
+        console.log('Fallback:', fallbackPath);
+
+        loader.load(
+            modelPath,
+            (gltf) => {
+                const model = gltf.scene;
+                model.scale.set(1, 1, 1);
+                model.position.set(0, 0, 0);
+                scene.add(model);
+                model.rotation.y = Math.PI / 2;
+                console.log('Modelo cargado:', modelPath);
+            },
+            undefined,
+            (error) => {
+                console.error('Error al cargar el modelo específico:', error);
+                loader.load(
+                    fallbackPath,
+                    (gltf) => {
+                        const model = gltf.scene;
+                        model.scale.set(1, 1, 1);
+                        model.position.set(0, 0, 0);
+                        scene.add(model);
+                        model.rotation.y = Math.PI / 2;
+                        console.log('Modelo genérico cargado:', fallbackPath);
+                    },
+                    undefined,
+                    (error) => console.error('Error al cargar el modelo genérico:', error)
+                );
+            }
+        );
+
+        camera.position.z = 5;
+        camera.position.y = 2;
+
+        let rotateSpeed = 0.002;
+        function animate() {
+            requestAnimationFrame(animate);
+            if (scene.children.length > 2) {
+                scene.children[2].rotation.y += rotateSpeed;
+            }
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        document.getElementById('coche-3d-scene').addEventListener('mousedown', (e) => {
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
+                if (scene.children.length > 2) {
+                    scene.children[2].rotation.y += deltaX * 0.005;
+                    scene.children[2].rotation.x += deltaY * 0.005;
+                }
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        document.getElementById('coche-3d-scene').addEventListener('wheel', (e) => {
+            e.preventDefault();
+            camera.position.z += e.deltaY * 0.01;
+            camera.position.z = Math.max(0.5, Math.min(5, camera.position.z));
+        });
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(400, 600);
+            camera.aspect = 400 / 600;
+            camera.updateProjectionMatrix();
+        });
+
+        // Calcular precio dinámico
+        document.querySelector('form').addEventListener('change', function(e) {
+            let basePrice = {{ coche.precio_base|floatformat:0 }};
+            let totalPrice = basePrice;
+
+            const motorizaciones = {
+                'V6 3.0L': 0,
+                'V8 4.0L': 5000,
+                'Eléctrico 400kW': 10000
+            };
+            const tapicerias = {
+                'Cuero Negro': 0,
+                'Alcantara Roja': 2000,
+                'Tela Gris': 500
+            };
+            const extras = {
+                'Ninguno': 0,
+                'Techo Panorámico': 3000,
+                'Sistema de Sonido Premium': 1500,
+                'Asistente de Conducción': 2500
+            };
+
+            const formData = new FormData(this);
+            for (let [key, value] of formData) {
+                if (key === 'motorizacion' && motorizaciones[value]) totalPrice += motorizaciones[value];
+                if (key === 'tapiceria' && tapicerias[value]) totalPrice += tapicerias[value];
+                if (key === 'extras' && extras[value]) totalPrice += extras[value];
+            }
+
+            document.getElementById('total-price').textContent = totalPrice + ' €';
+        });
+    </script>
+{% endblock %}

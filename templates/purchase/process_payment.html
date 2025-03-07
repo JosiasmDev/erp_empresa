@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Confirmar Pago</h1>
+    <p>Compra de {{ compra.coche.nombre }} por {{ compra.precio_total }} €</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn">Pagar</button>
+    </form>
+{% endblock %}

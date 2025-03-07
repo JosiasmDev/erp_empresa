@@ -1,12 +1,13 @@
 from django.db import models
-from inventory.models import Pieza
+from ecommerce.models import Coche
+from crm.models import Cliente
 
 class Compra(models.Model):
-    pieza = models.ForeignKey(Pieza, on_delete=models.CASCADE)
-    cantidad = models.IntegerField()
-    proveedor = models.CharField(max_length=100)
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, null=False)
+    coche = models.ForeignKey(Coche, on_delete=models.CASCADE, null=False)
+    precio_total = models.DecimalField(max_digits=10, decimal_places=2)
     fecha = models.DateTimeField(auto_now_add=True)
-    costo = models.DecimalField(max_digits=10, decimal_places=2)
+    pagado = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Compra {self.id} - {self.pieza.nombre}"
+        return f"Compra {self.id} - {self.cliente.nombre}"

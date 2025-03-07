@@ -1,24 +1,22 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block title %}SAG - Inicio{% endblock %}
 {% block content %}
-    <h1>Páginas del Website</h1>
-    <a href="{% url 'website_crear_pagina' %}" class="btn">Crear Página</a>
-    <table>
-        <thead>
-            <tr>
-                <th>Título</th>
-                <th>Fecha</th>
-                <th>Publicada</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pagina in paginas %}
-                <tr>
-                    <td>{{ pagina.titulo }}</td>
-                    <td>{{ pagina.fecha }}</td>
-                    <td>{{ pagina.publicada|yesno:"Sí,No" }}</td>
-                </tr>
+    <div class="header-content">
+        <div class="welcome-text">
+            <h1>Descubre el Poder de Conducir un SAG</h1>
+            <p>En SAG, combinamos innovación, rendimiento y elegancia para ofrecerte una experiencia de conducción inolvidable. Nuestros coches, como el revolucionario Eclipse y el ágil Arrow, están diseñados para quienes buscan superar límites y disfrutar de cada kilómetro con estilo. ¿Estás listo para tomar el volante de tu próximo sueño?</p>
+            <p>Desde la potencia descomunal del Eclipse hasta la eficiencia dinámica del Arrow, cada modelo está crafted para adaptarse a tu personalidad y necesidades. Con tecnologías de punta y acabados de lujo, conducir un SAG no es solo un viaje, es una declaración. ¡Únete a la élite del automovilismo hoy mismo!</p>
+            <p>No esperes más para sentir la adrenalina. Explora nuestras opciones de personalización y encuentra el coche perfecto para ti. Con precios starting desde 29.900 euros, un SAG está al alcance de quienes se atreven a soñar en grande. ¡Haz clic y comienza tu aventura ahora!</p>
+        </div>
+        <div class="coche-grid">
+            {% for coche in coches %}
+                <div class="coche-card">
+                    <h2>{{ coche.nombre }}</h2>
+                    <p>{{ coche.descripcion|default:"Nuevo SAG "|add:coche.nombre|add:" desde "|add:coche.precio_base|floatformat:0|add:" euros" }}</p>
+                    <a href="{% url 'website_coche_detalle' coche.id %}" class="btn">Personalizar</a>
+                </div>
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
+    </div>
 {% endblock %}

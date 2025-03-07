@@ -1,7 +1,7 @@
 from django import forms
-from .models import Pagina
+from ecommerce.models import Coche
 
-class PaginaForm(forms.ModelForm):
+class CocheConfigForm(forms.ModelForm):
     class Meta:
-        model = Pagina
-        fields = ['titulo', 'contenido', 'publicada']
+        model = Coche
+        fields = ['color', 'rueda', 'motorizacion', 'tapiceria', 'extras']

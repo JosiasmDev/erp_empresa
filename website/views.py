@@ -1,19 +1,22 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Pagina
-from .forms import PaginaForm
+from ecommerce.models import Coche
+from .forms import CocheConfigForm
 from django.contrib import messages
 
 def index(request):
-    paginas = Pagina.objects.all()
-    return render(request, 'website/index.html', {'paginas': paginas})
+    coches = Coche.objects.all()
+    return render(request, 'website/index.html', {'coches': coches})
 
-def crear_pagina(request):
+def coche_detalle(request, coche_id):
+    coche = get_object_or_404(Coche, id=coche_id)
+    # Generar el nombre del archivo del modelo 3D
+    model_filename = coche.nombre.lower() + ".glb"
     if request.method == 'POST':
-        form = PaginaForm(request.POST)
+        form = CocheConfigForm(request.POST, instance=coche)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Página creada.')
-            return redirect('website_index')
+            messages.success(request, 'Configuración actualizada.')
+            return redirect('website_coche_detalle', coche_id=coche.id)
     else:
-        form = PaginaForm()
-    return render(request, 'website/crear_pagina.html', {'form': form})
+        form = CocheConfigForm(instance=coche)
+    return render(request, 'website/coche_detalle.html', {'coche': coche, 'form': form, 'model_filename': model_filename})

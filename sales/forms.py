@@ -1,12 +1,12 @@
 from django import forms
-from .models import Pedido, PedidoItem
+from .models import Pedido, PedidoItem  # Añadimos PedidoItem a la importación
 
 class PedidoForm(forms.ModelForm):
     class Meta:
         model = Pedido
-        fields = ['cliente', 'coche', 'color', 'rueda', 'estado']
+        fields = ['cliente', 'coche', 'color', 'rueda']
 
 class PedidoItemForm(forms.ModelForm):
     class Meta:
         model = PedidoItem
-        fields = ['coche', 'cantidad']  # Cambiado de 'producto' a 'coche'
+        fields = ['pedido', 'coche', 'cantidad']
