@@ -6,21 +6,19 @@
     <table>
         <thead>
             <tr>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Proveedor</th>
-                <th>Costo</th>
+                <th>Coche</th>
+                <th>Cliente</th>
+                <th>Precio Total</th>
                 <th>Fecha</th>
             </tr>
         </thead>
         <tbody>
             {% for compra in compras %}
                 <tr>
-                    <td>{{ compra.producto.nombre }}</td>
-                    <td>{{ compra.cantidad }}</td>
-                    <td>{{ compra.proveedor }}</td>
-                    <td>${{ compra.costo }}</td>
-                    <td>{{ compra.fecha }}</td>
+                    <td>{{ compra.coche.nombre }}</td>
+                    <td>{{ compra.cliente.nombre }}</td>
+                    <td>${{ compra.precio_total }}</td>
+                    <td>{{ compra.fecha|default:"Sin fecha" }}</td>
                 </tr>
             {% endfor %}
         </tbody>

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Iniciar Sesión o Registrarse</h1>
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <div>
+        <h2>Iniciar Sesión</h2>
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="hidden" name="login" value="1">
+            {{ login_form.as_p }}
+            <button type="submit" class="btn">Iniciar Sesión</button>
+        </form>
+    </div>
+    <div>
+        <h2>Registrarse</h2>
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="hidden" name="register" value="1">
+            {{ register_form.as_p }}
+            <button type="submit" class="btn">Registrarse</button>
+        </form>
+    </div>
+{% endblock %}

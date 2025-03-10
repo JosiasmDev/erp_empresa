@@ -11,7 +11,9 @@ def crear_orden(request):
     if request.method == 'POST':
         form = OrdenProduccionForm(request.POST)
         if form.is_valid():
-            form.save()
+            orden = form.save(commit=False)
+            orden.completada = False  # Inicializar como False
+            orden.save()
             messages.success(request, 'Orden creada.')
             return redirect('manufacturing_produccion')
     else:

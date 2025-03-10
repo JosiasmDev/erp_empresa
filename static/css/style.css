@@ -3,12 +3,11 @@ body {
     background-color: #1a1a1a;
     color: #fff;
     margin: 0;
-    padding: 20px;
+    padding: 120px 20px 20px; /* Asegura espacio para la cabecera fija */
 }
 
 .header {
     text-align: center;
-    margin-bottom: 40px;
     background: linear-gradient(135deg, #2c2c2c 0%, #404040 50%, #333333 100%);
     padding: 20px;
     border-radius: 10px;
@@ -38,6 +37,7 @@ body {
 .header .menu {
     position: relative;
     right: 0;
+    max-width: 200px;
 }
 
 .header .menu select {
@@ -48,6 +48,7 @@ body {
     border: 2px solid #00bfff;
     border-radius: 5px;
     cursor: pointer;
+    width: 100%;
 }
 
 .header .menu select:hover {
@@ -73,8 +74,30 @@ body {
     background-color: #0099cc;
 }
 
-.header-content {
-    margin-top: 120px; /* Ajuste para la cabecera fija */
+.contact-container {
+    margin-top: 150px; /* Más espacio para evitar solapamiento con la cabecera */
+    padding: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #2c2c2c;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.contact-container h1 {
+    color: #00bfff;
+    margin-bottom: 20px;
+}
+
+.contact-container p {
+    margin: 10px 0;
+}
+
+.contact-container iframe {
+    width: 100%;
+    border-radius: 10px;
+    margin-top: 20px;
 }
 
 .welcome-text {
@@ -179,4 +202,100 @@ body {
     border: 2px solid #00bfff;
     border-radius: 10px;
     overflow: hidden;
+}
+
+
+.create-employee-container {
+    margin-top: 150px;
+    padding: 20px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #2c2c2c;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.create-employee-container h1 {
+    color: #00bfff;
+    margin-bottom: 20px;
+}
+
+.create-employee-container form p {
+    margin: 10px 0;
+}
+
+.create-employee-container label {
+    display: block;
+    color: #00bfff;
+    margin-bottom: 5px;
+}
+
+.create-employee-container input,
+.create-employee-container select {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #00bfff;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+}
+
+.create-employee-container button {
+    margin-top: 20px;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #2c2c2c;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #00bfff;
+}
+
+th {
+    background-color: #333;
+    color: #00bfff;
+}
+
+tr:nth-child(even) {
+    background-color: #404040;
+}
+
+.form-container {
+    margin-top: 150px;
+    padding: 20px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #2c2c2c;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.form-container h1 {
+    color: #00bfff;
+    margin-bottom: 20px;
+}
+
+.form-container .message {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.form-container .message.success {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.form-container .message.error {
+    background-color: #dc3545;
+    color: #fff;
 }

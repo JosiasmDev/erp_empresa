@@ -1,103 +1,52 @@
-import os
-import django
-from faker import Faker
-import random
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import login, authenticate, logout
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User, Group
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'erp_empresa.settings')
-django.setup()
+def is_admin(user):
+    return user.groups.filter(name='Administrador').exists()
 
-from ecommerce.models import Coche
-from website.models import Pagina
-from crm.models import Cliente
-from sales.models import Pedido, PedidoItem
-from human_resources.models import Empleado
-from manufacturing.models import OrdenProduccion
-from marketing_automation.models import Campana
-from inventory.models import Pieza, MovimientoStock
-from accounting.models import Factura
-from purchase.models import Compra
+def login_register(request):
+    login_form = AuthenticationForm()  # Inicializar fuera del if
+    register_form = UserCreationForm()  # Inicializar fuera del if
+    if request.method == 'POST':
+        if 'login' in request.POST:
+            login_form = AuthenticationForm(request, data=request.POST)
+            if login_form.is_valid():
+                user = login_form.get_user()
+                login(request, user)
+                messages.success(request, f'¡Bienvenido, {user.username}!')
+                return redirect('/')
+        elif 'register' in request.POST:
+            register_form = UserCreationForm(request.POST)
+            if register_form.is_valid():
+                user = register_form.save()
+                # Asignar rol de cliente por defecto
+                user.groups.add(Group.objects.get(name='Clientes'))
+                login(request, user)
+                messages.success(request, '¡Registro exitoso! Bienvenido.')
+                return redirect('/')
+    return render(request, 'accounts/login_register.html', {
+        'login_form': login_form,
+        'register_form': register_form,
+    })
 
-fake = Faker()
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'Has cerrado sesión.')
+    return redirect('/')
 
-# Crear solo dos coches (Eclipse y Arrow)
-coches = [
-    {
-        'nombre': 'Eclipse',
-        'precio_base': 78000,
-        'potencia': 470,
-        'velocidad_maxima': 300,
-        'descripcion': 'Un sedán deportivo con interiores lujosos y potencia brutal.'
-    },
-    {
-        'nombre': 'Arrow',
-        'precio_base': 48000,
-        'potencia': 320,
-        'velocidad_maxima': 260,
-        'descripcion': 'Pequeño pero feroz, con aerodinámica optimizada y tracción total.'
-    },
-]
-
-# Eliminar coches existentes para evitar duplicados
-Coche.objects.all().delete()
-
-for coche_data in coches:
-    Coche.objects.create(
-        nombre=coche_data['nombre'],
-        precio_base=coche_data['precio_base'],
-        potencia=coche_data['potencia'],
-        velocidad_maxima=coche_data['velocidad_maxima'],
-        descripcion=coche_data['descripcion'],
-        color='Negro',
-        rueda='19"'
-    )
-
-# Crear páginas para cada coche en el website
-for coche in Coche.objects.all():
-    Pagina.objects.create(
-        coche=coche,
-        titulo=f"{coche.nombre} - SAG",
-        contenido=f"Descubre el {coche.nombre}, un coche deportivo con {coche.potencia} HP y una velocidad máxima de {coche.velocidad_maxima} km/h. {coche.descripcion}",
-        publicada=True
-    )
-
-# Crear clientes, empleados, campañas, pedidos, etc. (simplificado)
-for _ in range(5):
-    Cliente.objects.create(
-        nombre=fake.name(),
-        email=fake.email(),
-        telefono=fake.phone_number()[:15]
-    )
-
-for _ in range(3):
-    Empleado.objects.create(
-        nombre=fake.name(),
-        cargo=fake.job(),
-        salario=random.uniform(3000, 8000)
-    )
-
-for _ in range(2):
-    Campana.objects.create(
-        nombre=fake.catch_phrase(),
-        objetivo=f"Promocionar {random.choice(coches)['nombre']}",
-        fecha_envio=fake.date_time_this_month(),
-        estado=random.choice(['Borrador', 'Enviada'])
-    )
-
-clientes = Cliente.objects.all()
-for _ in range(3):
-    cliente = random.choice(clientes)
-    coche = random.choice(Coche.objects.all())
-    pedido = Pedido.objects.create(
-        cliente=cliente,
-        coche=coche,
-        color=random.choice(['Rojo', 'Negro', 'Azul']),
-        rueda=random.choice(['17"', '19"', '21"'])
-    )
-    PedidoItem.objects.create(pedido=pedido, coche=coche, cantidad=1)
-    pedido.calcular_total()
-    Factura.objects.create(pedido=pedido, monto=pedido.total, pagada=random.choice([True, False]))
-
-for coche in Coche.objects.all():
-    OrdenProduccion.objects.create(coche=coche, cantidad=random.randint(5, 20))
-
-print("Datos de SAG actualizados con Eclipse y Arrow.")
+@login_required
+@user_passes_test(is_admin)
+def create_employee(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        role = request.POST['role']
+        user = User.objects.create_user(username=username, email=email, password=password)
+        user.groups.add(Group.objects.get(name=role))
+        return redirect('/')
+    return render(request, 'accounts/create_employee.html', {'roles': ['RRHH', 'Compras', 'Logistica', 'Gerencia']})

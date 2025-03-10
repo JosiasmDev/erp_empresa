@@ -13,7 +13,7 @@ def crear_campana(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Campaña creada.')
-            return redirect('marketing_campanas')
+            return redirect('marketing_automation_campanas')  # Cambiado de 'marketing_campanas'
     else:
         form = CampanaForm()
     return render(request, 'marketing_automation/crear_campana.html', {'form': form})

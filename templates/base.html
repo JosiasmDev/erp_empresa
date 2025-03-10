@@ -11,19 +11,48 @@
 </head>
 <body>
     <div class="header">
-        <div class="nav-buttons">
-            <a href="{% url 'website_index' %}" class="btn">Clientes</a>
-            <a href="#" class="btn">Empleados</a> <!-- Añadir vista si es necesario -->
-        </div>
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="btn">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn">Login</a>
+        {% endif %}
         <img src="{% static 'images/sag_logo.jpg' %}" alt="SAG Logo" class="logo">
         <nav class="menu">
             <select onchange="window.location.href=this.value">
                 <option value="">Menú</option>
-                <option value="{% url 'website_index' %}">Inicio</option>
-                <option value="{% url 'website_coche_detalle' 1 %}">Eclipse</option>
-                <option value="{% url 'website_coche_detalle' 2 %}">Arrow</option>
-                <option value="#">Configuración</option>
-                <option value="#">Contacto</option>
+                {% if not user.is_authenticated %}
+                    <option value="{% url 'website_index' %}">Inicio</option>
+                    <option value="{% url 'website_coche_detalle' 1 %}">Eclipse</option>
+                    <option value="{% url 'website_coche_detalle' 2 %}">Arrow</option>
+                    <option value="{% url 'contacto' %}">Contacto</option>
+                {% else %}
+                    {% if is_gerencia_or_admin %}
+                        <option value="{% url 'website_index' %}">Inicio</option>
+                        <option value="{% url 'website_coche_detalle' 1 %}">Eclipse</option>
+                        <option value="{% url 'website_coche_detalle' 2 %}">Arrow</option>
+                        <option value="{% url 'create_employee' %}">Crear Empleado</option>
+                        <optgroup label="Módulos ERP">
+                            <option value="{% url 'accounting_facturas' %}">Contabilidad</option>
+                            <option value="{% url 'crm_clientes' %}">CRM</option>
+                            <option value="{% url 'sales_pedidos' %}">Ventas</option>
+                            <option value="{% url 'purchase_compras' %}">Compras</option> <!-- Aquí está el problema -->
+                            <option value="{% url 'manufacturing_produccion' %}">Fabricación</option>
+                            <option value="{% url 'inventory_stock' %}">Inventario</option>
+                            <option value="{% url 'hr_empleados' %}">Recursos Humanos</option>
+                            <option value="{% url 'marketing_automation_campanas' %}">Marketing</option>
+                            <option value="{% url 'ecommerce_dashboard' %}">Ecommerce</option>
+                        </optgroup>
+                        <option value="{% url 'contacto' %}">Contacto</option>
+                    {% elif is_cliente %}
+                        <!-- ... -->
+                    {% elif is_rrhh %}
+                        <!-- ... -->
+                    {% elif is_compras %}
+                        <!-- ... -->
+                    {% elif is_logistica %}
+                        <!-- ... -->
+                    {% endif %}
+                {% endif %}
             </select>
         </nav>
     </div>

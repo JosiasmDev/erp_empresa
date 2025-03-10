@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Inicio de Sesión Requerido</h1>
+    <p>Debes iniciar sesión para realizar esta acción.</p>
+    <a href="{% url 'login' %}" class="btn">Iniciar Sesión</a>
+{% endblock %}
