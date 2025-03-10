@@ -1,13 +1,13 @@
-<!-- purchase/crear_compra.html -->
+<!-- purchase/eliminar_compra.html -->
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
 <div class="container">
-    <h1>Crear Nueva Compra</h1>
+    <h1>Eliminar Compra #{{ compra.id }}</h1>
+    <p>¿Estás seguro de que deseas eliminar esta compra?</p>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="submit" class="btn btn-danger">Eliminar</button>
         <a href="{% url 'purchase_compras' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>

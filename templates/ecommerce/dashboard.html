@@ -1,5 +1,52 @@
+<!-- ecommerce/dashboard.html -->
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-    <h1>Panel de Ecommerce</h1>
-    <p>Bienvenido al módulo de Ecommerce.</p>
+<div class="container">
+    <h1>Catálogo de Coches</h1>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Precio Base</th>
+                <th>Descripción</th>
+                <th>Potencia</th>
+                <th>Velocidad Máxima</th>
+                <th>Color</th>
+                <th>Rueda</th>
+                <th>Motorización</th>
+                <th>Tapicería</th>
+                <th>Extras</th>
+                {% if is_gerencia_or_admin or is_cliente %}
+                <th>Acciones</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for coche in coches %}
+            <tr>
+                <td>{{ coche.nombre }}</td>
+                <td>{{ coche.precio_base }}</td>
+                <td>{{ coche.descripcion }}</td>
+                <td>{{ coche.potencia }} HP</td>
+                <td>{{ coche.velocidad_maxima }} km/h</td>
+                <td>{{ coche.color }}</td>
+                <td>{{ coche.rueda }}</td>
+                <td>{{ coche.motorizacion }}</td>
+                <td>{{ coche.tapiceria }}</td>
+                <td>{{ coche.extras }}</td>
+                {% if is_gerencia_or_admin or is_cliente %}
+                <td>
+                    <!-- Añadir acciones como "Comprar" o "Editar" -->
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="11">No hay coches disponibles.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

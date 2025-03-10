@@ -1,26 +1,58 @@
+<!-- purchase/compras.html -->
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-    <h1>Compras</h1>
-    <a href="{% url 'purchase_crear_compra' %}" class="btn">Crear Compra</a>
-    <table>
+<div class="container">
+    <h1>Listado de Compras</h1>
+    {% if messages %}
+        {% for message in messages %}
+            <p class="message {{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="get" class="search-form">
+        <input type="text" name="q" value="{{ query }}" placeholder="Buscar por nombre del cliente...">
+        <button type="submit" class="btn">Buscar</button>
+    </form>
+
+    {% if is_gerencia_or_admin or is_compras %}
+    <a href="{% url 'purchase_crear_compra' %}" class="btn btn-primary">Crear Nueva Compra</a>
+    {% endif %}
+
+    <table class="data-table">
         <thead>
             <tr>
                 <th>Coche</th>
                 <th>Cliente</th>
                 <th>Precio Total</th>
                 <th>Fecha</th>
+                <th>Pagado</th>
+                {% if is_gerencia_or_admin or is_compras %}
+                <th>Acciones</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
             {% for compra in compras %}
-                <tr>
-                    <td>{{ compra.coche.nombre }}</td>
-                    <td>{{ compra.cliente.nombre }}</td>
-                    <td>${{ compra.precio_total }}</td>
-                    <td>{{ compra.fecha|default:"Sin fecha" }}</td>
-                </tr>
+            <tr>
+                <td>{{ compra.coche.nombre }}</td>
+                <td>{{ compra.cliente.nombre }}</td>
+                <td>{{ compra.precio_total }}</td>
+                <td>{{ compra.fecha|date:"d/m/Y H:i" }}</td>
+                <td>{{ compra.pagado|yesno:"Sí,No" }}</td>
+                {% if is_gerencia_or_admin or is_compras %}
+                <td>
+                    <a href="{% url 'purchase_editar_compra' compra.id %}" class="btn btn-small btn-edit">Editar</a>
+                    <a href="{% url 'purchase_eliminar_compra' compra.id %}" class="btn btn-small btn-delete">Eliminar</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No hay compras disponibles.</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
+</div>
 {% endblock %}

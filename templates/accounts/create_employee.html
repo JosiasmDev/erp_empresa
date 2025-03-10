@@ -1,30 +1,33 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-    <div class="create-employee-container">
-        <h1>Crear Empleado</h1>
+    <div class="form-container">
+        <h1>Crear Nuevo Empleado</h1>
         {% if messages %}
             {% for message in messages %}
-                <p class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</p>
+                <p class="message {{ message.tags }}">{{ message }}</p>
             {% endfor %}
         {% endif %}
         <form method="post">
             {% csrf_token %}
-            <p><label for="username">Nombre de usuario:</label></p>
-            <p><input type="text" name="username" placeholder="Nombre de usuario" required></p>
-            <p><label for="email">Email (opcional):</label></p>
-            <p><input type="email" name="email" placeholder="Email"></p>
-            <p><label for="password">Contraseña:</label></p>
-            <p><input type="password" name="password" placeholder="Contraseña" required></p>
-            <p><label for="role">Rol:</label></p>
-            <p>
-                <select name="role" required>
+            <div class="form-group">
+                <label for="username">Nombre de usuario:</label>
+                <input type="text" name="username" id="username" placeholder="Nombre de usuario" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" name="password" id="password" placeholder="Contraseña" required>
+            </div>
+            <div class="form-group">
+                <label for="role">Rol:</label>
+                <select name="role" id="role" required>
                     <option value="" disabled selected>Selecciona un rol</option>
                     {% for role in roles %}
                         <option value="{{ role }}">{{ role }}</option>
                     {% endfor %}
                 </select>
-            </p>
-            <button type="submit" class="btn">Crear</button>
+            </div>
+            <button type="submit" class="btn">Crear Empleado</button>
         </form>
     </div>
 {% endblock %}

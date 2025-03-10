@@ -46,27 +46,32 @@ def logout_view(request):
 @login_required
 @user_passes_test(is_admin)
 def create_employee(request):
-    roles = ['Clientes', 'RRHH', 'Compras', 'Logistica', 'Gerencia', 'Administrador']  # Lista de roles permitidos
+    roles = ['Clientes', 'RRHH', 'Compras', 'Logistica', 'Gerencia', 'Administrador']
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email', '')  # Email es opcional
         password = request.POST.get('password')
         role = request.POST.get('role')
 
-        # Validar que todos los campos necesarios estén presentes
         if not username or not password or not role:
             messages.error(request, 'Por favor, completa todos los campos requeridos.')
         elif role not in roles:
             messages.error(request, 'Rol no válido.')
         else:
             try:
-                # Crear el usuario
                 user = User.objects.create_user(username=username, email=email, password=password)
-                # Asignar el rol
                 user.groups.add(Group.objects.get(name=role))
                 messages.success(request, f'Usuario {username} creado exitosamente.')
                 return redirect('/')
             except Exception as e:
                 messages.error(request, f'Error al crear el usuario: {str(e)}')
 
-    return render(request, 'accounts/create_employee.html', {'roles': roles})
+    context = {
+        'roles': roles,
+        'is_gerencia_or_admin': request.user.groups.filter(name__in=['Gerencia', 'Administrador']).exists() or request.user.is_superuser,
+        'is_cliente': request.user.groups.filter(name='Clientes').exists(),
+        'is_rrhh': request.user.groups.filter(name='RRHH').exists(),
+        'is_compras': request.user.groups.filter(name='Compras').exists(),
+        'is_logistica': request.user.groups.filter(name='Logistica').exists(),
+    }
+    return render(request, 'accounts/create_employee.html', context)

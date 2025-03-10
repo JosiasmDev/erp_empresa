@@ -82,8 +82,12 @@ WSGI_APPLICATION = 'erp_empresa.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'erp_empresa',           # Nombre de la base de datos que creaste
+        'USER': 'postgres',         # Usuario de PostgreSQL
+        'PASSWORD': 'aaaaaa',     # Contraseña del usuario
+        'HOST': 'localhost',             # O la dirección del servidor (por defecto 'localhost')
+        'PORT': '5432',                  # Puerto por defecto de PostgreSQL
     }
 }
 
