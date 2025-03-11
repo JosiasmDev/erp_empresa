@@ -1,4 +1,3 @@
-<!-- templates/base.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
@@ -7,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ERP Empresa</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Incluye DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
 </head>
 <body>
     <header>
@@ -35,7 +36,7 @@
                         </optgroup>
                         {% endif %}
                         <optgroup label="Usuario">
-                            <option value="{% url 'logout' %}">   ">Cerrar Sesión</option>
+                            <option value="{% url 'logout' %}">Cerrar Sesión</option>
                         </optgroup>
                     {% else %}
                         <option value="{% url 'login' %}">Iniciar Sesión</option>
@@ -48,5 +49,21 @@
         {% block content %}
         {% endblock %}
     </main>
+    <!-- Incluye jQuery y DataTables JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.data-table').DataTable({
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+            });
+        });
+    </script>
 </body>
 </html>

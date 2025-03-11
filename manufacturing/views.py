@@ -2,10 +2,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import OrdenProduccion
 from .forms import OrdenProduccionForm
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 def produccion(request):
-    ordenes = OrdenProduccion.objects.all()
+    ordenes_list = OrdenProduccion.objects.all()
+    paginator = Paginator(ordenes_list, 10)  # Muestra 10 órdenes por página
+    page_number = request.GET.get('page')
+    ordenes = paginator.get_page(page_number)
     return render(request, 'manufacturing/produccion.html', {'ordenes': ordenes})
+
 
 def crear_orden(request):
     if request.method == 'POST':
