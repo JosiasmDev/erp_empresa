@@ -54,3 +54,9 @@ def contacto(request):
             'is_logistica': request.user.groups.filter(name='Logistica').exists(),
         })
     return render(request, 'website/contacto.html', context)
+
+def home(request):
+    # Lógica para obtener los coches o lo que necesites
+    coches = Coche.objects.filter(nombre__in=['Eclipse', 'Arrow'])
+    context = {'coches': coches}
+    return render(request, 'home.html', context)
