@@ -1,6 +1,13 @@
 # ecommerce/views.py
 from django.shortcuts import render
 from .models import Coche
+from accounts.decorators import role_required
+
+@role_required(['ecommerce'])
+def ecommerce_dashboard(request):
+    from ecommerce.models import Coche
+    coches = Coche.objects.all()
+    return render(request, 'ecommerce/dashboard.html', {'coches': coches})
 
 def ecommerce_dashboard(request):
     coches = Coche.objects.all()

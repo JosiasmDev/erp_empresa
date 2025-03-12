@@ -3,6 +3,13 @@ from .models import Factura
 from .forms import FacturaForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from accounts.decorators import role_required
+
+@role_required(['accounting'])
+def accounting_facturas(request):
+    from accounting.models import Factura
+    facturas = Factura.objects.all()
+    return render(request, 'accounting/facturas.html', {'facturas': facturas})
 
 @login_required
 def facturas_view(request):

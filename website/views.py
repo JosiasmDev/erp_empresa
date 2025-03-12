@@ -3,6 +3,19 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from .models import Coche
 from purchase.forms import CompraForm
+from accounts.decorators import role_required
+
+@role_required(['website'])
+def home(request):
+    return render(request, 'website/index.html')
+
+@role_required(['website'])
+def contacto(request):
+    return render(request, 'website/contacto.html')
+
+@role_required(['website'])
+def coche_detalle(request):
+    return render(request, 'website/coche_detalle.html')
 
 def add_user_groups_to_context(request, context):
     """Función auxiliar para agregar variables de grupos al contexto"""
@@ -52,3 +65,7 @@ def home(request):
     context = {'coches': coches}
     add_user_groups_to_context(request, context)
     return render(request, 'home.html', context)
+
+def coche_list(request):
+    coches = Coche.objects.all()  # Lista todos los coches
+    return render(request, 'website/coche_list.html', {'coches': coches})

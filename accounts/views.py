@@ -5,13 +5,16 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group
 from accounting.models import Factura
+from .models import Profile
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 def is_admin(user):
     return user.groups.filter(name='Administrador').exists()
 
 def get_user_roles(user):
     return {
-        'roles': [group.name for group in user.groups.all()]  # Aquí agregamos todos los grupos del usuario
+        'roles': [group.name for group in user.groups.all()]
     }
 
 def login_register(request):
@@ -61,6 +64,16 @@ def create_employee(request):
                 user = User.objects.create_user(username=username, password=password)
                 group = Group.objects.get(name=role)
                 user.groups.add(group)
+                role_mapping = {
+                    'Administrador': 'administrador',
+                    'Gerente': 'gerente',
+                    'Finanzas': 'finanzas',
+                    'Producción': 'produccion',
+                    'Recursos Humanos': 'recursos_humanos',
+                    'Marketing': 'marketing',
+                    'Cliente': 'cliente',  # Nuevo mapeo para el rol Cliente
+                }
+                Profile.objects.create(user=user, role=role_mapping.get(role, 'administrador'))
                 messages.success(request, f'Usuario {username} creado con éxito.')
                 return redirect('create_employee')
             except Exception as e:
@@ -71,10 +84,14 @@ def create_employee(request):
 
 @login_required
 def facturas_view(request):
-    """Vista de facturas con permisos y datos correctos."""
     facturas = Factura.objects.all()
     context = {
         'facturas': facturas,
-        **get_user_roles(request.user)  # Agregamos los roles al contexto
+        **get_user_roles(request.user)
     }
     return render(request, 'accounting/facturas.html', context)
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created and not hasattr(instance, 'profile'):
+        Profile.objects.create(user=instance, role='administrador')

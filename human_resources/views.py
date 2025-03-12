@@ -2,6 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Empleado
 from .forms import EmpleadoForm
 from django.contrib import messages
+from accounts.decorators import role_required
+
+@role_required(['human_resources'])
+def hr_empleados(request):
+    from human_resources.models import Empleado
+    empleados = Empleado.objects.all()
+    return render(request, 'human_resources/empleados.html', {'empleados': empleados})
 
 def empleados(request):
     empleados = Empleado.objects.all()

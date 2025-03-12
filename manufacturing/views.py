@@ -3,6 +3,13 @@ from .models import OrdenProduccion
 from .forms import OrdenProduccionForm
 from django.contrib import messages
 from django.core.paginator import Paginator
+from accounts.decorators import role_required
+
+@role_required(['manufacturing'])
+def manufacturing_produccion(request):
+    from manufacturing.models import OrdenProduccion
+    ordenes = OrdenProduccion.objects.all()
+    return render(request, 'manufacturing/produccion.html', {'ordenes': ordenes})
 
 def produccion(request):
     ordenes_list = OrdenProduccion.objects.all()

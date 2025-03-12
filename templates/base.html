@@ -25,27 +25,65 @@
                 <select onchange="location = this.value;">
                     <option value="" selected disabled>Menú</option>
                     {% if user.is_authenticated %}
-                        {% if is_gerencia_or_admin %}
-                        <optgroup label="Administración">
-                            <option value="{% url 'create_employee' %}">Crear Empleado</option>
-                        </optgroup>
-                        <optgroup label="Módulos ERP">
-                            <option value="{% url 'accounting_facturas' %}">Contabilidad</option>
-                            <option value="{% url 'crm_clientes' %}">CRM</option>
-                            <option value="{% url 'sales_pedidos' %}">Ventas</option>
-                            <option value="{% url 'purchase_compras' %}">Compras</option>
-                            <option value="{% url 'manufacturing_produccion' %}">Fabricación</option>
-                            <option value="{% url 'inventory_stock' %}">Inventario</option>
-                            <option value="{% url 'hr_empleados' %}">Recursos Humanos</option>
-                            <option value="{% url 'marketing_automation_campanas' %}">Marketing</option>
-                            <option value="{% url 'ecommerce_dashboard' %}">Ecommerce</option>
-                        </optgroup>
-                        {% endif %}
-                        {% if is_cliente %}
-                        <optgroup label="Cliente">
-                            <option value="{% url 'ecommerce_dashboard' %}">Tienda</option>
-                        </optgroup>
-                        {% endif %}
+                        {% with profile=user.profile %}
+                            <!-- Opciones de Website para todos los usuarios autenticados -->
+                            <optgroup label="Website">
+                                <option value="{% url 'home' %}">Inicio</option>
+                                <option value="{% url 'contacto' %}">Contacto</option>
+                                <option value="{% url 'coche_list' %}">Catálogo de Coches</option>  <!-- Cambiado a coche_list -->
+                            </optgroup>
+
+                            {% if 'administrador' in profile.role or 'gerente' in profile.role %}
+                                <optgroup label="Administración">
+                                    <option value="{% url 'create_employee' %}">Crear Empleado</option>
+                                </optgroup>
+                                <optgroup label="Módulos ERP">
+                                    <option value="{% url 'accounting_facturas' %}">Contabilidad</option>
+                                    <option value="{% url 'crm_clientes' %}">CRM</option>
+                                    <option value="{% url 'sales_pedidos' %}">Ventas</option>
+                                    <option value="{% url 'purchase_compras' %}">Compras</option>
+                                    <option value="{% url 'manufacturing_produccion' %}">Fabricación</option>
+                                    <option value="{% url 'inventory_stock' %}">Inventario</option>
+                                    <option value="{% url 'hr_empleados' %}">Recursos Humanos</option>
+                                    <option value="{% url 'marketing_automation_campanas' %}">Marketing</option>
+                                    <option value="{% url 'ecommerce_dashboard' %}">Ecommerce</option>
+                                </optgroup>
+                            {% else %}
+                                {% if 'finanzas' in profile.role %}
+                                    <optgroup label="Módulos ERP">
+                                        <option value="{% url 'accounting_facturas' %}">Contabilidad</option>
+                                        <option value="{% url 'crm_clientes' %}">CRM</option>
+                                        <option value="{% url 'sales_pedidos' %}">Ventas</option>
+                                        <option value="{% url 'purchase_compras' %}">Compras</option>
+                                    </optgroup>
+                                {% endif %}
+                                {% if 'produccion' in profile.role %}
+                                    <optgroup label="Módulos ERP">
+                                        <option value="{% url 'manufacturing_produccion' %}">Fabricación</option>
+                                        <option value="{% url 'inventory_stock' %}">Inventario</option>
+                                    </optgroup>
+                                {% endif %}
+                                {% if 'recursos_humanos' in profile.role %}
+                                    <optgroup label="Módulos ERP">
+                                        <option value="{% url 'hr_empleados' %}">Recursos Humanos</option>
+                                        <option value="{% url 'create_employee' %}">Crear Empleado</option>
+                                    </optgroup>
+                                {% endif %}
+                                {% if 'marketing' in profile.role %}
+                                    <optgroup label="Módulos ERP">
+                                        <option value="{% url 'marketing_automation_campanas' %}">Marketing</option>
+                                        <option value="{% url 'ecommerce_dashboard' %}">Ecommerce</option>
+                                    </optgroup>
+                                {% endif %}
+                                {% if 'cliente' in profile.role %}
+                                    <optgroup label="Website">
+                                        <option value="{% url 'home' %}">Inicio</option>
+                                        <option value="{% url 'contacto' %}">Contacto</option>
+                                        <option value="{% url 'coche_list' %}">Catálogo de Coches</option>  <!-- Cambiado a coche_list -->
+                                    </optgroup>
+                                {% endif %}
+                            {% endif %}
+                        {% endwith %}
                     {% endif %}
                 </select>
             </nav>

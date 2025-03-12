@@ -2,6 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Compra
 from .forms import CompraForm
 from django.contrib import messages
+from accounts.decorators import role_required
+
+@role_required(['purchase'])
+def purchase_compras(request):
+    from purchase.models import Compra
+    compras = Compra.objects.all()
+    return render(request, 'purchase/compras.html', {'compras': compras})
 
 def compras(request):
     compras = Compra.objects.all()

@@ -2,6 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Pedido, PedidoItem
 from .forms import PedidoForm, PedidoItemForm
 from django.contrib import messages
+from accounts.decorators import role_required
+
+@role_required(['sales'])
+def sales_pedidos(request):
+    from sales.models import Pedido
+    pedidos = Pedido.objects.all()
+    return render(request, 'sales/pedidos.html', {'pedidos': pedidos})
 
 def pedidos(request):
     pedidos = Pedido.objects.all()

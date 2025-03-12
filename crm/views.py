@@ -2,6 +2,13 @@ from django.shortcuts import render, redirect
 from .models import Cliente
 from .forms import ClienteForm
 from django.contrib import messages
+from accounts.decorators import role_required
+
+@role_required(['crm'])
+def crm_clientes(request):
+    from crm.models import Cliente
+    clientes = Cliente.objects.all()
+    return render(request, 'crm/clientes.html', {'clientes': clientes})
 
 def is_gerencia_or_admin(user):
     return user.groups.filter(name__in=['Gerencia', 'Administrador']).exists()

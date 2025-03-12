@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Catálogo de Coches</h1>
+<ul>
+    {% for coche in coches %}
+        <li><a href="{% url 'coche_detalle' coche.id %}">{{ coche.nombre }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

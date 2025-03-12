@@ -2,6 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import MovimientoStock
 from .forms import MovimientoStockForm
 from django.contrib import messages
+from accounts.decorators import role_required
+
+@role_required(['inventory'])
+def inventory_stock(request):
+    from inventory.models import MovimientoStock
+    movimientos = MovimientoStock.objects.all()
+    return render(request, 'inventory/stock.html', {'movimientos': movimientos})
 
 def stock(request):
     movimientos = MovimientoStock.objects.all()
