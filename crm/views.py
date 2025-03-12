@@ -1,11 +1,22 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from .models import Cliente
 from .forms import ClienteForm
 from django.contrib import messages
 
+def is_gerencia_or_admin(user):
+    return user.groups.filter(name__in=['Gerencia', 'Administrador']).exists()
+
+def is_cliente(user):
+    return user.groups.filter(name='Cliente').exists()
+
 def clientes(request):
     clientes = Cliente.objects.all()
-    return render(request, 'crm/clientes.html', {'clientes': clientes})
+    context = {
+        'clientes': clientes,
+        'is_gerencia_or_admin': is_gerencia_or_admin(request.user),
+        'is_cliente': is_cliente(request.user),
+    }
+    return render(request, 'crm/clientes.html', context)
 
 def crear_cliente(request):
     if request.method == 'POST':
@@ -16,4 +27,9 @@ def crear_cliente(request):
             return redirect('crm_clientes')
     else:
         form = ClienteForm()
-    return render(request, 'crm/crear_cliente.html', {'form': form})
+    context = {
+        'form': form,
+        'is_gerencia_or_admin': is_gerencia_or_admin(request.user),
+        'is_cliente': is_cliente(request.user),
+    }
+    return render(request, 'crm/crear_cliente.html', context)

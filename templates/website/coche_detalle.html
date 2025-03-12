@@ -6,20 +6,26 @@
         <div class="config-options">
             <h1>{{ coche.nombre }}</h1>
             <p>{% if coche.nombre == "Arrow" %}Nuevo SAG Arrow desde 29.900 euros{% else %}Nuevo SAG Eclipse desde 34.900 euros{% endif %}</p>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <p>Precio base: <span id="base-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
-                <p>Precio total: <span id="total-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
-                <button type="submit" class="btn">Actualizar Configuración</button>
-                <a href="{% url 'purchase_form' coche.id %}" class="btn">Comprar</a>
-            </form>
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'coche_detalle' coche.id %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <p>Precio base: <span id="base-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
+                    <p>Precio total: <span id="total-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
+                    <input type="hidden" name="precio_total" id="precio_total_input" value="{{ coche.precio_base|floatformat:0 }}">
+                    <button type="submit" class="btn">Comprar</button>
+                </form>
+            {% else %}
+                <p>Debes <a href="{% url 'login' %}?next={{ request.path|urlencode }}">iniciar sesión</a> para personalizar y comprar.</p>
+            {% endif %}
         </div>
         <div class="coche-3d-container">
             <div id="coche-3d-scene"></div>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
     <script>
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, 400 / 600, 0.1, 1000);
@@ -149,6 +155,7 @@
             }
 
             document.getElementById('total-price').textContent = totalPrice + ' €';
+            document.getElementById('precio_total_input').value = totalPrice;
         });
     </script>
 {% endblock %}

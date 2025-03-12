@@ -37,13 +37,15 @@
                             <option value="{% url 'ecommerce_dashboard' %}">Tienda</option>
                         </optgroup>
                         {% endif %}
-                        <optgroup label="Usuario">
-                            <option value="{% url 'logout' %}">Cerrar Sesión</option>
-                        </optgroup>
-                    {% else %}
-                    <option value="{% url 'login_register' %}">Iniciar Sesión</option>
                     {% endif %}
                 </select>
+                <div class="auth-buttons">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'logout' %}" class="btn">Cerrar Sesión</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn">Iniciar Sesión</a>
+                    {% endif %}
+                </div>
             </nav>
         </div>
     </header>

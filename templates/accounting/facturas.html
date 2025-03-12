@@ -2,7 +2,11 @@
 {% load static %}
 {% block content %}
     <h1>Facturas</h1>
-    <a href="{% url 'accounting_crear_factura' %}" class="btn">Crear Factura</a>
+
+    {% if 'Administrador' in roles %}
+        <a href="{% url 'accounting_crear_factura' %}" class="btn btn-primary">Crear Factura</a>
+    {% endif %}
+
     <table class="data-table">
         <thead>
             <tr>
@@ -17,8 +21,12 @@
                 <tr>
                     <td>{{ factura.pedido.id }}</td>
                     <td>${{ factura.monto }}</td>
-                    <td>{{ factura.fecha }}</td>
+                    <td>{{ factura.fecha|date:"d/m/Y H:i" }}</td>
                     <td>{{ factura.pagada|yesno:"Sí,No" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No hay facturas disponibles.</td>
                 </tr>
             {% endfor %}
         </tbody>

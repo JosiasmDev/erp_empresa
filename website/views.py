@@ -1,11 +1,11 @@
-from django.shortcuts import render, get_object_or_404
+# website/views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from .models import Coche
-from django.contrib.auth.decorators import login_required
 from purchase.forms import CompraForm
 
-def index(request):
-    coches = Coche.objects.all()
-    context = {'coches': coches}
+def add_user_groups_to_context(request, context):
+    """Función auxiliar para agregar variables de grupos al contexto"""
     if request.user.is_authenticated:
         context.update({
             'is_gerencia_or_admin': request.user.groups.filter(name__in=['Gerencia', 'Administrador']).exists() or request.user.is_superuser,
@@ -14,6 +14,12 @@ def index(request):
             'is_compras': request.user.groups.filter(name='Compras').exists(),
             'is_logistica': request.user.groups.filter(name='Logistica').exists(),
         })
+    return context
+
+def index(request):
+    coches = Coche.objects.filter(nombre__in=['Eclipse', 'Arrow'])
+    context = {'coches': coches}
+    add_user_groups_to_context(request, context)
     return render(request, 'website/index.html', context)
 
 def coche_detalle(request, coche_id):
@@ -22,7 +28,7 @@ def coche_detalle(request, coche_id):
     context = {'coche': coche, 'model_filename': model_filename}
     if request.method == 'POST':
         if not request.user.is_authenticated:
-            return render(request, 'website/login_required.html')
+            return redirect(f"{reverse('login')}?next={request.path}")
         form = CompraForm(request.POST)
         if form.is_valid():
             compra = form.save(commit=False)
@@ -33,30 +39,16 @@ def coche_detalle(request, coche_id):
     else:
         form = CompraForm(initial={'coche': coche, 'precio_total': coche.precio_base})
     context['form'] = form
-    if request.user.is_authenticated:
-        context.update({
-            'is_gerencia_or_admin': request.user.groups.filter(name__in=['Gerencia', 'Administrador']).exists() or request.user.is_superuser,
-            'is_cliente': request.user.groups.filter(name='Clientes').exists(),
-            'is_rrhh': request.user.groups.filter(name='RRHH').exists(),
-            'is_compras': request.user.groups.filter(name='Compras').exists(),
-            'is_logistica': request.user.groups.filter(name='Logistica').exists(),
-        })
+    add_user_groups_to_context(request, context)
     return render(request, 'website/coche_detalle.html', context)
 
 def contacto(request):
     context = {}
-    if request.user.is_authenticated:
-        context.update({
-            'is_gerencia_or_admin': request.user.groups.filter(name__in=['Gerencia', 'Administrador']).exists() or request.user.is_superuser,
-            'is_cliente': request.user.groups.filter(name='Clientes').exists(),
-            'is_rrhh': request.user.groups.filter(name='RRHH').exists(),
-            'is_compras': request.user.groups.filter(name='Compras').exists(),
-            'is_logistica': request.user.groups.filter(name='Logistica').exists(),
-        })
+    add_user_groups_to_context(request, context)
     return render(request, 'website/contacto.html', context)
 
 def home(request):
-    # Lógica para obtener los coches o lo que necesites
     coches = Coche.objects.filter(nombre__in=['Eclipse', 'Arrow'])
     context = {'coches': coches}
+    add_user_groups_to_context(request, context)
     return render(request, 'home.html', context)

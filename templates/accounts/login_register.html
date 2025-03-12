@@ -1,27 +1,31 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h1>Iniciar Sesión o Registrarse</h1>
+<h1>Iniciar sesión / Registrarse</h1>
+
+<!-- Mensajes de éxito o error -->
 {% if messages %}
-    {% for message in messages %}
-        <p>{{ message }}</p>
-    {% endfor %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
 {% endif %}
-<div>
-    <h2>Iniciar Sesión</h2>
-    <form method="post" action="{% url 'login_register' %}">
-        {% csrf_token %}
-        <input type="hidden" name="login" value="1">
-        {{ login_form.as_p }}
-        <button type="submit" class="btn">Iniciar Sesión</button>
-    </form>
-</div>
-<div>
-    <h2>Registrarse</h2>
-    <form method="post" action="{% url 'login_register' %}">
-        {% csrf_token %}
-        <input type="hidden" name="register" value="1">
-        {{ register_form.as_p }}
-        <button type="submit" class="btn">Registrarse</button>
-    </form>
-</div>
+
+<!-- Formulario de login -->
+<h2>Iniciar sesión</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ login_form.as_p }}
+    <button type="submit" name="login">Iniciar sesión</button>
+</form>
+
+<!-- Formulario de registro -->
+<h2>Registrarse</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ register_form.as_p }}
+    <button type="submit" name="register">Registrarse</button>
+</form>
+
 {% endblock %}

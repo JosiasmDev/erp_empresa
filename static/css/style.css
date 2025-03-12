@@ -186,3 +186,18 @@ form input, form select {
 main {
     margin-top: 80px; /* Espacio para la cabecera */
 }
+
+.auth-buttons {
+    margin-left: 20px;
+    display: inline-block;
+}
+.btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+.btn:hover {
+    background-color: #0056b3;
+}

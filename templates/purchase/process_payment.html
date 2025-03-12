@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Confirmar Pago</h1>
-    <p>Compra de {{ compra.coche.nombre }} por {{ compra.precio_total }} €</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn">Pagar</button>
-    </form>
+    <h1>Procesando pago para la compra #{{ compra.id }}</h1>
+    <p>Coche: {{ compra.coche.nombre }}</p>
+    <p>Precio total: {{ compra.precio_total }} €</p>
+    <p>Estado: Pago pendiente (simulado)</p>
 {% endblock %}
