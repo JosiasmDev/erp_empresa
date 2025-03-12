@@ -29,8 +29,9 @@
                             <!-- Opciones de Website para todos los usuarios autenticados -->
                             <optgroup label="Website">
                                 <option value="{% url 'home' %}">Inicio</option>
+                                <option value="{% url 'coche_detalle' 1 %}">Arrow</option>  <!-- ID 1 para Arrow -->
+                                <option value="{% url 'coche_detalle' 2 %}">Eclipse</option>  <!-- ID 2 para Eclipse -->
                                 <option value="{% url 'contacto' %}">Contacto</option>
-                                <option value="{% url 'coche_list' %}">Catálogo de Coches</option>  <!-- Cambiado a coche_list -->
                             </optgroup>
 
                             {% if 'administrador' in profile.role or 'gerente' in profile.role %}
@@ -78,8 +79,9 @@
                                 {% if 'cliente' in profile.role %}
                                     <optgroup label="Website">
                                         <option value="{% url 'home' %}">Inicio</option>
+                                        <option value="{% url 'coche_detalle' 1 %}">Arrow</option>  <!-- ID 1 para Arrow -->
+                                        <option value="{% url 'coche_detalle' 2 %}">Eclipse</option>  <!-- ID 2 para Eclipse -->
                                         <option value="{% url 'contacto' %}">Contacto</option>
-                                        <option value="{% url 'coche_list' %}">Catálogo de Coches</option>  <!-- Cambiado a coche_list -->
                                     </optgroup>
                                 {% endif %}
                             {% endif %}
