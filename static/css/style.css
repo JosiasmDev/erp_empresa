@@ -80,6 +80,8 @@ h1 {
 .btn-primary {
     background-color: #3498db;
     color: #fff;
+    margin-top: 20px; /* Espacio debajo del título */
+    text-align: left;
 }
 
 .btn-primary:hover {
@@ -187,17 +189,45 @@ main {
     margin-top: 80px; /* Espacio para la cabecera */
 }
 
-.auth-buttons {
-    margin-left: 20px;
-    display: inline-block;
+.navbar-title {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Aligns the title and button to the left */
 }
-.btn {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
+
+.auth-buttons {
+    margin-top: 10px; /* Adjusts the space between the title and the button */
+    text-align: left;
+}
+
+.auth-buttons a {
+    padding: 10px 20px; /* Adjusted padding for better button size */
     text-decoration: none;
     border-radius: 5px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: inline-block;
 }
-.btn:hover {
-    background-color: #0056b3;
+
+.auth-buttons .btn-primary {
+    background-color: #3498db; /* Azul para Iniciar sesión */
+    color: white;
+}
+
+.auth-buttons .btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.auth-buttons .btn-logout {
+    background-color: #3498db; /* Azul para Cerrar sesión */
+    color: white;
+}
+
+.auth-buttons .btn-logout:hover {
+    background-color: #2980b9;
+}
+
+.auth-buttons .btn {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
 }
