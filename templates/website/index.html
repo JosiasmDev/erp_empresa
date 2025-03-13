@@ -3,6 +3,7 @@
 
 {% block content %}
 <div class="main-container">
+    <!-- Tercio izquierdo: Texto -->
     <div class="hero-left">
         <div class="hero-content">
             <h1>Descubre SAG: Donde la carretera cobra vida</h1>
@@ -11,20 +12,44 @@
             <p>No esperes más para sentir la adrenalina. Explora nuestras opciones de personalización y encuentra el coche perfecto para ti. Con precios starting desde 29.900 euros, un SAG está al alcance de quienes se atreven a soñar en grande. ¡Haz clic y comienza tu aventura ahora!</p>
         </div>
     </div>
+
+    <!-- Tercio central: Arrow -->
+    <div class="coche-center">
+        {% for coche in coches %}
+            {% if coche.nombre == "Arrow" %}
+                <div class="coche-card">
+                    <div class="coche-3d-box">
+                        <div class="coche-3d" id="coche-{{ coche.id }}-3d" style="width: 400px; height: 300px;"></div>
+                    </div>
+                    <div class="coche-text-box">
+                        <h2>{{ coche.nombre }}</h2>
+                        <p>{{ coche.descripcion }}</p>
+                    </div>
+                    <div class="coche-button-box">
+                        <a href="{% url 'coche_detalle' coche.id %}" class="btn">Personalizar</a>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Tercio derecho: Eclipse -->
     <div class="coche-right">
         {% for coche in coches %}
-            <div class="coche-card">
-                <div class="coche-3d-box">
-                    <div class="coche-3d" id="coche-{{ coche.id }}-3d" style="width: 500px; height: 400px;"></div>
+            {% if coche.nombre == "Eclipse" %}
+                <div class="coche-card">
+                    <div class="coche-3d-box">
+                        <div class="coche-3d" id="coche-{{ coche.id }}-3d" style="width: 400px; height: 300px;"></div>
+                    </div>
+                    <div class="coche-text-box">
+                        <h2>{{ coche.nombre }}</h2>
+                        <p>{{ coche.descripcion }}</p>
+                    </div>
+                    <div class="coche-button-box">
+                        <a href="{% url 'coche_detalle' coche.id %}" class="btn">Personalizar</a>
+                    </div>
                 </div>
-                <div class="coche-text-box">
-                    <h2>{{ coche.nombre }}</h2>
-                    <p>{{ coche.descripcion }}</p>
-                </div>
-                <div class="coche-button-box">
-                    <a href="{% url 'coche_detalle' coche.id %}" class="btn">Personalizar</a>
-                </div>
-            </div>
+            {% endif %}
         {% endfor %}
     </div>
 </div>
@@ -35,9 +60,9 @@
     {% for coche in coches %}
     (function() {
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, 500 / 400, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(75, 400 / 300, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(500, 400);
+        renderer.setSize(400, 300);
         document.getElementById('coche-{{ coche.id }}-3d').appendChild(renderer.domElement);
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -87,16 +112,23 @@
         display: flex;
         gap: 20px;
         padding: 20px;
+        min-height: calc(100vh - 100px); /* Ajuste para la cabecera fija */
     }
     .hero-left {
-        flex: 1;
+        flex: 1; /* Tercio izquierdo */
         padding: 20px;
     }
-    .coche-right {
-        flex: 1;
+    .coche-center {
+        flex: 1; /* Tercio central */
         display: flex;
-        flex-direction: column;
-        gap: 20px;
+        justify-content: center;
+        align-items: center;
+    }
+    .coche-right {
+        flex: 1; /* Tercio derecho */
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     .coche-card {
         background-color: #2a2a2a;
@@ -107,10 +139,11 @@
         flex-direction: column;
         align-items: center;
         gap: 10px;
+        width: 400px;
     }
     .coche-3d-box {
-        width: 500px;
-        height: 400px;
+        width: 400px;
+        height: 300px;
         background-color: #333333;
         border-radius: 5px;
     }

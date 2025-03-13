@@ -9,23 +9,27 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
 </head>
 <body>
-    <header>
+    <header class="fixed-header">
         <div class="navbar">
             <div class="navbar-title">
-                <h1>ERP Empresa</h1>
-                <div class="auth-buttons">
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'logout' %}" class="btn btn-primary">Cerrar Sesión</a>
-                    {% else %}
-                        <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión</a>
-                    {% endif %}
-                    <span class="user-info">
-                        Bienvenido, {% if user.is_authenticated %}{{ user.username }}{% else %}Invitado{% endif %}
-                    </span>
+                <div class="auth-section">
+                    <div class="auth-buttons">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'logout' %}" class="btn btn-primary">Cerrar Sesión</a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión</a>
+                        {% endif %}
+                        <span class="user-info">
+                            Bienvenido, {% if user.is_authenticated %}{{ user.username }}{% else %}Invitado{% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="logo-container">
+                    <img src="{% static 'images/sag_logo.jpg' %}" alt="SAG Logo" class="header-logo">
                 </div>
             </div>
             <nav>
-                <select onchange="location = this.value;">
+                <select onchange="location = this.value;" class="main-menu">
                     <option value="" selected disabled>Menú</option>
                     {% if user.is_authenticated %}
                         {% with profile=user.profile %}
@@ -35,6 +39,14 @@
                                 <option value="{% url 'coche_detalle' 2 %}">Eclipse</option>
                                 <option value="{% url 'contacto' %}">Contacto</option>
                             </optgroup>
+
+                            {% if 'administrador' in profile.role or 'gerente' in profile.role or 'marketing' in profile.role %}
+                                <optgroup label="Marketing">
+                                    <option value="" disabled>Marketing</option>
+                                    <option value="{% url 'marketing_automation:campanas' %}">Campañas</option>
+                                    <option value="{% url 'marketing_automation:editar_todos_coches' %}">Editar Coches</option>
+                                </optgroup>
+                            {% endif %}
 
                             {% if 'administrador' in profile.role or 'gerente' in profile.role %}
                                 <optgroup label="Administración">
@@ -48,7 +60,6 @@
                                     <option value="{% url 'manufacturing_produccion' %}">Fabricación</option>
                                     <option value="{% url 'inventory_stock' %}">Inventario</option>
                                     <option value="{% url 'hr_empleados' %}">Recursos Humanos</option>
-                                    <option value="{% url 'marketing_automation_campanas' %}">Marketing</option>
                                     <option value="{% url 'ecommerce_dashboard' %}">Ecommerce</option>
                                 </optgroup>
                             {% else %}
@@ -70,12 +81,6 @@
                                     <optgroup label="Módulos ERP">
                                         <option value="{% url 'hr_empleados' %}">Recursos Humanos</option>
                                         <option value="{% url 'create_employee' %}">Crear Empleado</option>
-                                    </optgroup>
-                                {% endif %}
-                                {% if 'marketing' in profile.role %}
-                                    <optgroup label="Módulos ERP">
-                                        <option value="{% url 'marketing_automation_campanas' %}">Marketing</option>
-                                        <option value="{% url 'ecommerce_dashboard' %}">Ecommerce</option>
                                     </optgroup>
                                 {% endif %}
                                 {% if 'cliente' in profile.role %}

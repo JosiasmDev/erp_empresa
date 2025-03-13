@@ -14,8 +14,16 @@ class Pagina(models.Model):
 class Coche(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
-    precio_base = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Campo para precio_base
-    imagen = models.ImageField(upload_to='coches/', blank=True, null=True)  # Opcional: para imágenes
+    precio_base = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return self.nombre
+
+class PersonalizacionComponente(models.Model):
+    coche = models.ForeignKey(Coche, on_delete=models.CASCADE, related_name='componentes')
+    nombre = models.CharField(max_length=100)  # Ejemplo: "Ruedas", "Techo Solar", "Motor"
+    opcion = models.CharField(max_length=100)  # Ejemplo: "Estándar 17"", "Panorámico", "V6 3.0L"
+    precio_adicional = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def __str__(self):
+        return f"{self.nombre}: {self.opcion} (+{self.precio_adicional}€)"

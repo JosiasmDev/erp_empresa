@@ -1,3 +1,5 @@
 from django.contrib import admin
+from website.models import Coche, PersonalizacionComponente
 
-# Register your models here.
+admin.site.register(Coche)
+admin.site.register(PersonalizacionComponente)

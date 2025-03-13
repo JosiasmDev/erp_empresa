@@ -13,12 +13,10 @@ body {
 }
 
 .navbar {
-    background-color: #2c3e50;
-    padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
 }
 
 .navbar h1 {
@@ -41,12 +39,7 @@ body {
 }
 
 .container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-top: 140px; /* Ajuste para el tamaño aumentado de la cabecera */
 }
 
 h1 {
@@ -192,8 +185,14 @@ main {
 
 .navbar-title {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Aligns the title and button to the left */
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.header-logo {
+    height: 100px; /* Aumentamos el tamaño del logo */
+    width: auto; /* Mantiene la proporción */
 }
 
 .auth-buttons {
@@ -235,13 +234,33 @@ main {
 }
 
 .user-info {
-    color: #ffffff; /* Blanco puro */
+    color: #ffffff !important;
     font-weight: bold;
     margin-left: 10px;
 }
 
-.user-info {
-    color: #ffffff; /* Blanco puro */
-    font-weight: bold;
-    margin-left: 10px;
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    z-index: 1000;
+}
+
+.logo-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.header-logo {
+    height: 120px;
+    width: auto;
+}
+
+.auth-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }

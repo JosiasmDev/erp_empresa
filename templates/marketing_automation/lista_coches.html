@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Lista de Coches</h1>
+<ul>
+    {% for coche in coches %}
+        <li><a href="{% url 'marketing_automation:editar_coche' coche.id %}">{{ coche.nombre }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

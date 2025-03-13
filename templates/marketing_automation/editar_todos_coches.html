@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Editar Todos los Coches</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-header">
+        <button type="submit" class="btn">Guardar Cambios</button>
+    </div>
+    <div class="coches-container">
+        {% for form in coche_forms %}
+            <div class="coche-form">
+                <h2>{{ form.instance.nombre }}</h2>
+                {{ form.as_p }}
+                <h3>Componentes de Personalización</h3>
+                {% for comp_form in componente_forms %}
+                    {% if comp_form.instance.coche.id == form.instance.id %}
+                        {{ comp_form.as_p }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+</form>
+
+<style>
+.form-header {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.coches-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.coche-form {
+    flex: 1;
+    min-width: 400px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+</style>
+{% endblock %}

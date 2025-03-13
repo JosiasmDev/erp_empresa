@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Editar {{ coche.nombre }}</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ coche_form.as_p }}
+    <h2>Componentes de Personalización</h2>
+    {% for form in componente_forms %}
+        {{ form.as_p }}
+    {% endfor %}
+    <button type="submit" class="btn">Guardar Cambios</button>
+</form>
+{% endblock %}
