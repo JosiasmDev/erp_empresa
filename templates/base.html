@@ -19,6 +19,9 @@
                     {% else %}
                         <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión</a>
                     {% endif %}
+                    <span class="user-info">
+                        Bienvenido, {% if user.is_authenticated %}{{ user.username }}{% else %}Invitado{% endif %}
+                    </span>
                 </div>
             </div>
             <nav>
@@ -26,11 +29,10 @@
                     <option value="" selected disabled>Menú</option>
                     {% if user.is_authenticated %}
                         {% with profile=user.profile %}
-                            <!-- Opciones de Website para todos los usuarios autenticados -->
                             <optgroup label="Website">
                                 <option value="{% url 'home' %}">Inicio</option>
-                                <option value="{% url 'coche_detalle' 1 %}">Arrow</option>  <!-- ID 1 para Arrow -->
-                                <option value="{% url 'coche_detalle' 2 %}">Eclipse</option>  <!-- ID 2 para Eclipse -->
+                                <option value="{% url 'coche_detalle' 1 %}">Arrow</option>
+                                <option value="{% url 'coche_detalle' 2 %}">Eclipse</option>
                                 <option value="{% url 'contacto' %}">Contacto</option>
                             </optgroup>
 
@@ -79,8 +81,8 @@
                                 {% if 'cliente' in profile.role %}
                                     <optgroup label="Website">
                                         <option value="{% url 'home' %}">Inicio</option>
-                                        <option value="{% url 'coche_detalle' 1 %}">Arrow</option>  <!-- ID 1 para Arrow -->
-                                        <option value="{% url 'coche_detalle' 2 %}">Eclipse</option>  <!-- ID 2 para Eclipse -->
+                                        <option value="{% url 'coche_detalle' 1 %}">Arrow</option>
+                                        <option value="{% url 'coche_detalle' 2 %}">Eclipse</option>
                                         <option value="{% url 'contacto' %}">Contacto</option>
                                     </optgroup>
                                 {% endif %}
@@ -96,7 +98,8 @@
         {% endblock %}
     </main>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
     <script>
         $(document).ready(function() {
             $('.data-table').DataTable({

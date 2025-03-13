@@ -35,6 +35,8 @@ def index(request):
     add_user_groups_to_context(request, context)
     return render(request, 'website/index.html', context)
 
+
+@role_required(['website'])
 def coche_detalle(request, coche_id):
     coche = get_object_or_404(Coche, id=coche_id)
     model_filename = f"{coche.nombre.lower()}.glb"
@@ -55,6 +57,7 @@ def coche_detalle(request, coche_id):
     add_user_groups_to_context(request, context)
     return render(request, 'website/coche_detalle.html', context)
 
+@role_required(['website'])
 def contacto(request):
     context = {}
     add_user_groups_to_context(request, context)
@@ -66,6 +69,7 @@ def home(request):
     add_user_groups_to_context(request, context)
     return render(request, 'home.html', context)
 
+@role_required(['website'])
 def coche_list(request):
-    coches = Coche.objects.all()  # Lista todos los coches
+    coches = Coche.objects.all()
     return render(request, 'website/coche_list.html', {'coches': coches})

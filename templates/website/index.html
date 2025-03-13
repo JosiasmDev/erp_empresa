@@ -2,7 +2,8 @@
 {% load static %}
 
 {% block content %}
-    <div class="hero">
+<div class="main-container">
+    <div class="hero-left">
         <div class="hero-content">
             <h1>Descubre SAG: Donde la carretera cobra vida</h1>
             <p>En SAG, combinamos innovación, rendimiento y elegancia para ofrecerte una experiencia de conducción inolvidable. Nuestros coches, como el revolucionario Eclipse y el ágil Arrow, están diseñados para quienes buscan superar límites y disfrutar de cada kilómetro con estilo. ¿Estás listo para tomar el volante de tu próximo sueño?</p>
@@ -10,13 +11,125 @@
             <p>No esperes más para sentir la adrenalina. Explora nuestras opciones de personalización y encuentra el coche perfecto para ti. Con precios starting desde 29.900 euros, un SAG está al alcance de quienes se atreven a soñar en grande. ¡Haz clic y comienza tu aventura ahora!</p>
         </div>
     </div>
-    <div class="coche-grid">
+    <div class="coche-right">
         {% for coche in coches %}
             <div class="coche-card">
-                <h2>{{ coche.nombre }}</h2>
-                <p>{{ coche.descripcion|default:"Nuevo SAG "|add:coche.nombre|add:" desde "|add:coche.precio_base|floatformat:0|add:" euros" }}</p>
-                <a href="{% url 'coche_detalle' coche.id %}" class="btn">Personalizar</a>
+                <div class="coche-3d-box">
+                    <div class="coche-3d" id="coche-{{ coche.id }}-3d" style="width: 500px; height: 400px;"></div>
+                </div>
+                <div class="coche-text-box">
+                    <h2>{{ coche.nombre }}</h2>
+                    <p>{{ coche.descripcion }}</p>
+                </div>
+                <div class="coche-button-box">
+                    <a href="{% url 'coche_detalle' coche.id %}" class="btn">Personalizar</a>
+                </div>
             </div>
         {% endfor %}
     </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+    {% for coche in coches %}
+    (function() {
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, 500 / 400, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(500, 400);
+        document.getElementById('coche-{{ coche.id }}-3d').appendChild(renderer.domElement);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 3, 5);
+        scene.add(directionalLight);
+
+        const loader = new THREE.GLTFLoader();
+        const modelPath = '{% static "3d_models/"|add:coche.nombre|lower|add:".glb" %}';
+        console.log('Intentando cargar modelo en index:', modelPath);
+
+        loader.load(
+            modelPath,
+            function (gltf) {
+                const model = gltf.scene;
+                model.scale.set(0.5, 0.5, 0.5);
+                model.position.set(0, 0, 0);
+                scene.add(model);
+                model.rotation.y = Math.PI / 2;
+                console.log('Modelo cargado en index:', modelPath);
+            },
+            undefined,
+            function (error) {
+                console.error('Error al cargar el modelo en index:', error);
+            }
+        );
+
+        camera.position.z = 5;
+        camera.position.y = 2;
+
+        let rotateSpeed = 0.002;
+        function animate() {
+            requestAnimationFrame(animate);
+            if (scene.children.length > 2) {
+                scene.children[2].rotation.y += rotateSpeed;
+            }
+            renderer.render(scene, camera);
+        }
+        animate();
+    })();
+    {% endfor %}
+</script>
+
+<style>
+    .main-container {
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+    }
+    .hero-left {
+        flex: 1;
+        padding: 20px;
+    }
+    .coche-right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .coche-card {
+        background-color: #2a2a2a;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        padding: 20px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    .coche-3d-box {
+        width: 500px;
+        height: 400px;
+        background-color: #333333;
+        border-radius: 5px;
+    }
+    .coche-text-box {
+        text-align: center;
+        color: #ffffff;
+    }
+    .coche-button-box {
+        text-align: center;
+    }
+    .btn {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .btn:hover {
+        background-color: #0056b3;
+    }
+</style>
 {% endblock %}

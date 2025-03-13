@@ -1,161 +1,202 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}{{ coche.nombre }} - SAG{% endblock %}
+
 {% block content %}
-    <div class="coche-config-container">
-        <div class="config-options">
-            <h1>{{ coche.nombre }}</h1>
-            <p>{% if coche.nombre == "Arrow" %}Nuevo SAG Arrow desde 29.900 euros{% else %}Nuevo SAG Eclipse desde 34.900 euros{% endif %}</p>
-            {% if user.is_authenticated %}
-                <form method="post" action="{% url 'coche_detalle' coche.id %}">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <p>Precio base: <span id="base-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
-                    <p>Precio total: <span id="total-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
-                    <input type="hidden" name="precio_total" id="precio_total_input" value="{{ coche.precio_base|floatformat:0 }}">
-                    <button type="submit" class="btn">Comprar</button>
-                </form>
-            {% else %}
-                <p>Debes <a href="{% url 'login' %}?next={{ request.path|urlencode }}">iniciar sesión</a> para personalizar y comprar.</p>
-            {% endif %}
-        </div>
-        <div class="coche-3d-container">
-            <div id="coche-3d-scene"></div>
-        </div>
+<div class="config-container">
+    <!-- Parte izquierda: Opciones de Configuración -->
+    <div class="config-options">
+        <h1>Configura tu {{ coche.nombre }}</h1>
+        <p>Precio base: <span id="base-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
+        {% if user.is_authenticated %}
+            <form method="post" action="{% url 'coche_detalle' coche.id %}">
+                {% csrf_token %}
+                <!-- Opciones personalizadas en lugar de form.as_p -->
+                <div class="option-group">
+                    <label for="ruedas">Ruedas:</label>
+                    <select name="ruedas" id="ruedas" onchange="updatePrice()">
+                        <option value="0">Estándar 17" (Incluido)</option>
+                        <option value="1000">Deportivas 19" (+1000 €)</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="techo_solar">Techo Solar:</label>
+                    <select name="techo_solar" id="techo_solar" onchange="updatePrice()">
+                        <option value="0">Sin Techo (Incluido)</option>
+                        <option value="1500">Panorámico (+1500 €)</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="motor">Motor:</label>
+                    <select name="motor" id="motor" onchange="updatePrice()">
+                        <option value="0">V6 3.0L (Incluido)</option>
+                        <option value="5000">V8 4.0L (+5000 €)</option>
+                    </select>
+                </div>
+                <p>Precio total: <span id="total-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
+                <input type="hidden" name="precio_total" id="precio_total_input" value="{{ coche.precio_base|floatformat:0 }}">
+                <button type="submit" class="btn">Comprar</button>
+            </form>
+        {% else %}
+            <p>Debes <a href="{% url 'login' %}?next={{ request.path|urlencode }}">iniciar sesión</a> para personalizar y comprar.</p>
+        {% endif %}
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script>
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, 400 / 600, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true });
-        renderer.setSize(400, 600);
-        renderer.setClearColor(0x333333);
-        document.getElementById('coche-3d-scene').appendChild(renderer.domElement);
+    <!-- Parte derecha: Modelo 3D -->
+    <div class="coche-3d-container">
+        <div class="coche-card">
+            <div class="coche-3d-box">
+                <div id="coche-3d-scene" style="width: 500px; height: 400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(5, 3, 5);
-        scene.add(directionalLight);
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+    // Configuración de Three.js para el modelo 3D
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, 500 / 400, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(500, 400);
+    document.getElementById('coche-3d-scene').appendChild(renderer.domElement);
 
-        const loader = new THREE.GLTFLoader();
-        const modelPath = '{% static "3d_models/"|add:model_filename %}';
-        const fallbackPath = '{% static "3d_models/generic_car.glb" %}';
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 3, 5);
+    scene.add(directionalLight);
 
-        console.log('Intentando cargar:', modelPath);
-        console.log('Fallback:', fallbackPath);
+    const loader = new THREE.GLTFLoader();
+    const modelPath = '{% static "3d_models/"|add:model_filename %}';
+    console.log('Intentando cargar modelo en coche_detalle:', modelPath);
 
-        loader.load(
-            modelPath,
-            (gltf) => {
-                const model = gltf.scene;
-                model.scale.set(1, 1, 1);
-                model.position.set(0, 0, 0);
-                scene.add(model);
-                model.rotation.y = Math.PI / 2;
-                console.log('Modelo cargado:', modelPath);
-            },
-            undefined,
-            (error) => {
-                console.error('Error al cargar el modelo específico:', error);
-                loader.load(
-                    fallbackPath,
-                    (gltf) => {
-                        const model = gltf.scene;
-                        model.scale.set(1, 1, 1);
-                        model.position.set(0, 0, 0);
-                        scene.add(model);
-                        model.rotation.y = Math.PI / 2;
-                        console.log('Modelo genérico cargado:', fallbackPath);
-                    },
-                    undefined,
-                    (error) => console.error('Error al cargar el modelo genérico:', error)
-                );
-            }
-        );
-
-        camera.position.z = 5;
-        camera.position.y = 2;
-
-        let rotateSpeed = 0.002;
-        function animate() {
-            requestAnimationFrame(animate);
-            if (scene.children.length > 2) {
-                scene.children[2].rotation.y += rotateSpeed;
-            }
-            renderer.render(scene, camera);
+    loader.load(
+        modelPath,
+        function (gltf) {
+            const model = gltf.scene;
+            model.scale.set(0.5, 0.5, 0.5);
+            model.position.set(0, 0, 0);
+            scene.add(model);
+            model.rotation.y = Math.PI / 2;
+            console.log('Modelo cargado en coche_detalle:', modelPath);
+        },
+        undefined,
+        function (error) {
+            console.error('Error al cargar el modelo en coche_detalle:', error);
         }
-        animate();
+    );
 
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
+    camera.position.z = 5;
+    camera.position.y = 2;
 
-        document.getElementById('coche-3d-scene').addEventListener('mousedown', (e) => {
-            isDragging = true;
+    let rotateSpeed = 0.002;
+    function animate() {
+        requestAnimationFrame(animate);
+        if (scene.children.length > 2) {
+            scene.children[2].rotation.y += rotateSpeed;
+        }
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+
+    document.getElementById('coche-3d-scene').addEventListener('mousedown', (e) => {
+        isDragging = true;
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            const deltaX = e.clientX - previousMousePosition.x;
+            const deltaY = e.clientY - previousMousePosition.y;
+            if (scene.children.length > 2) {
+                scene.children[2].rotation.y += deltaX * 0.005;
+                scene.children[2].rotation.x += deltaY * 0.005;
+            }
             previousMousePosition = { x: e.clientX, y: e.clientY };
-        });
+        }
+    });
 
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                const deltaX = e.clientX - previousMousePosition.x;
-                const deltaY = e.clientY - previousMousePosition.y;
-                if (scene.children.length > 2) {
-                    scene.children[2].rotation.y += deltaX * 0.005;
-                    scene.children[2].rotation.x += deltaY * 0.005;
-                }
-                previousMousePosition = { x: e.clientX, y: e.clientY };
-            }
-        });
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
 
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
+    document.getElementById('coche-3d-scene').addEventListener('wheel', (e) => {
+        e.preventDefault();
+        camera.position.z += e.deltaY * 0.01;
+        camera.position.z = Math.max(0.5, Math.min(5, camera.position.z));
+    });
 
-        document.getElementById('coche-3d-scene').addEventListener('wheel', (e) => {
-            e.preventDefault();
-            camera.position.z += e.deltaY * 0.01;
-            camera.position.z = Math.max(0.5, Math.min(5, camera.position.z));
-        });
+    // Calcular precio dinámico
+    function updatePrice() {
+        let basePrice = {{ coche.precio_base|floatformat:0 }};
+        let totalPrice = basePrice;
 
-        window.addEventListener('resize', () => {
-            renderer.setSize(400, 600);
-            camera.aspect = 400 / 600;
-            camera.updateProjectionMatrix();
-        });
+        const ruedasPrice = parseInt(document.getElementById('ruedas').value) || 0;
+        const techoSolarPrice = parseInt(document.getElementById('techo_solar').value) || 0;
+        const motorPrice = parseInt(document.getElementById('motor').value) || 0;
 
-        // Calcular precio dinámico
-        document.querySelector('form').addEventListener('change', function(e) {
-            let basePrice = {{ coche.precio_base|floatformat:0 }};
-            let totalPrice = basePrice;
+        totalPrice += ruedasPrice + techoSolarPrice + motorPrice;
 
-            const motorizaciones = {
-                'V6 3.0L': 0,
-                'V8 4.0L': 5000,
-                'Eléctrico 400kW': 10000
-            };
-            const tapicerias = {
-                'Cuero Negro': 0,
-                'Alcantara Roja': 2000,
-                'Tela Gris': 500
-            };
-            const extras = {
-                'Ninguno': 0,
-                'Techo Panorámico': 3000,
-                'Sistema de Sonido Premium': 1500,
-                'Asistente de Conducción': 2500
-            };
+        document.getElementById('total-price').textContent = totalPrice + ' €';
+        document.getElementById('precio_total_input').value = totalPrice;
+    }
 
-            const formData = new FormData(this);
-            for (let [key, value] of formData) {
-                if (key === 'motorizacion' && motorizaciones[value]) totalPrice += motorizaciones[value];
-                if (key === 'tapiceria' && tapicerias[value]) totalPrice += tapicerias[value];
-                if (key === 'extras' && extras[value]) totalPrice += extras[value];
-            }
+    document.querySelector('form').addEventListener('change', updatePrice);
+</script>
 
-            document.getElementById('total-price').textContent = totalPrice + ' €';
-            document.getElementById('precio_total_input').value = totalPrice;
-        });
-    </script>
+<style>
+    .config-container {
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    .config-options {
+        flex: 1;
+        padding: 20px;
+    }
+    .coche-3d-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .coche-card {
+        background-color: #2a2a2a;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        padding: 20px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    .coche-3d-box {
+        width: 500px;
+        height: 400px;
+        background-color: #333333;
+        border-radius: 5px;
+    }
+    .option-group {
+        margin: 10px 0;
+    }
+    .option-group label {
+        display: inline-block;
+        width: 150px;
+    }
+    .btn {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .btn:hover {
+        background-color: #0056b3;
+    }
+</style>
 {% endblock %}

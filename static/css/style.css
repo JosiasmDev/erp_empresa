@@ -78,14 +78,15 @@ h1 {
 }
 
 .btn-primary {
-    background-color: #3498db;
-    color: #fff;
-    margin-top: 20px; /* Espacio debajo del título */
-    text-align: left;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
 }
 
 .btn-primary:hover {
-    background-color: #2980b9;
+    background-color: #0056b3;
 }
 
 .btn-secondary {
@@ -196,8 +197,9 @@ main {
 }
 
 .auth-buttons {
-    margin-top: 10px; /* Adjusts the space between the title and the button */
-    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .auth-buttons a {
@@ -230,4 +232,16 @@ main {
 
 .auth-buttons .btn {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.user-info {
+    color: #ffffff; /* Blanco puro */
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.user-info {
+    color: #ffffff; /* Blanco puro */
+    font-weight: bold;
+    margin-left: 10px;
 }
