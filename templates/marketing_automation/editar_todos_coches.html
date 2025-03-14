@@ -1,35 +1,27 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %} <!-- Cargar el filtro personalizado -->
 
 {% block content %}
 <h1>Editar Todos los Coches</h1>
 <form method="post">
     {% csrf_token %}
     <div class="form-header">
-        <button type="submit" class="btn">Guardar Cambios</button>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
     </div>
     <div class="coches-container">
-        {% for form in coche_forms %}
+        {% for coche_form, personalizacion_form in coche_forms %}
             <div class="coche-form">
-                <h2>{{ form.instance.nombre }}</h2>
-                {{ form.as_p }}
+                <h2>{{ coche_form.instance.nombre }}</h2>
+                {{ coche_form.as_p }}
                 <h3>Componentes de Personalización</h3>
-                {% for comp_form in componente_forms %}
-                    {% if comp_form.instance.coche.id == form.instance.id %}
-                        {{ comp_form.as_p }}
-                    {% endif %}
-                {% endfor %}
+                {{ personalizacion_form.as_p }}
             </div>
         {% endfor %}
     </div>
 </form>
 
 <style>
-.form-header {
-    margin-bottom: 20px;
-    text-align: center;
-}
-
 .coches-container {
     display: flex;
     gap: 20px;
@@ -41,23 +33,27 @@
     flex: 1;
     min-width: 400px;
     padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
     background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.btn {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
+.coche-form h2 {
+    color: #2c3e50;
+    margin-bottom: 15px;
 }
 
-.btn:hover {
-    background-color: #0056b3;
+.coche-form h3 {
+    color: #34495e;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.coche-form h4 {
+    color: #7f8c8d;
+    margin-top: 10px;
+    margin-bottom: 5px;
 }
 </style>
 {% endblock %}

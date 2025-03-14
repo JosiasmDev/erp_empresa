@@ -8,33 +8,20 @@
         <h1>Configura tu {{ coche.nombre }}</h1>
         <p>Precio base: <span id="base-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
         {% if user.is_authenticated %}
-            <form method="post" action="{% url 'coche_detalle' coche.id %}">
+            <form method="post">
                 {% csrf_token %}
-                <!-- Opciones personalizadas en lugar de form.as_p -->
-                <div class="option-group">
-                    <label for="ruedas">Ruedas:</label>
-                    <select name="ruedas" id="ruedas" onchange="updatePrice()">
-                        <option value="0">Estándar 17" (Incluido)</option>
-                        <option value="1000">Deportivas 19" (+1000 €)</option>
-                    </select>
-                </div>
-                <div class="option-group">
-                    <label for="techo_solar">Techo Solar:</label>
-                    <select name="techo_solar" id="techo_solar" onchange="updatePrice()">
-                        <option value="0">Sin Techo (Incluido)</option>
-                        <option value="1500">Panorámico (+1500 €)</option>
-                    </select>
-                </div>
-                <div class="option-group">
-                    <label for="motor">Motor:</label>
-                    <select name="motor" id="motor" onchange="updatePrice()">
-                        <option value="0">V6 3.0L (Incluido)</option>
-                        <option value="5000">V8 4.0L (+5000 €)</option>
-                    </select>
-                </div>
-                <p>Precio total: <span id="total-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
-                <input type="hidden" name="precio_total" id="precio_total_input" value="{{ coche.precio_base|floatformat:0 }}">
-                <button type="submit" class="btn">Comprar</button>
+                <!-- Formulario de personalización -->
+                {{ personalizar_form.as_p }}
+                <!-- Formulario de compra (oculto, solo para enviar datos) -->
+                {{ compra_form.as_p }}
+                <p>Precio total: <span id="total-price">{{ precio_total|floatformat:0 }} €</span></p>
+                {% if rueda_precio is not None %}
+                    <p>Precio Ruedas ({{ personalizar_form.cleaned_data.rueda }}): €{{ rueda_precio }}</p>
+                    <p>Precio Motorización ({{ personalizar_form.cleaned_data.motorizacion }}): €{{ motorizacion_precio }}</p>
+                    <p>Precio Tapicería ({{ personalizar_form.cleaned_data.tapiceria }}): €{{ tapiceria_precio }}</p>
+                    <p>Precio Extras ({{ personalizar_form.cleaned_data.extras }}): €{{ extras_precio }}</p>
+                {% endif %}
+                <button type="submit" class="btn btn-primary">Calcular y Comprar</button>
             </form>
         {% else %}
             <p>Debes <a href="{% url 'login' %}?next={{ request.path|urlencode }}">iniciar sesión</a> para personalizar y comprar.</p>
@@ -129,23 +116,6 @@
         camera.position.z += e.deltaY * 0.01;
         camera.position.z = Math.max(0.5, Math.min(5, camera.position.z));
     });
-
-    // Calcular precio dinámico
-    function updatePrice() {
-        let basePrice = {{ coche.precio_base|floatformat:0 }};
-        let totalPrice = basePrice;
-
-        const ruedasPrice = parseInt(document.getElementById('ruedas').value) || 0;
-        const techoSolarPrice = parseInt(document.getElementById('techo_solar').value) || 0;
-        const motorPrice = parseInt(document.getElementById('motor').value) || 0;
-
-        totalPrice += ruedasPrice + techoSolarPrice + motorPrice;
-
-        document.getElementById('total-price').textContent = totalPrice + ' €';
-        document.getElementById('precio_total_input').value = totalPrice;
-    }
-
-    document.querySelector('form').addEventListener('change', updatePrice);
 </script>
 
 <style>
@@ -187,16 +157,6 @@
     .option-group label {
         display: inline-block;
         width: 150px;
-    }
-    .btn {
-        background-color: #007bff;
-        color: white;
-        padding: 10px 20px;
-        text-decoration: none;
-        border-radius: 5px;
-    }
-    .btn:hover {
-        background-color: #0056b3;
     }
 </style>
 {% endblock %}

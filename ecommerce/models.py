@@ -1,3 +1,4 @@
+# ecommerce/models.py
 from django.db import models
 
 class Coche(models.Model):

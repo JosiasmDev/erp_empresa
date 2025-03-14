@@ -20,10 +20,11 @@ class Coche(models.Model):
         return self.nombre
 
 class PersonalizacionComponente(models.Model):
-    coche = models.ForeignKey(Coche, on_delete=models.CASCADE, related_name='componentes')
-    nombre = models.CharField(max_length=100)  # Ejemplo: "Ruedas", "Techo Solar", "Motor"
-    opcion = models.CharField(max_length=100)  # Ejemplo: "Estándar 17"", "Panorámico", "V6 3.0L"
-    precio_adicional = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    coche = models.ForeignKey(Coche, related_name='componentes', on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=100)
+    opcion = models.CharField(max_length=100)
+    precio_adicional = models.DecimalField(max_digits=10, decimal_places=2)
+    tipo = models.CharField(max_length=50, choices=[('ruedas', 'Ruedas'), ('techo', 'Techo'), ('motor', 'Motor')], default='ruedas')  # Añade este campo
 
     def __str__(self):
-        return f"{self.nombre}: {self.opcion} (+{self.precio_adicional}€)"
+        return f"{self.nombre} - {self.opcion}"

@@ -264,3 +264,43 @@ main {
     align-items: center;
     gap: 10px;
 }
+
+/* Estilos para editar_todos_coches */
+.form-header {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.coches-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.coche-form {
+    flex: 1;
+    min-width: 400px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.coche-form h2 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.coche-form h3 {
+    color: #34495e;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.coche-form h4 {
+    color: #7f8c8d;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
