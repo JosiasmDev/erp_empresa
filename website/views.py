@@ -2,8 +2,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django import forms
-from ecommerce.models import Coche  # Cambia esta importación
-from purchase.forms import CompraForm
+from django.contrib.auth.decorators import login_required
+from ecommerce.models import Coche
 from accounts.decorators import role_required
 
 # Formulario dinámico para la personalización del coche
@@ -12,19 +12,6 @@ class PersonalizarCocheForm(forms.Form):
     motorizacion = forms.ChoiceField(choices=Coche.motorizacion.field.choices, label="Motorización")
     tapiceria = forms.ChoiceField(choices=Coche.tapiceria.field.choices, label="Tapicería")
     extras = forms.ChoiceField(choices=Coche.extras.field.choices, label="Extras")
-
-@role_required(['website'])
-def home(request):
-    coches = Coche.objects.filter(nombre__in=['Eclipse', 'Arrow'])
-    context = {'coches': coches}
-    add_user_groups_to_context(request, context)
-    return render(request, 'website/index.html', context)
-
-@role_required(['website'])
-def contacto(request):
-    context = {}
-    add_user_groups_to_context(request, context)
-    return render(request, 'website/contacto.html', context)
 
 def add_user_groups_to_context(request, context):
     """Función auxiliar para agregar variables de grupos al contexto"""
@@ -45,63 +32,60 @@ def index(request):
     return render(request, 'website/index.html', context)
 
 @role_required(['website'])
+def contacto(request):
+    context = {}
+    add_user_groups_to_context(request, context)
+    return render(request, 'website/contacto.html', context)
+
+@role_required(['website'])
+def coche_list(request):
+    coches = Coche.objects.all()
+    context = {'coches': coches}
+    add_user_groups_to_context(request, context)
+    return render(request, 'website/coche_list.html', context)
+
+@login_required
 def coche_detalle(request, coche_id):
     coche = get_object_or_404(Coche, id=coche_id)
     model_filename = f"{coche.nombre.lower()}.glb"
 
     # Precios adicionales para cada opción
     precios = {
-        'rueda': {
-            '17"': 0,
-            '19"': 1000,
-            '21"': 2000,
-        },
-        'motorizacion': {
-            'V6 3.0L': 0,
-            'V8 4.0L': 5000,
-            'Eléctrico 400kW': 7000,
-        },
-        'tapiceria': {
-            'Cuero Negro': 0,
-            'Alcantara Roja': 1500,
-            'Tela Gris': 500,
-        },
-        'extras': {
-            'Ninguno': 0,
-            'Techo Panorámico': 2000,
-            'Sistema de Sonido Premium': 1500,
-            'Asistente de Conducción': 3000,
-        },
+        'rueda': {'17"': 0, '19"': 1000, '21"': 2000},
+        'motorizacion': {'V6 3.0L': 0, 'V8 4.0L': 5000, 'Eléctrico 400kW': 7000},
+        'tapiceria': {'Cuero Negro': 0, 'Alcantara Roja': 1500, 'Tela Gris': 500},
+        'extras': {'Ninguno': 0, 'Techo Panorámico': 2000, 'Sistema de Sonido Premium': 1500, 'Asistente de Conducción': 3000},
     }
 
     if request.method == 'POST':
         personalizar_form = PersonalizarCocheForm(request.POST)
-        compra_form = CompraForm(request.POST)
-
-        if not request.user.is_authenticated:
-            return redirect(f"{reverse('login')}?next={request.path}")
-
         if personalizar_form.is_valid():
-            # Calcular el precio total
-            precio_base = coche.precio_base
-            rueda_precio = precios['rueda'][personalizar_form.cleaned_data['rueda']]
-            motorizacion_precio = precios['motorizacion'][personalizar_form.cleaned_data['motorizacion']]
-            tapiceria_precio = precios['tapiceria'][personalizar_form.cleaned_data['tapiceria']]
-            extras_precio = precios['extras'][personalizar_form.cleaned_data['extras']]
-            precio_total = precio_base + rueda_precio + motorizacion_precio + tapiceria_precio + extras_precio
+            rueda = personalizar_form.cleaned_data['rueda']
+            motorizacion = personalizar_form.cleaned_data['motorizacion']
+            tapiceria = personalizar_form.cleaned_data['tapiceria']
+            extras = personalizar_form.cleaned_data['extras']
 
-            if compra_form.is_valid():
-                compra = compra_form.save(commit=False)
-                compra.coche = coche
-                compra.precio_total = precio_total
-                compra.save()
-                return redirect('purchase_process_payment', compra.id)
+            rueda_precio = precios['rueda'][rueda]
+            motorizacion_precio = precios['motorizacion'][motorizacion]
+            tapiceria_precio = precios['tapiceria'][tapiceria]
+            extras_precio = precios['extras'][extras]
+            precio_total = coche.precio_base + rueda_precio + motorizacion_precio + tapiceria_precio + extras_precio
+
+            # Guardar las selecciones y precios en la sesión
+            request.session['rueda'] = rueda
+            request.session['motorizacion'] = motorizacion
+            request.session['tapiceria'] = tapiceria
+            request.session['extras'] = extras
+            request.session['rueda_precio'] = rueda_precio
+            request.session['motorizacion_precio'] = motorizacion_precio
+            request.session['tapiceria_precio'] = tapiceria_precio
+            request.session['extras_precio'] = extras_precio
+            request.session['precio_total'] = precio_total
 
             context = {
                 'coche': coche,
                 'model_filename': model_filename,
                 'personalizar_form': personalizar_form,
-                'compra_form': compra_form,
                 'precio_total': precio_total,
                 'rueda_precio': rueda_precio,
                 'motorizacion_precio': motorizacion_precio,
@@ -109,7 +93,7 @@ def coche_detalle(request, coche_id):
                 'extras_precio': extras_precio,
             }
             add_user_groups_to_context(request, context)
-            return render(request, 'website/coche_detalle.html', context)
+            return redirect('ecommerce:pasarela_pago', coche_id=coche.id)
     else:
         personalizar_form = PersonalizarCocheForm(initial={
             'rueda': coche.rueda,
@@ -117,19 +101,22 @@ def coche_detalle(request, coche_id):
             'tapiceria': coche.tapiceria,
             'extras': coche.extras,
         })
-        compra_form = CompraForm(initial={'coche': coche, 'precio_total': coche.precio_base})
+
+    rueda_precio = precios['rueda'][coche.rueda]
+    motorizacion_precio = precios['motorizacion'][coche.motorizacion]
+    tapiceria_precio = precios['tapiceria'][coche.tapiceria]
+    extras_precio = precios['extras'][coche.extras]
+    precio_total = coche.precio_base + rueda_precio + motorizacion_precio + tapiceria_precio + extras_precio
 
     context = {
         'coche': coche,
         'model_filename': model_filename,
         'personalizar_form': personalizar_form,
-        'compra_form': compra_form,
-        'precio_total': coche.precio_base,  # Precio inicial sin extras
+        'precio_total': precio_total,
+        'rueda_precio': rueda_precio,
+        'motorizacion_precio': motorizacion_precio,
+        'tapiceria_precio': tapiceria_precio,
+        'extras_precio': extras_precio,
     }
     add_user_groups_to_context(request, context)
     return render(request, 'website/coche_detalle.html', context)
-
-@role_required(['website'])
-def coche_list(request):
-    coches = Coche.objects.all()
-    return render(request, 'website/coche_list.html', {'coches': coches})

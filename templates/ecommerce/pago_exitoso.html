@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>¡Pago Exitoso!</h1>
+    <p>Gracias, {{ nombre_completo }}, por tu compra del {{ coche.nombre }} por {{ precio_total|floatformat:0 }} €.</p>
+    <p>Un correo de confirmación ha sido enviado a {{ email }}.</p>
+    <a href="{% url 'ecommerce:ecommerce_dashboard' %}" class="btn btn-primary">Volver al Dashboard</a>
+{% endblock %}

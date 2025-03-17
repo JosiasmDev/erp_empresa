@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Pasarela de Pago</h1>
+    
+    <div class="row">
+        <!-- Resumen de la Compra -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4>Resumen de tu Compra</h4>
+                </div>
+                <div class="card-body">
+                    <h5>{{ coche.nombre }}</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Precio Base:</strong> {{ coche.precio_base|floatformat:0 }} €</li>
+                        <li class="list-group-item"><strong>Ruedas:</strong> {{ rueda }} ({{ rueda_precio|floatformat:0 }} €)</li>
+                        <li class="list-group-item"><strong>Motorización:</strong> {{ motorizacion }} ({{ motorizacion_precio|floatformat:0 }} €)</li>
+                        <li class="list-group-item"><strong>Tapicería:</strong> {{ tapiceria }} ({{ tapiceria_precio|floatformat:0 }} €)</li>
+                        <li class="list-group-item"><strong>Extras:</strong> {{ extras }} ({{ extras_precio|floatformat:0 }} €)</li>
+                        <li class="list-group-item"><strong>Total:</strong> <span id="total-price">{{ precio_total|floatformat:0 }}</span> €</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de Pago -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>Detalles de Pago</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+
+                        <p><strong>Contrato de Compra-Venta:</strong> Al aceptar, confirmas la compra del vehículo {{ coche.nombre }} por {{ precio_total|floatformat:0 }} €. Los datos bancarios serán procesados para completar la transacción.</p>
+                        <button type="submit" class="btn btn-success btn-block">Procesar Pago</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .card-header {
+        border-bottom: none;
+    }
+    .list-group-item {
+        border: none;
+        padding: 10px 0;
+    }
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+</style>
+{% endblock %}

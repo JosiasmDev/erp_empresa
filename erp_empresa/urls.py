@@ -1,11 +1,12 @@
+# erp_empresa/urls.py
 from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('website.urls')),  # Esto maneja la ruta principal
+    path('', include('website.urls')),
     path('accounts/', include('accounts.urls')),
-    path('ecommerce/', include('ecommerce.urls')),
+    path('ecommerce/', include('ecommerce.urls', namespace='ecommerce')),
     path('crm/', include('crm.urls')),
     path('sales/', include('sales.urls')),
     path('purchase/', include('purchase.urls')),

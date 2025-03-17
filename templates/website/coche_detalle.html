@@ -3,32 +3,33 @@
 
 {% block content %}
 <div class="config-container">
-    <!-- Parte izquierda: Opciones de Configuración -->
     <div class="config-options">
         <h1>Configura tu {{ coche.nombre }}</h1>
-        <p>Precio base: <span id="base-price">{{ coche.precio_base|floatformat:0 }} €</span></p>
+        <p>Precio base: <span>{{ coche.precio_base|floatformat:0 }} €</span></p>
+        <p>Precio total: <span id="total-price">{{ precio_total|floatformat:0 }} €</span></p>
+
         {% if user.is_authenticated %}
-            <form method="post">
+            <form method="post" id="personalizar-form" action="{% url 'ecommerce:pasarela_pago' coche.id %}">
                 {% csrf_token %}
-                <!-- Formulario de personalización -->
                 {{ personalizar_form.as_p }}
-                <!-- Formulario de compra (oculto, solo para enviar datos) -->
-                {{ compra_form.as_p }}
-                <p>Precio total: <span id="total-price">{{ precio_total|floatformat:0 }} €</span></p>
-                {% if rueda_precio is not None %}
-                    <p>Precio Ruedas ({{ personalizar_form.cleaned_data.rueda }}): €{{ rueda_precio }}</p>
-                    <p>Precio Motorización ({{ personalizar_form.cleaned_data.motorizacion }}): €{{ motorizacion_precio }}</p>
-                    <p>Precio Tapicería ({{ personalizar_form.cleaned_data.tapiceria }}): €{{ tapiceria_precio }}</p>
-                    <p>Precio Extras ({{ personalizar_form.cleaned_data.extras }}): €{{ extras_precio }}</p>
+
+                {% if rueda_precio or motorizacion_precio or tapiceria_precio or extras_precio %}
+                    <div id="price-details">
+                        <p>Detalles de precios:</p>
+                        <p>Precio Ruedas ({{ personalizar_form.rueda.value }}): €<span id="rueda-price">{{ rueda_precio }}</span></p>
+                        <p>Precio Motorización ({{ personalizar_form.motorizacion.value }}): €<span id="motorizacion-price">{{ motorizacion_precio }}</span></p>
+                        <p>Precio Tapicería ({{ personalizar_form.tapiceria.value }}): €<span id="tapiceria-price">{{ tapiceria_precio }}</span></p>
+                        <p>Precio Extras ({{ personalizar_form.extras.value }}): €<span id="extras-price">{{ extras_precio }}</span></p>
+                    </div>
                 {% endif %}
-                <button type="submit" class="btn btn-primary">Calcular y Comprar</button>
+
+                <button type="submit" class="btn btn-primary">Comprar</button>
             </form>
         {% else %}
             <p>Debes <a href="{% url 'login' %}?next={{ request.path|urlencode }}">iniciar sesión</a> para personalizar y comprar.</p>
         {% endif %}
     </div>
 
-    <!-- Parte derecha: Modelo 3D -->
     <div class="coche-3d-container">
         <div class="coche-card">
             <div class="coche-3d-box">
@@ -116,6 +117,55 @@
         camera.position.z += e.deltaY * 0.01;
         camera.position.z = Math.max(0.5, Math.min(5, camera.position.z));
     });
+
+    // Actualización automática del precio
+    const form = document.getElementById('personalizar-form');
+    const totalPrice = document.getElementById('total-price');
+    const ruedaPrice = document.getElementById('rueda-price');
+    const motorizacionPrice = document.getElementById('motorizacion-price');
+    const tapiceriaPrice = document.getElementById('tapiceria-price');
+    const extrasPrice = document.getElementById('extras-price');
+    const basePrice = {{ coche.precio_base|floatformat:0 }}; // Precio base desde el servidor
+
+    function updateTotalPrice() {
+        const rueda = form.querySelector('#id_rueda').value;
+        const motorizacion = form.querySelector('#id_motorizacion').value;
+        const tapiceria = form.querySelector('#id_tapiceria').value;
+        const extras = form.querySelector('#id_extras').value;
+
+        const precios = {
+            'rueda': {'17"': 0, '19"': 1000, '21"': 2000},
+            'motorizacion': {'V6 3.0L': 0, 'V8 4.0L': 5000, 'Eléctrico 400kW': 7000},
+            'tapiceria': {'Cuero Negro': 0, 'Alcantara Roja': 1500, 'Tela Gris': 500},
+            'extras': {'Ninguno': 0, 'Techo Panorámico': 2000, 'Sistema de Sonido Premium': 1500, 'Asistente de Conducción': 3000},
+        };
+
+        const rueda_precio = precios['rueda'][rueda] || 0;
+        const motorizacion_precio = precios['motorizacion'][motorizacion] || 0;
+        const tapiceria_precio = precios['tapiceria'][tapiceria] || 0;
+        const extras_precio = precios['extras'][extras] || 0;
+        const newTotal = basePrice + rueda_precio + motorizacion_precio + tapiceria_precio + extras_precio;
+
+        totalPrice.textContent = `${newTotal} €`;
+        if (ruedaPrice) ruedaPrice.textContent = rueda_precio;
+        if (motorizacionPrice) motorizacionPrice.textContent = motorizacion_precio;
+        if (tapiceriaPrice) tapiceriaPrice.textContent = tapiceria_precio;
+        if (extrasPrice) extrasPrice.textContent = extras_precio;
+
+        // Guardar las selecciones en el formulario para enviarlas a la pasarela
+        form.querySelector('#id_rueda').value = rueda;
+        form.querySelector('#id_motorizacion').value = motorizacion;
+        form.querySelector('#id_tapiceria').value = tapiceria;
+        form.querySelector('#id_extras').value = extras;
+    }
+
+    // Inicializar el precio y agregar event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+        form.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', updateTotalPrice);
+        });
+        updateTotalPrice(); // Inicializar el precio al cargar la página
+    });
 </script>
 
 <style>
@@ -157,6 +207,9 @@
     .option-group label {
         display: inline-block;
         width: 150px;
+    }
+    #price-details p {
+        margin: 5px 0;
     }
 </style>
 {% endblock %}

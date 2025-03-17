@@ -59,7 +59,7 @@
                                     <option value="{% url 'manufacturing_produccion' %}">Fabricación</option>
                                     <option value="{% url 'inventory_stock' %}">Inventario</option>
                                     <option value="{% url 'hr_empleados' %}">Recursos Humanos</option>
-                                    <option value="{% url 'ecommerce_dashboard' %}">Ecommerce</option>
+                                    <option value="{% url 'ecommerce:ecommerce_dashboard' %}">Ecommerce</option> <!-- Corregido aquí -->
                                 </optgroup>
                             {% else %}
                                 {% if 'finanzas' in profile.role %}
