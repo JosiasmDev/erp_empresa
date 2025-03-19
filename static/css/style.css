@@ -39,7 +39,7 @@ body {
 }
 
 .container {
-    margin-top: 140px; /* Ajuste para el tamaño aumentado de la cabecera */
+    margin-top: 10px; /* Aumentado para asegurar que el contenido comience debajo de la cabecera */
 }
 
 h1 {
@@ -180,7 +180,7 @@ form input, form select {
 }
 
 main {
-    margin-top: 80px; /* Espacio para la cabecera */
+    margin-top: 180px; /* Aumentado para asegurar que el contenido comience debajo de la cabecera */
 }
 
 .navbar-title {
@@ -237,15 +237,6 @@ main {
     color: #ffffff !important;
     font-weight: bold;
     margin-left: 10px;
-}
-
-.fixed-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: #333;
-    z-index: 1000;
 }
 
 .logo-container {

@@ -4,140 +4,371 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERP Empresa</title>
+    <title>{% block title %}ERP Empresa{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding-top: 80px; /* Reducimos el padding ya que el header será más pequeño */
+        }
+        header {
+            background-color: #333333; /* Gris más claro */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px; /* Altura más compacta */
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar {
+            height: 100%;
+            padding: 0;
+        }
+        .navbar .container {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+        }
+        .left-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            height: 100%;
+        }
+        .center-section {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .right-section {
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        .navbar-brand {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+        }
+        .navbar-brand img {
+            height: 70px; /* Altura específica para el logo */
+            width: auto;
+            object-fit: contain;
+        }
+        .time-info {
+            color: #fff;
+            font-size: 1rem;
+            white-space: nowrap;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .dropdown-menu {
+            background-color: #1a1a1a;
+            border: 1px solid rgba(255,255,255,.1);
+            padding: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .dropdown-item {
+            color: rgba(255,255,255,.8) !important;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+        }
+        .dropdown-item:hover {
+            background-color: rgba(255,255,255,.1);
+            color: #fff !important;
+        }
+        .dropdown-submenu {
+            color: #fff;
+            padding: 8px 16px;
+            background-color: rgba(255,255,255,.05);
+        }
+        .dropdown-submenu ul {
+            list-style: none;
+            padding-left: 15px;
+            margin: 5px 0;
+        }
+        .btn-dark {
+            background-color: transparent;
+            border: 1px solid rgba(255,255,255,.2);
+            color: #fff;
+        }
+        .dropdown-menu-end {
+            right: 0;
+            left: auto;
+        }
+        .content-wrapper {
+            margin-top: 2rem;
+        }
+        @media (max-width: 991px) {
+            header {
+                height: auto;
+                min-height: 200px;
+            }
+            .navbar .container {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            .left-section,
+            .center-section,
+            .right-section {
+                width: 100%;
+                justify-content: center;
+                position: static;
+                transform: none;
+                
+            }
+            .navbar-brand img {
+                height: 150px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header class="fixed-header">
-        <div class="navbar">
-            <div class="navbar-title">
-                <div class="auth-section">
-                    <div class="auth-buttons">
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'website:perfil_usuario' %}" class="btn btn-primary">Mi Perfil</a>
-                            <a href="{% url 'logout' %}" class="btn btn-primary btn-logout">Cerrar Sesión</a>
-                        {% else %}
-                            <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión</a>
-                        {% endif %}
-                        <span class="user-info">
-                            Bienvenido, {% if user.is_authenticated %}{{ user.username }}{% else %}Invitado{% endif %}
-                        </span>
-                        <span class="time-info">
-                            Tiempo: <span id="simulated-time">00:00</span>
-                        </span>
-                    </div>
+    <header>
+        <nav class="navbar navbar-dark">
+            <div class="container">
+                <div class="left-section">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'accounts:logout' %}" class="btn btn-outline-light btn-sm">Cerrar Sesión</a>
+                        <div class="time-info">
+                            <span>Fecha: <span id="current-date"></span></span>
+                            <span>Hora: <span id="current-time"></span></span>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-sm">Iniciar Sesión</a>
+                        <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-sm">Registrarse</a>
+                    {% endif %}
                 </div>
-                <div class="logo-container">
-                    <img src="{% static 'images/sag_logo.jpg' %}" alt="SAG Logo" class="header-logo">
+
+                <div class="center-section">
+                    <a class="navbar-brand" href="{% url 'website:index' %}">
+                        <img src="{% static 'images/sag_logo.jpg' %}" alt="Logo">
+                    </a>
+                </div>
+
+                <div class="right-section">
+                    {% if user.is_authenticated %}
+                    <div class="dropdown">
+                        <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            Menú Principal
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if user.is_staff or 'website' in user_roles %}
+                            <li class="dropdown-submenu">Website
+                                <ul>
+                                    <li><a class="dropdown-item" href="{% url 'website:index' %}">Inicio</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'website:contacto' %}">Contacto</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'website:perfil_usuario' %}">Mi Perfil</a></li>
+                                </ul>
+                            </li>
+                            {% endif %}
+                            
+                            {% if user.is_staff or 'ventas' in user_roles %}
+                            <li class="dropdown-submenu">Ventas
+                                <ul>
+                                    <li><a class="dropdown-item" href="/sales/">Pedidos</a></li>
+                                    <li><a class="dropdown-item" href="/crm/">Clientes</a></li>
+                                    <li><a class="dropdown-item" href="/sales/crear/">Nueva Venta</a></li>
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            {% if user.is_staff or 'compras' in user_roles %}
+                            <li class="dropdown-submenu">Compras
+                                <ul>
+                                    <li><a class="dropdown-item" href="/purchase/">Órdenes de Compra</a></li>
+                                    <li><a class="dropdown-item" href="/purchase/crear/">Nueva Compra</a></li>
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            {% if user.is_staff or 'produccion' in user_roles %}
+                            <li class="dropdown-submenu">Producción
+                                <ul>
+                                    <li><a class="dropdown-item" href="/manufacturing/">Órdenes de Fabricación</a></li>
+                                    <li><a class="dropdown-item" href="/manufacturing/crear/">Nueva Orden</a></li>
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            {% if user.is_staff or 'inventario' in user_roles %}
+                            <li class="dropdown-submenu">Inventario
+                                <ul>
+                                    <li><a class="dropdown-item" href="/inventory/">Stock</a></li>
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            {% if user.is_staff or 'rrhh' in user_roles %}
+                            <li class="dropdown-submenu">RRHH
+                                <ul>
+                                    <li><a class="dropdown-item" href="/human_resources/">Empleados</a></li>
+                                    <li><a class="dropdown-item" href="/human_resources/crear/">Nuevo Empleado</a></li>
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            {% if user.is_staff or 'marketing' in user_roles %}
+                            <li class="dropdown-submenu">Marketing
+                                <ul>
+                                    <li><a class="dropdown-item" href="/marketing_automation/">Campañas</a></li>
+                                    <li><a class="dropdown-item" href="/marketing_automation/crear/">Nueva Campaña</a></li>
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            {% if user.is_staff or 'contabilidad' in user_roles %}
+                            <li class="dropdown-submenu">Contabilidad
+                                <ul>
+                                    <li><a class="dropdown-item" href="/accounting/">Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="/accounting/ingresos/">Ingresos</a></li>
+                                    <li><a class="dropdown-item" href="/accounting/gastos/">Gastos</a></li>
+                                    <li><a class="dropdown-item" href="/accounting/balance/">Balance</a></li>
+                                    <li><a class="dropdown-item" href="/accounting/facturas/">Facturas</a></li>
+                                </ul>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
-            <nav>
-                <select onchange="location = this.value;">
-                    <option value="" selected disabled>Menú</option>
-                    {% if user.is_authenticated %}
-                        {% with profile=user.profile %}
-                            <optgroup label="Website">
-                                <option value="{% url 'website:index' %}">Inicio</option>
-                                <option value="{% url 'website:coche_detalle' 1 %}">Arrow</option>
-                                <option value="{% url 'website:coche_detalle' 2 %}">Eclipse</option>
-                                <option value="{% url 'website:contacto' %}">Contacto</option>
-                            </optgroup>
-
-                            {% if 'administrador' in profile.role or 'gerente' in profile.role or 'marketing' in profile.role %}
-                                <optgroup label="Marketing">
-                                    <option value="{% url 'marketing_automation:campanas' %}">Campañas</option>
-                                    <option value="{% url 'marketing_automation:editar_todos_coches' %}">Editar Coches</option>
-                                </optgroup>
-                            {% endif %}
-
-                            {% if 'administrador' in profile.role or 'gerente' in profile.role %}
-                                <optgroup label="Administración">
-                                    <option value="{% url 'create_employee' %}">Crear Empleado</option>
-                                </optgroup>
-                                <optgroup label="Módulos ERP">
-                                    <option value="{% url 'accounting_facturas' %}">Contabilidad</option>
-                                    <option value="{% url 'crm_clientes' %}">CRM</option>
-                                    <option value="{% url 'sales_pedidos' %}">Ventas</option>
-                                    <option value="{% url 'purchase_compras' %}">Compras</option>
-                                    <option value="{% url 'manufacturing_produccion' %}">Fabricación</option>
-                                    <option value="{% url 'inventory_stock' %}">Inventario</option>
-                                    <option value="{% url 'hr_empleados' %}">Recursos Humanos</option>
-                                    <option value="{% url 'ecommerce:ecommerce_dashboard' %}">Ecommerce</option>
-                                </optgroup>
-                            {% else %}
-                                {% if 'finanzas' in profile.role %}
-                                    <optgroup label="Módulos ERP">
-                                        <option value="{% url 'accounting_facturas' %}">Contabilidad</option>
-                                        <option value="{% url 'crm_clientes' %}">CRM</option>
-                                        <option value="{% url 'sales_pedidos' %}">Ventas</option>
-                                        <option value="{% url 'purchase_compras' %}">Compras</option>
-                                    </optgroup>
-                                {% endif %}
-                                {% if 'produccion' in profile.role %}
-                                    <optgroup label="Módulos ERP">
-                                        <option value="{% url 'manufacturing_produccion' %}">Fabricación</option>
-                                        <option value="{% url 'inventory_stock' %}">Inventario</option>
-                                    </optgroup>
-                                {% endif %}
-                                {% if 'recursos_humanos' in profile.role %}
-                                    <optgroup label="Módulos ERP">
-                                        <option value="{% url 'hr_empleados' %}">Recursos Humanos</option>
-                                        <option value="{% url 'create_employee' %}">Crear Empleado</option>
-                                    </optgroup>
-                                {% endif %}
-                                {% if 'cliente' in profile.role %}
-                                    <optgroup label="Website">
-                                        <option value="{% url 'website:index' %}">Inicio</option>
-                                        <option value="{% url 'website:coche_detalle' 1 %}">Arrow</option>
-                                        <option value="{% url 'website:coche_detalle' 2 %}">Eclipse</option>
-                                        <option value="{% url 'website:contacto' %}">Contacto</option>
-                                    </optgroup>
-                                {% endif %}
-                            {% endif %}
-                        {% endwith %}
-                    {% endif %}
-                </select>
-            </nav>
-        </div>
+        </nav>
     </header>
-    <main class="container">
-        {% block content %}
-        {% endblock %}
-    </main>
+
+    <div class="content-wrapper">
+        {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <main class="container">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
     <script>
-        $(document).ready(function() {
-            $('.data-table').DataTable({
-                "paging": true,
-                "lengthChange": true,
-                "searching": true,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-            });
-
-            // Simulación de tiempo (3 segundos = 1 hora)
-            let simulatedHours = 0;
-            let simulatedMinutes = 0;
-            
-            function updateTime() {
-                simulatedMinutes += 20; // 3 segundos = 20 minutos
-                if (simulatedMinutes >= 60) {
-                    simulatedHours += 1;
-                    simulatedMinutes = 0;
-                }
-                $('#simulated-time').text(
-                    String(simulatedHours).padStart(2, '0') + ':' + 
-                    String(simulatedMinutes).padStart(2, '0')
-                );
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar DataTables
+            if (typeof $.fn.DataTable !== 'undefined') {
+                $('.data-table').DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+                    },
+                    "paging": true,
+                    "lengthChange": true,
+                    "searching": true,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                });
             }
 
-            // Actualizar cada 3 segundos
-            setInterval(updateTime, 3000);
+            // Función para actualizar fecha y hora
+            function updateDateTime() {
+                const now = new Date();
+                
+                // Formatear fecha
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', options);
+                
+                // Formatear hora
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');
+                document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds}`;
+
+                // Ejecutar tareas cada minuto
+                if (seconds === '00') {
+                    actualizarTareasPeriodicas();
+                }
+            }
+
+            // Función para ejecutar tareas periódicas
+            async function actualizarTareasPeriodicas() {
+                try {
+                    const response = await fetch('/api/actualizar-tareas/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        }
+                    });
+                    const data = await response.json();
+                    console.log('Tareas actualizadas:', data);
+                } catch (error) {
+                    console.error('Error al actualizar tareas:', error);
+                }
+            }
+
+            // Función para obtener el token CSRF
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // Iniciar el reloj
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
+            // Agregar funcionalidad para submenús en dispositivos móviles
+            document.querySelectorAll('.dropdown-submenu > a').forEach(function(element) {
+                element.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var submenu = this.nextElementSibling;
+                    var allSubmenus = document.querySelectorAll('.dropdown-submenu .dropdown-menu');
+                    
+                    // Cerrar todos los otros submenús
+                    allSubmenus.forEach(function(menu) {
+                        if (menu !== submenu) {
+                            menu.style.display = 'none';
+                        }
+                    });
+
+                    // Alternar el submenú actual
+                    if (submenu.style.display === 'block') {
+                        submenu.style.display = 'none';
+                    } else {
+                        submenu.style.display = 'block';
+                    }
+                });
+            });
         });
     </script>
 </body>

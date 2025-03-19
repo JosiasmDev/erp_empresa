@@ -1,8 +1,47 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-    <h1>¡Pago Exitoso!</h1>
-    <p>Gracias, {{ nombre_completo }}, por tu compra del {{ coche.nombre }} por {{ precio_total|floatformat:0 }} €.</p>
-    <p>Un correo de confirmación ha sido enviado a {{ email }}.</p>
-    <a href="{% url 'ecommerce:ecommerce_dashboard' %}" class="btn btn-primary">Volver al Dashboard</a>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body text-center">
+            <h2 class="card-title text-success mb-4">¡Pago Exitoso!</h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Detalles del Pedido</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Coche:</strong> {{ coche.nombre }}</p>
+                            <p><strong>Número de Pedido:</strong> {{ numero_pedido }}</p>
+                            <p><strong>Precio Total:</strong> {{ precio_total|floatformat:2 }}€</p>
+                            <p><strong>Cliente:</strong> {{ nombre_completo }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Estado de la Producción</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Orden de Fabricación:</strong> {{ orden_fabricacion.numero_orden }}</p>
+                            <p><strong>Estado:</strong> {{ orden_fabricacion.get_estado_display }}</p>
+                            <p><strong>Orden de Entrega:</strong> {{ orden_entrega.numero_orden }}</p>
+                            <p><strong>Estado:</strong> {{ orden_entrega.get_estado_display }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{% url 'website:index' %}" class="btn btn-primary">Volver al Inicio</a>
+                <a href="{% url 'website:perfil_usuario' %}" class="btn btn-info">Ver Mi Perfil</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

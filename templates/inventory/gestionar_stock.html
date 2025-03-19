@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Gestión de Stock</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Componente</th>
+                            <th>Cantidad Actual</th>
+                            <th>Stock Mínimo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stock in stocks %}
+                        <tr>
+                            <td>{{ stock.componente.nombre }}</td>
+                            <td>{{ stock.cantidad }}</td>
+                            <td>{{ stock.componente.stock_minimo }}</td>
+                            <td>
+                                {% if stock.cantidad <= stock.componente.stock_minimo %}
+                                    <span class="badge bg-danger">Stock Bajo</span>
+                                {% else %}
+                                    <span class="badge bg-success">Stock Normal</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'inventory:editar_stock' stock.id %}" class="btn btn-sm btn-primary">
+                                    Editar
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">No hay stock registrado</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

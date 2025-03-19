@@ -1,8 +1,13 @@
 # ecommerce/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import Coche, Pedido
 from .forms import PasarelaPagoForm
+from manufacturing.models import OrdenFabricacion
+from accounting.models import Cuenta
+from inventory.models import OrdenEntrega
+from decimal import Decimal
 
 @login_required
 def ecommerce_dashboard(request):
@@ -15,19 +20,23 @@ def ecommerce_dashboard(request):
 @login_required
 def pasarela_pago(request, coche_id):
     coche = get_object_or_404(Coche, id=coche_id)
-
-    # Obtener los precios de la sesión al inicio
-    rueda_precio = request.session.get('rueda_precio', 0)
-    motorizacion_precio = request.session.get('motorizacion_precio', 0)
-    tapiceria_precio = request.session.get('tapiceria_precio', 0)
-    extras_precio = request.session.get('extras_precio', 0)
-    precio_total = request.session.get('precio_total', coche.precio_base)
-
-    # Obtener las selecciones de POST o sesión
-    rueda = request.POST.get('rueda', request.session.get('rueda', coche.rueda))
-    motorizacion = request.POST.get('motorizacion', request.session.get('motorizacion', coche.motorizacion))
-    tapiceria = request.POST.get('tapiceria', request.session.get('tapiceria', coche.tapiceria))
-    extras = request.POST.get('extras', request.session.get('extras', coche.extras))
+    
+    # Obtener valores de la sesión
+    rueda = request.session.get('rueda', coche.rueda)
+    motorizacion = request.session.get('motorizacion', coche.motorizacion)
+    tapiceria = request.session.get('tapiceria', coche.tapiceria)
+    extras = request.session.get('extras', coche.extras)
+    
+    # Calcular precio total
+    precio_total = coche.precio_base
+    if rueda != coche.rueda:
+        precio_total += Decimal('1000.00')
+    if motorizacion != coche.motorizacion:
+        precio_total += Decimal('5000.00')
+    if tapiceria != coche.tapiceria:
+        precio_total += Decimal('2000.00')
+    if extras != coche.extras:
+        precio_total += Decimal('3000.00')
 
     if request.method == 'POST':
         form = PasarelaPagoForm(request.POST)
@@ -51,6 +60,27 @@ def pasarela_pago(request, coche_id):
                     extras_seleccionados=extras
                 )
 
+                # Crear orden de fabricación
+                orden_fabricacion = OrdenFabricacion.objects.create(
+                    pedido=pedido,
+                    coche=coche,
+                    estado='pendiente'
+                )
+
+                # Crear orden de entrega
+                orden_entrega = OrdenEntrega.objects.create(
+                    pedido=pedido,
+                    estado='pendiente'
+                )
+
+                # Registrar la venta en contabilidad
+                Cuenta.objects.create(
+                    tipo='venta',
+                    descripcion=f'Venta del coche {coche.nombre} - Pedido {pedido.numero_pedido}',
+                    monto=precio_total,
+                    pedido=pedido
+                )
+
                 # Limpiar la sesión
                 for key in ['rueda', 'motorizacion', 'tapiceria', 'extras', 
                           'rueda_precio', 'motorizacion_precio', 'tapiceria_precio', 
@@ -58,11 +88,14 @@ def pasarela_pago(request, coche_id):
                     if key in request.session:
                         del request.session[key]
 
+                messages.success(request, '¡Compra realizada con éxito!')
                 return render(request, 'ecommerce/pago_exitoso.html', {
                     'coche': coche,
                     'nombre_completo': nombre_completo,
                     'precio_total': precio_total,
-                    'numero_pedido': pedido.numero_pedido
+                    'numero_pedido': pedido.numero_pedido,
+                    'orden_fabricacion': orden_fabricacion,
+                    'orden_entrega': orden_entrega
                 })
             else:
                 form.add_error('aceptar_contrato', 'Debes aceptar el contrato para continuar.')
@@ -72,17 +105,12 @@ def pasarela_pago(request, coche_id):
             'email': request.user.email,
         })
 
-    context = {
+    return render(request, 'ecommerce/pasarela_pago.html', {
         'coche': coche,
         'form': form,
-        'precio_total': precio_total,
-        'rueda_precio': rueda_precio,
-        'motorizacion_precio': motorizacion_precio,
-        'tapiceria_precio': tapiceria_precio,
-        'extras_precio': extras_precio,
         'rueda': rueda,
         'motorizacion': motorizacion,
         'tapiceria': tapiceria,
         'extras': extras,
-    }
-    return render(request, 'ecommerce/pasarela_pago.html', context)
+        'precio_total': precio_total
+    })

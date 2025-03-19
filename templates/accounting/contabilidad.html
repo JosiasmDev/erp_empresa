@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Contabilidad</h2>
+    
+    <!-- Resumen de Totales -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Balance Total</h5>
+                    <p class="card-text h3">{{ balance_total|floatformat:2 }}€</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Ingresos del Mes</h5>
+                    <p class="card-text h3">{{ ingresos_mes|floatformat:2 }}€</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Gastos del Mes</h5>
+                    <p class="card-text h3">{{ gastos_mes|floatformat:2 }}€</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="tipo" class="form-label">Tipo</label>
+                    <select name="tipo" id="tipo" class="form-select">
+                        <option value="">Todos</option>
+                        {% for key, value in tipos.items %}
+                        <option value="{{ key }}" {% if filtros.tipo == key %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ filtros.fecha_inicio }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ filtros.fecha_fin }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="orden" class="form-label">Ordenar por</label>
+                    <select name="orden" id="orden" class="form-select">
+                        <option value="-fecha" {% if request.GET.orden == '-fecha' %}selected{% endif %}>Fecha (más reciente)</option>
+                        <option value="fecha" {% if request.GET.orden == 'fecha' %}selected{% endif %}>Fecha (más antigua)</option>
+                        <option value="-monto" {% if request.GET.orden == '-monto' %}selected{% endif %}>Monto (mayor)</option>
+                        <option value="monto" {% if request.GET.orden == 'monto' %}selected{% endif %}>Monto (menor)</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Cuentas -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Monto</th>
+                    <th>Detalles</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cuenta in cuentas %}
+                <tr>
+                    <td>{{ cuenta.fecha|date:"d/m/Y H:i" }}</td>
+                    <td>{{ cuenta.get_tipo_display }}</td>
+                    <td>{{ cuenta.descripcion }}</td>
+                    <td class="{% if cuenta.tipo in 'ingreso,venta' %}text-success{% else %}text-danger{% endif %}">
+                        {{ cuenta.monto|floatformat:2 }}€
+                    </td>
+                    <td>
+                        {% if cuenta.pedido %}
+                        <span class="badge bg-info">Pedido: {{ cuenta.pedido.numero_pedido }}</span>
+                        {% endif %}
+                        {% if cuenta.empleado %}
+                        <span class="badge bg-secondary">Empleado: {{ cuenta.empleado.get_full_name }}</span>
+                        {% endif %}
+                        {% if cuenta.orden_compra %}
+                        <span class="badge bg-warning">Orden: {{ cuenta.orden_compra.numero_orden }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay registros que mostrar</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 

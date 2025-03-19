@@ -6,6 +6,9 @@ from django.contrib.auth.decorators import login_required
 from ecommerce.models import Coche, Pedido
 from accounts.decorators import role_required
 from decimal import Decimal
+from accounts.models import Profile
+from core.models import RelojSimulacion
+from django.utils import timezone
 
 # Formulario dinámico para la personalización del coche
 class PersonalizarCocheForm(forms.Form):
@@ -27,8 +30,16 @@ def add_user_groups_to_context(request, context):
     return context
 
 def index(request):
+    # Inicializar el reloj si no existe
+    reloj, created = RelojSimulacion.objects.get_or_create(
+        defaults={'fecha_actual': timezone.now(), 'activo': True}
+    )
+    
     coches = Coche.objects.filter(nombre__in=['Eclipse', 'Arrow'])
-    context = {'coches': coches}
+    context = {
+        'coches': coches,
+        'reloj': reloj
+    }
     add_user_groups_to_context(request, context)
     return render(request, 'website/index.html', context)
 
@@ -124,10 +135,18 @@ def coche_detalle(request, coche_id):
 
 @login_required
 def perfil_usuario(request):
+    # Obtener pedidos del usuario
     pedidos = Pedido.objects.filter(cliente=request.user).order_by('-fecha_pedido')
+    
+    # Obtener perfil del usuario
+    try:
+        perfil = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        perfil = None
+    
     context = {
         'pedidos': pedidos,
-        'usuario': request.user
+        'perfil': perfil,
+        'usuario': request.user,
     }
-    add_user_groups_to_context(request, context)
     return render(request, 'website/perfil_usuario.html', context)

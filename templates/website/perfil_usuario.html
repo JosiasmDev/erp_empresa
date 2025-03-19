@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Información del Perfil -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Mi Perfil</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nombre:</strong> {{ request.user.get_full_name }}</p>
+                    <p><strong>Email:</strong> {{ request.user.email }}</p>
+                    <p><strong>Usuario:</strong> {{ request.user.username }}</p>
+                    {% if perfil %}
+                        <p><strong>Teléfono:</strong> {{ perfil.telefono }}</p>
+                        <p><strong>Dirección:</strong> {{ perfil.direccion }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial de Pedidos -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Mis Pedidos</h5>
+                </div>
+                <div class="card-body">
+                    {% if pedidos %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Número</th>
+                                        <th>Fecha</th>
+                                        <th>Coche</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pedido in pedidos %}
+                                    <tr>
+                                        <td>{{ pedido.numero_pedido }}</td>
+                                        <td>{{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</td>
+                                        <td>{{ pedido.coche.nombre }}</td>
+                                        <td>{{ pedido.precio_total|floatformat:2 }}€</td>
+                                        <td>
+                                            <span class="badge {% if pedido.estado == 'completado' %}bg-success
+                                                              {% elif pedido.estado == 'cancelado' %}bg-danger
+                                                              {% elif pedido.estado == 'en_produccion' %}bg-warning
+                                                              {% else %}bg-info{% endif %}">
+                                                {{ pedido.get_estado_display }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No tienes pedidos realizados.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

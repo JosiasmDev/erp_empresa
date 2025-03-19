@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Sum
+from decimal import Decimal
 
 class Cuenta(models.Model):
     TIPOS = [
@@ -8,6 +10,7 @@ class Cuenta(models.Model):
         ('salario', 'Salario'),
         ('compra', 'Compra'),
         ('venta', 'Venta'),
+        ('stock', 'Stock'),
     ]
     
     fecha = models.DateTimeField(auto_now_add=True)
@@ -18,8 +21,42 @@ class Cuenta(models.Model):
     empleado = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     orden_compra = models.ForeignKey('purchase.OrdenCompra', on_delete=models.SET_NULL, null=True, blank=True)
     
+    class Meta:
+        ordering = ['-fecha']
+        verbose_name = "Cuenta"
+        verbose_name_plural = "Cuentas"
+
     def __str__(self):
         return f"{self.get_tipo_display()} - {self.monto}€ - {self.fecha.strftime('%Y-%m-%d')}"
+
+    @classmethod
+    def get_balance_total(cls):
+        """Calcula el balance total de la empresa"""
+        ingresos = cls.objects.filter(tipo__in=['ingreso', 'venta']).aggregate(total=Sum('monto'))['total'] or Decimal('0')
+        gastos = cls.objects.filter(tipo__in=['gasto', 'salario', 'compra', 'stock']).aggregate(total=Sum('monto'))['total'] or Decimal('0')
+        return ingresos - gastos
+
+    @classmethod
+    def get_ingresos_mes(cls):
+        """Calcula los ingresos del mes actual"""
+        from django.utils import timezone
+        from datetime import datetime
+        inicio_mes = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        return cls.objects.filter(
+            tipo__in=['ingreso', 'venta'],
+            fecha__gte=inicio_mes
+        ).aggregate(total=Sum('monto'))['total'] or Decimal('0')
+
+    @classmethod
+    def get_gastos_mes(cls):
+        """Calcula los gastos del mes actual"""
+        from django.utils import timezone
+        from datetime import datetime
+        inicio_mes = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        return cls.objects.filter(
+            tipo__in=['gasto', 'salario', 'compra', 'stock'],
+            fecha__gte=inicio_mes
+        ).aggregate(total=Sum('monto'))['total'] or Decimal('0')
 
 class Balance(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)

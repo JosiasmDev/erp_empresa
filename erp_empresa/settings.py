@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'marketing_automation',
     'accounts',
     'django_tables2',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -72,7 +73,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'erp_empresa.context_processors.user_roles',  # Agrega esta línea
+                'erp_empresa.context_processors.user_roles',
+                'core.context_processors.reloj_context',
             ],
         },
     },

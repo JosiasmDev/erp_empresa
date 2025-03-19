@@ -11,6 +11,9 @@
                     <p><strong>Usuario:</strong> {{ usuario.username }}</p>
                     <p><strong>Email:</strong> {{ usuario.email }}</p>
                     <p><strong>Nombre:</strong> {{ usuario.first_name }} {{ usuario.last_name }}</p>
+                    {% if perfil %}
+                        <p><strong>Rol:</strong> {{ perfil.get_role_display }}</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -19,7 +22,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Mis Pedidos</h5>
                     <div class="table-responsive">
-                        <table class="table table-striped" id="tablaPedidos">
+                        <table class="table table-striped data-table">
                             <thead>
                                 <tr>
                                     <th>Número de Pedido</th>
