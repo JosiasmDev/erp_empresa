@@ -1,7 +1,7 @@
 from django import forms
-from .models import Factura
+from .models import Cuenta
 
-class FacturaForm(forms.ModelForm):
+class CuentaForm(forms.ModelForm):
     class Meta:
-        model = Factura
-        fields = ['pedido', 'monto', 'pagada']
+        model = Cuenta
+        fields = ['tipo', 'descripcion', 'monto', 'pedido', 'empleado', 'orden_compra']

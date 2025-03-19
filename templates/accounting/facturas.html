@@ -1,34 +1,42 @@
 {% extends 'base.html' %}
-{% load static %}
+
 {% block content %}
-    <h1>Facturas</h1>
+<h1>Cuentas</h1>
 
-    {% if 'Administrador' in roles %}
-        <a href="{% url 'accounting_crear_factura' %}" class="btn btn-primary">Crear Factura</a>
-    {% endif %}
+<div class="mb-3">
+    <a href="{% url 'accounting_crear_factura' %}" class="btn btn-primary">Crear Cuenta</a>
+</div>
 
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>Pedido</th>
-                <th>Monto</th>
-                <th>Fecha</th>
-                <th>Pagada</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for factura in facturas %}
-                <tr>
-                    <td>{{ factura.pedido.id }}</td>
-                    <td>${{ factura.monto }}</td>
-                    <td>{{ factura.fecha_emision|date:"d/m/Y H:i" }}</td>
-                    <td>{{ factura.pagada|yesno:"Sí,No" }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="4">No hay facturas disponibles.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+            <th>Monto</th>
+            <th>Pedido</th>
+            <th>Empleado</th>
+            <th>Orden Compra</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cuenta in cuentas %}
+        <tr>
+            <td>{{ cuenta.id }}</td>
+            <td>{{ cuenta.fecha|date:"d/m/Y H:i" }}</td>
+            <td>{{ cuenta.get_tipo_display }}</td>
+            <td>{{ cuenta.descripcion }}</td>
+            <td>${{ cuenta.monto }}</td>
+            <td>{{ cuenta.pedido.id|default:"-" }}</td>
+            <td>{{ cuenta.empleado.username|default:"-" }}</td>
+            <td>{{ cuenta.orden_compra.numero_orden|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8">No hay cuentas disponibles.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

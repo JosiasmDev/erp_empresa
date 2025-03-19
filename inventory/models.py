@@ -1,26 +1,51 @@
 from django.db import models
 from ecommerce.models import Coche
+from manufacturing.models import Componente
 
-class Pieza(models.Model):
-    nombre = models.CharField(max_length=100)
-    cantidad_disponible = models.IntegerField(default=0)
-
+class OrdenEntrega(models.Model):
+    ESTADOS = [
+        ('pendiente', 'Pendiente'),
+        ('en_proceso', 'En Proceso'),
+        ('completada', 'Completada'),
+        ('cancelada', 'Cancelada'),
+    ]
+    
+    numero_orden = models.CharField(max_length=20, unique=True)
+    pedido = models.OneToOneField('ecommerce.Pedido', on_delete=models.CASCADE, related_name='orden_entrega_rel')
+    fecha_entrega = models.DateTimeField(null=True, blank=True)
+    estado = models.CharField(max_length=20, choices=ESTADOS, default='pendiente')
+    
     def __str__(self):
-        return self.nombre
-
-class MovimientoStock(models.Model):
-    pieza = models.ForeignKey(Pieza, on_delete=models.CASCADE)
-    cantidad = models.IntegerField()
-    tipo = models.CharField(max_length=10, choices=[('Entrada', 'Entrada'), ('Salida', 'Salida')])
-    fecha = models.DateTimeField(auto_now_add=True)
+        return f"Orden Entrega {self.numero_orden}"
 
     def save(self, *args, **kwargs):
+        if not self.numero_orden:
+            from datetime import datetime
+            timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+            self.numero_orden = f"OE-{timestamp}"
         super().save(*args, **kwargs)
-        if self.tipo == 'Entrada':
-            self.pieza.cantidad_disponible += self.cantidad
-        elif self.tipo == 'Salida':
-            self.pieza.cantidad_disponible -= self.cantidad
-        self.pieza.save()
 
+class Stock(models.Model):
+    componente = models.OneToOneField(Componente, on_delete=models.CASCADE)
+    cantidad = models.IntegerField(default=0)
+    ultima_actualizacion = models.DateTimeField(auto_now=True)
+    
     def __str__(self):
-        return f"{self.tipo} - {self.pieza.nombre}"
+        return f"{self.componente.nombre} - Stock: {self.cantidad}"
+
+class MovimientoStock(models.Model):
+    TIPOS = [
+        ('entrada', 'Entrada'),
+        ('salida', 'Salida'),
+        ('ajuste', 'Ajuste'),
+    ]
+    
+    componente = models.ForeignKey(Componente, on_delete=models.CASCADE)
+    cantidad = models.IntegerField()
+    tipo = models.CharField(max_length=10, choices=TIPOS)
+    fecha = models.DateTimeField(auto_now_add=True)
+    orden_entrega = models.ForeignKey(OrdenEntrega, on_delete=models.SET_NULL, null=True, blank=True)
+    descripcion = models.TextField(blank=True)
+    
+    def __str__(self):
+        return f"{self.get_tipo_display()} - {self.componente.nombre} - {self.cantidad}"

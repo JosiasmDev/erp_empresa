@@ -1,0 +1,132 @@
+[
+    {
+        "model": "ecommerce.coche",
+        "pk": 1,
+        "fields": {
+            "nombre": "Eclipse",
+            "precio_base": "50000.00",
+            "potencia": 300,
+            "velocidad_maxima": 250,
+            "descripcion": "Un coche deportivo de alto rendimiento con diseño aerodinámico y tecnología de vanguardia.",
+            "color": "Negro",
+            "rueda": "19\"",
+            "motorizacion": "V6 3.0L",
+            "tapiceria": "Cuero Negro",
+            "extras": "Ninguno"
+        }
+    },
+    {
+        "model": "ecommerce.coche",
+        "pk": 2,
+        "fields": {
+            "nombre": "Arrow",
+            "precio_base": "45000.00",
+            "potencia": 250,
+            "velocidad_maxima": 230,
+            "descripcion": "Un coche elegante y eficiente, perfecto para el uso diario y viajes largos.",
+            "color": "Azul",
+            "rueda": "17\"",
+            "motorizacion": "V6 3.0L",
+            "tapiceria": "Tela Gris",
+            "extras": "Ninguno"
+        }
+    },
+    {
+        "model": "crm.cliente",
+        "pk": 1,
+        "fields": {
+            "nombre": "Juan Pérez",
+            "email": "juan@example.com",
+            "telefono": "123456789"
+        }
+    },
+    {
+        "model": "ecommerce.pedido",
+        "pk": 1,
+        "fields": {
+            "numero_pedido": "PED-20240101000000",
+            "cliente": 1,
+            "coche": 1,
+            "fecha_pedido": "2024-01-01T00:00:00Z",
+            "estado": "pendiente",
+            "precio_total": "50000.00",
+            "rueda_seleccionada": "19\"",
+            "motorizacion_seleccionada": "V6 3.0L",
+            "tapiceria_seleccionada": "Cuero Negro",
+            "extras_seleccionados": "Ninguno"
+        }
+    },
+    {
+        "model": "purchase.ordencompra",
+        "pk": 1,
+        "fields": {
+            "numero_orden": "OC-001",
+            "fecha_orden": "2024-01-01T00:00:00Z",
+            "fecha_entrega_esperada": "2024-01-15T00:00:00Z",
+            "estado": "pendiente",
+            "total": "10000.00"
+        }
+    },
+    {
+        "model": "manufacturing.ordenfabricacion",
+        "pk": 1,
+        "fields": {
+            "numero_orden": "OF-001",
+            "pedido": 1,
+            "coche": 1,
+            "fecha_inicio": "2024-01-01T00:00:00Z",
+            "fecha_fin": "2024-01-15T00:00:00Z",
+            "estado": "en_proceso"
+        }
+    },
+    {
+        "model": "manufacturing.componente",
+        "pk": 1,
+        "fields": {
+            "nombre": "Motor V6",
+            "descripcion": "Motor V6 3.0L",
+            "stock_minimo": 5,
+            "precio_compra": "5000.00"
+        }
+    },
+    {
+        "model": "inventory.stock",
+        "pk": 1,
+        "fields": {
+            "componente": 1,
+            "cantidad": 10,
+            "ultima_actualizacion": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "accounting.cuenta",
+        "pk": 1,
+        "fields": {
+            "fecha": "2024-01-01T00:00:00Z",
+            "tipo": "ingreso",
+            "descripcion": "Venta del coche Eclipse",
+            "monto": "50000.00",
+            "pedido": 1
+        }
+    },
+    {
+        "model": "human_resources.empleado",
+        "pk": 1,
+        "fields": {
+            "nombre": "María García",
+            "cargo": "Gerente de Producción",
+            "salario": "3000.00",
+            "fecha_contratacion": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
+        "model": "marketing_automation.campana",
+        "pk": 1,
+        "fields": {
+            "nombre": "Lanzamiento Eclipse",
+            "objetivo": "Promocionar el nuevo modelo Eclipse",
+            "fecha_envio": "2024-01-01T00:00:00Z",
+            "estado": "Borrador"
+        }
+    }
+] 

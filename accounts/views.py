@@ -4,7 +4,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group
-from accounting.models import Factura
+from accounting.models import Cuenta
 from .models import Profile
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -25,14 +25,14 @@ def login_register(request):
                 user = login_form.get_user()
                 login(request, user)
                 messages.success(request, f'¡Bienvenido, {user.username}!')
-                return redirect(request.GET.get('next', 'home'))
+                return redirect(request.GET.get('next', '/'))
         elif 'register' in request.POST:
             register_form = UserCreationForm(request.POST)
             if register_form.is_valid():
                 user = register_form.save()
                 login(request, user)
                 messages.success(request, '¡Registro exitoso! Bienvenido.')
-                return redirect(request.GET.get('next', 'home'))
+                return redirect(request.GET.get('next', '/'))
             else:
                 messages.error(request, 'Error al registrarse. Verifica los datos.')
     else:
@@ -47,7 +47,7 @@ def login_register(request):
 def logout_view(request):
     logout(request)
     messages.success(request, 'Has cerrado sesión.')
-    return redirect('home')
+    return redirect('/')
 
 @login_required
 @user_passes_test(is_admin)
@@ -84,9 +84,9 @@ def create_employee(request):
 
 @login_required
 def facturas_view(request):
-    facturas = Factura.objects.all()
+    cuentas = Cuenta.objects.all()
     context = {
-        'facturas': facturas,
+        'cuentas': cuentas,
         **get_user_roles(request.user)
     }
     return render(request, 'accounting/facturas.html', context)

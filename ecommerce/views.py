@@ -1,7 +1,7 @@
 # ecommerce/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Coche
+from .models import Coche, Pedido
 from .forms import PasarelaPagoForm
 
 @login_required
@@ -40,11 +40,29 @@ def pasarela_pago(request, coche_id):
             aceptar_contrato = form.cleaned_data['aceptar_contrato']
 
             if aceptar_contrato:
-                # Simulación de procesamiento de pago
+                # Crear el pedido
+                pedido = Pedido.objects.create(
+                    cliente=request.user,
+                    coche=coche,
+                    precio_total=precio_total,
+                    rueda_seleccionada=rueda,
+                    motorizacion_seleccionada=motorizacion,
+                    tapiceria_seleccionada=tapiceria,
+                    extras_seleccionados=extras
+                )
+
+                # Limpiar la sesión
+                for key in ['rueda', 'motorizacion', 'tapiceria', 'extras', 
+                          'rueda_precio', 'motorizacion_precio', 'tapiceria_precio', 
+                          'extras_precio', 'precio_total']:
+                    if key in request.session:
+                        del request.session[key]
+
                 return render(request, 'ecommerce/pago_exitoso.html', {
                     'coche': coche,
                     'nombre_completo': nombre_completo,
                     'precio_total': precio_total,
+                    'numero_pedido': pedido.numero_pedido
                 })
             else:
                 form.add_error('aceptar_contrato', 'Debes aceptar el contrato para continuar.')

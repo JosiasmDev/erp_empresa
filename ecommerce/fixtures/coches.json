@@ -1,0 +1,34 @@
+[
+    {
+        "model": "ecommerce.coche",
+        "pk": 1,
+        "fields": {
+            "nombre": "Eclipse",
+            "precio_base": "50000.00",
+            "potencia": 300,
+            "velocidad_maxima": 250,
+            "descripcion": "Un coche deportivo de alto rendimiento con diseño aerodinámico y tecnología de vanguardia.",
+            "color": "Negro",
+            "rueda": "19\"",
+            "motorizacion": "V6 3.0L",
+            "tapiceria": "Cuero Negro",
+            "extras": "Ninguno"
+        }
+    },
+    {
+        "model": "ecommerce.coche",
+        "pk": 2,
+        "fields": {
+            "nombre": "Arrow",
+            "precio_base": "45000.00",
+            "potencia": 250,
+            "velocidad_maxima": 230,
+            "descripcion": "Un coche elegante y eficiente, perfecto para el uso diario y viajes largos.",
+            "color": "Azul",
+            "rueda": "17\"",
+            "motorizacion": "V6 3.0L",
+            "tapiceria": "Tela Gris",
+            "extras": "Ninguno"
+        }
+    }
+] 

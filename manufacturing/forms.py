@@ -1,12 +1,12 @@
 from django import forms
-from .models import OrdenProduccion
+from .models import OrdenFabricacion, ComponenteOrden
 
-class OrdenProduccionForm(forms.ModelForm):
+class OrdenFabricacionForm(forms.ModelForm):
     class Meta:
-        model = OrdenProduccion
-        fields = ['coche', 'cantidad', 'completada']
+        model = OrdenFabricacion
+        fields = ['pedido', 'coche']
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['completada'].initial = False
-        self.fields['completada'].widget.attrs['readonly'] = True  # Solo se actualiza por la lógica
+class ComponenteOrdenForm(forms.ModelForm):
+    class Meta:
+        model = ComponenteOrden
+        fields = ['componente', 'cantidad', 'es_extra']

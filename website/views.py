@@ -3,8 +3,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django import forms
 from django.contrib.auth.decorators import login_required
-from ecommerce.models import Coche
+from ecommerce.models import Coche, Pedido
 from accounts.decorators import role_required
+from decimal import Decimal
 
 # Formulario dinámico para la personalización del coche
 class PersonalizarCocheForm(forms.Form):
@@ -65,11 +66,11 @@ def coche_detalle(request, coche_id):
             tapiceria = personalizar_form.cleaned_data['tapiceria']
             extras = personalizar_form.cleaned_data['extras']
 
-            rueda_precio = precios['rueda'][rueda]
-            motorizacion_precio = precios['motorizacion'][motorizacion]
-            tapiceria_precio = precios['tapiceria'][tapiceria]
-            extras_precio = precios['extras'][extras]
-            precio_total = coche.precio_base + rueda_precio + motorizacion_precio + tapiceria_precio + extras_precio
+            rueda_precio = float(precios['rueda'][rueda])
+            motorizacion_precio = float(precios['motorizacion'][motorizacion])
+            tapiceria_precio = float(precios['tapiceria'][tapiceria])
+            extras_precio = float(precios['extras'][extras])
+            precio_total = float(coche.precio_base) + rueda_precio + motorizacion_precio + tapiceria_precio + extras_precio
 
             # Guardar las selecciones y precios en la sesión
             request.session['rueda'] = rueda
@@ -102,11 +103,11 @@ def coche_detalle(request, coche_id):
             'extras': coche.extras,
         })
 
-    rueda_precio = precios['rueda'][coche.rueda]
-    motorizacion_precio = precios['motorizacion'][coche.motorizacion]
-    tapiceria_precio = precios['tapiceria'][coche.tapiceria]
-    extras_precio = precios['extras'][coche.extras]
-    precio_total = coche.precio_base + rueda_precio + motorizacion_precio + tapiceria_precio + extras_precio
+    rueda_precio = float(precios['rueda'][coche.rueda])
+    motorizacion_precio = float(precios['motorizacion'][coche.motorizacion])
+    tapiceria_precio = float(precios['tapiceria'][coche.tapiceria])
+    extras_precio = float(precios['extras'][coche.extras])
+    precio_total = float(coche.precio_base) + rueda_precio + motorizacion_precio + tapiceria_precio + extras_precio
 
     context = {
         'coche': coche,
@@ -120,3 +121,13 @@ def coche_detalle(request, coche_id):
     }
     add_user_groups_to_context(request, context)
     return render(request, 'website/coche_detalle.html', context)
+
+@login_required
+def perfil_usuario(request):
+    pedidos = Pedido.objects.filter(cliente=request.user).order_by('-fecha_pedido')
+    context = {
+        'pedidos': pedidos,
+        'usuario': request.user
+    }
+    add_user_groups_to_context(request, context)
+    return render(request, 'website/perfil_usuario.html', context)

@@ -9,7 +9,7 @@
         <p>Precio total: <span id="total-price">{{ precio_total|floatformat:0 }} €</span></p>
 
         {% if user.is_authenticated %}
-            <form method="post" id="personalizar-form" action="{% url 'ecommerce:pasarela_pago' coche.id %}">
+            <form method="post" id="personalizar-form">
                 {% csrf_token %}
                 {{ personalizar_form.as_p }}
 
@@ -151,12 +151,6 @@
         if (motorizacionPrice) motorizacionPrice.textContent = motorizacion_precio;
         if (tapiceriaPrice) tapiceriaPrice.textContent = tapiceria_precio;
         if (extrasPrice) extrasPrice.textContent = extras_precio;
-
-        // Guardar las selecciones en el formulario para enviarlas a la pasarela
-        form.querySelector('#id_rueda').value = rueda;
-        form.querySelector('#id_motorizacion').value = motorizacion;
-        form.querySelector('#id_tapiceria').value = tapiceria;
-        form.querySelector('#id_extras').value = extras;
     }
 
     // Inicializar el precio y agregar event listeners
