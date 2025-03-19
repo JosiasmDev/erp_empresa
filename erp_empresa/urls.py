@@ -5,13 +5,8 @@ from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('website/', include('website.urls')),
     path('', RedirectView.as_view(url='/ecommerce/', permanent=True), name='index'),
-    path('contacto/', include('website.urls')),
-    path('coches/', include('website.urls')),
-    path('coche/<int:coche_id>/', include('website.urls')),
-    path('perfil/', include('accounts.urls')),
-    path('arrow-config/', include('website.urls')),
-    path('eclipse-config/', include('website.urls')),
     path('accounts/', include('accounts.urls')),
     path('ecommerce/', include('ecommerce.urls')),
     path('crm/', include('crm.urls')),

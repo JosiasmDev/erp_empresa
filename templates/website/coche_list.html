@@ -1,10 +1,21 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Catálogo de Coches</h1>
-<ul>
-    {% for coche in coches %}
-        <li><a href="{% url 'coche_detalle' coche.id %}">{{ coche.nombre }}</a></li>
-    {% endfor %}
-</ul>
+<div class="container mt-4">
+    <h1 class="mb-4">Catálogo de Coches</h1>
+    <div class="row">
+        {% for coche in coches %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ coche.nombre }}</h5>
+                    <p class="card-text">{{ coche.descripcion }}</p>
+                    <p class="card-text"><strong>Precio base:</strong> {{ coche.precio_base|floatformat:2 }} €</p>
+                    <a href="{% url 'website:coche_detalle' coche.id %}" class="btn btn-primary">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

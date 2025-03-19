@@ -5,53 +5,159 @@
 <div class="container mt-4">
     <h2>Gestión de Stock</h2>
     
+    <!-- Alertas de Stock Bajo -->
+    {% if alertas_stock %}
+    <div class="alert alert-warning mb-4">
+        <h4><i class="fas fa-exclamation-triangle"></i> Alertas de Stock Bajo</h4>
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Componente</th>
+                        <th>Stock Actual</th>
+                        <th>Stock Mínimo</th>
+                        <th>Diferencia</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alerta in alertas_stock %}
+                    <tr>
+                        <td>{{ alerta.componente.get_tipo_display }} - {{ alerta.componente.nombre }}</td>
+                        <td>{{ alerta.stock_actual }}</td>
+                        <td>{{ alerta.stock_minimo }}</td>
+                        <td>{{ alerta.diferencia }}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-warning" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#pedirStockModal"
+                                    data-componente-id="{{ alerta.componente.id }}"
+                                    data-componente-nombre="{{ alerta.componente.nombre }}"
+                                    data-precio-venta="{{ alerta.precio_venta }}">
+                                <i class="fas fa-shopping-cart"></i> Pedir Stock
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Botones de Acción -->
     <div class="mb-3">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pedirStockModal">
-            <i class="fas fa-plus"></i> Pedir Stock a Proveedor
+        <a href="{% url 'inventory:inventory_crear_movimiento' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Registrar Movimiento
+        </a>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#pedirStockModal">
+            <i class="fas fa-shopping-cart"></i> Pedir Stock a Proveedor
         </button>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Componente</th>
-                    <th>Stock Actual</th>
-                    <th>Stock Mínimo</th>
-                    <th>Precio Compra</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for stock in stocks %}
-                <tr>
-                    <td>{{ stock.componente.get_tipo_display }} - {{ stock.componente.nombre }}</td>
-                    <td>{{ stock.cantidad }}</td>
-                    <td>{{ stock.componente.stock_minimo }}</td>
-                    <td>{{ stock.componente.precio_compra }}€</td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-warning" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#pedirStockModal"
-                                data-componente-id="{{ stock.componente.id }}"
-                                data-componente-nombre="{{ stock.componente.get_tipo_display }} - {{ stock.componente.nombre }}"
-                                data-stock-minimo="{{ stock.componente.stock_minimo }}"
-                                data-precio="{{ stock.componente.precio_compra }}">
-                            <i class="fas fa-shopping-cart"></i> Pedir Stock
-                        </button>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center">No hay stock registrado</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Tabla de Stock -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Stock Actual</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Componente</th>
+                            <th>Stock Actual</th>
+                            <th>Stock Mínimo</th>
+                            <th>Stock Máximo</th>
+                            <th>Ubicación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stock in stocks %}
+                        <tr>
+                            <td>{{ stock.componente.get_tipo_display }} - {{ stock.componente.nombre }}</td>
+                            <td>{{ stock.cantidad }}</td>
+                            <td>{{ stock.stock_minimo }}</td>
+                            <td>{{ stock.stock_maximo }}</td>
+                            <td>{{ stock.ubicacion|default:"-" }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-warning" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#pedirStockModal"
+                                            data-componente-id="{{ stock.componente.id }}"
+                                            data-componente-nombre="{{ stock.componente.nombre }}"
+                                            data-precio-venta="{{ stock.precio_venta }}"
+                                            title="Pedir Stock">
+                                        <i class="fas fa-shopping-cart"></i> Pedir
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-info" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editarStockModal"
+                                            data-stock-id="{{ stock.id }}"
+                                            data-stock-minimo="{{ stock.stock_minimo }}"
+                                            data-stock-maximo="{{ stock.stock_maximo }}"
+                                            data-ubicacion="{{ stock.ubicacion }}"
+                                            data-notas="{{ stock.notas }}"
+                                            title="Editar Stock">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">No hay registros de stock</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Últimos Movimientos -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Últimos Movimientos</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Componente</th>
+                            <th>Tipo</th>
+                            <th>Cantidad</th>
+                            <th>Usuario</th>
+                            <th>Referencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for movimiento in ultimos_movimientos %}
+                        <tr>
+                            <td>{{ movimiento.fecha|date:"d/m/Y H:i" }}</td>
+                            <td>{{ movimiento.componente.get_tipo_display }} - {{ movimiento.componente.nombre }}</td>
+                            <td>{{ movimiento.get_tipo_display }}</td>
+                            <td>{{ movimiento.cantidad }}</td>
+                            <td>{{ movimiento.usuario.username }}</td>
+                            <td>{{ movimiento.numero_referencia|default:"-" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">No hay movimientos registrados</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Modal para pedir stock -->
+<!-- Modal para Pedir Stock -->
 <div class="modal fade" id="pedirStockModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -60,37 +166,63 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="pedirStockForm" method="post" action="{% url 'purchase:crear_orden_compra' %}">
+                <form id="pedirStockForm" method="post" action="{% url 'inventory:inventory_crear_movimiento' %}">
                     {% csrf_token %}
+                    <input type="hidden" name="tipo" value="entrada">
+                    <input type="hidden" name="componente" id="componente_id">
+                    <input type="hidden" name="precio_venta" id="precio_venta">
                     <div class="mb-3">
                         <label class="form-label">Componente</label>
-                        <select class="form-select" name="componente_id" required>
-                            <option value="">Seleccione un componente</option>
-                            {% for componente in componentes %}
-                            <option value="{{ componente.id }}" data-precio="{{ componente.precio_compra }}">
-                                {{ componente.get_tipo_display }} - {{ componente.nombre }}
-                            </option>
-                            {% endfor %}
-                        </select>
+                        <input type="text" class="form-control" id="componente_nombre" readonly>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Cantidad</label>
-                        <input type="number" class="form-control" name="cantidad" required min="1">
+                        <input type="number" class="form-control" name="cantidad" id="cantidad" required min="1">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Precio Unitario</label>
-                        <input type="number" class="form-control" name="precio_unitario" id="precio_unitario" readonly>
+                        <label class="form-label">Costo Unitario (30% del precio de venta)</label>
+                        <input type="text" class="form-control" id="costo_unitario" readonly>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Proveedor</label>
-                        <select class="form-select" name="proveedor_id" required>
-                            <option value="">Seleccione un proveedor</option>
-                            {% for proveedor in proveedores %}
-                            <option value="{{ proveedor.id }}">{{ proveedor.nombre }}</option>
-                            {% endfor %}
-                        </select>
+                        <label class="form-label">Valor Total</label>
+                        <input type="text" class="form-control" id="valor_total" readonly>
                     </div>
-                    <button type="submit" class="btn btn-primary">Crear Orden de Compra</button>
+                    <button type="submit" class="btn btn-primary">Generar Orden de Compra</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar Stock -->
+<div class="modal fade" id="editarStockModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Stock</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editarStockForm" method="post" action="{% url 'inventory:inventory_editar_stock' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="stock_id" id="stock_id">
+                    <div class="mb-3">
+                        <label class="form-label">Stock Mínimo</label>
+                        <input type="number" class="form-control" name="stock_minimo" id="stock_minimo" required min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Stock Máximo</label>
+                        <input type="number" class="form-control" name="stock_maximo" id="stock_maximo" required min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ubicación</label>
+                        <input type="text" class="form-control" name="ubicacion" id="ubicacion">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notas</label>
+                        <textarea class="form-control" name="notas" id="notas" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
                 </form>
             </div>
         </div>
@@ -100,14 +232,45 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const componenteSelect = document.querySelector('select[name="componente_id"]');
-    const precioInput = document.getElementById('precio_unitario');
+    // Manejar el modal de pedir stock
+    const pedirStockModal = document.getElementById('pedirStockModal');
+    if (pedirStockModal) {
+        pedirStockModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const componenteId = button.getAttribute('data-componente-id');
+            const componenteNombre = button.getAttribute('data-componente-nombre');
+            const precioVenta = parseFloat(button.getAttribute('data-precio-venta'));
+            
+            document.getElementById('componente_id').value = componenteId;
+            document.getElementById('componente_nombre').value = componenteNombre;
+            document.getElementById('precio_venta').value = precioVenta;
+            
+            // Calcular costo unitario (30% del precio de venta)
+            const costoUnitario = precioVenta * 0.3;
+            document.getElementById('costo_unitario').value = costoUnitario.toFixed(2) + ' €';
+            
+            // Actualizar valor total cuando cambie la cantidad
+            const cantidadInput = document.getElementById('cantidad');
+            cantidadInput.addEventListener('input', function() {
+                const cantidad = parseInt(this.value) || 0;
+                const total = cantidad * costoUnitario;
+                document.getElementById('valor_total').value = total.toFixed(2) + ' €';
+            });
+        });
+    }
 
-    componenteSelect.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const precio = selectedOption.dataset.precio;
-        precioInput.value = precio;
-    });
+    // Manejar el modal de editar stock
+    const editarStockModal = document.getElementById('editarStockModal');
+    if (editarStockModal) {
+        editarStockModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            document.getElementById('stock_id').value = button.getAttribute('data-stock-id');
+            document.getElementById('stock_minimo').value = button.getAttribute('data-stock-minimo');
+            document.getElementById('stock_maximo').value = button.getAttribute('data-stock-maximo');
+            document.getElementById('ubicacion').value = button.getAttribute('data-ubicacion') || '';
+            document.getElementById('notas').value = button.getAttribute('data-notas') || '';
+        });
+    }
 });
 </script>
 {% endblock %}

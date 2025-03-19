@@ -13,10 +13,39 @@ from django.contrib import messages
 
 # Formulario dinámico para la personalización del coche
 class PersonalizarCocheForm(forms.Form):
-    rueda = forms.ChoiceField(choices=Coche.rueda.field.choices, label="Ruedas")
-    motorizacion = forms.ChoiceField(choices=Coche.motorizacion.field.choices, label="Motorización")
-    tapiceria = forms.ChoiceField(choices=Coche.tapiceria.field.choices, label="Tapicería")
-    extras = forms.ChoiceField(choices=Coche.extras.field.choices, label="Extras")
+    rueda = forms.ChoiceField(
+        choices=[
+            ('17"', 'Ruedas 17"'),
+            ('19"', 'Ruedas 19"'),
+            ('21"', 'Ruedas 21"')
+        ],
+        label="Ruedas"
+    )
+    motorizacion = forms.ChoiceField(
+        choices=[
+            ('V6 3.0L', 'Motor V6 3.0L'),
+            ('V8 4.0L', 'Motor V8 4.0L'),
+            ('Eléctrico 400kW', 'Motor Eléctrico 400kW')
+        ],
+        label="Motorización"
+    )
+    tapiceria = forms.ChoiceField(
+        choices=[
+            ('Cuero Negro', 'Tapicería Cuero Negro'),
+            ('Alcantara Roja', 'Tapicería Alcantara Roja'),
+            ('Tela Gris', 'Tapicería Tela Gris')
+        ],
+        label="Tapicería"
+    )
+    extras = forms.ChoiceField(
+        choices=[
+            ('Ninguno', 'Sin extras'),
+            ('Techo Panorámico', 'Techo Panorámico'),
+            ('Sistema de Sonido Premium', 'Sistema de Sonido Premium'),
+            ('Asistente de Conducción', 'Asistente de Conducción')
+        ],
+        label="Extras"
+    )
 
 def add_user_groups_to_context(request, context):
     """Función auxiliar para agregar variables de grupos al contexto"""
@@ -154,8 +183,24 @@ def perfil_usuario(request):
 
 @login_required
 def arrow_config(request):
-    return render(request, 'website/arrow_config.html')
+    return redirect('website:coche_detalle', coche_id=1)
 
 @login_required
 def eclipse_config(request):
-    return render(request, 'website/eclipse_config.html')
+    return redirect('website:coche_detalle', coche_id=2)
+
+@login_required
+def inventory(request):
+    coches = Coche.objects.all()
+    componentes = []
+    for coche in coches:
+        for componente in coche.componentes.all():
+            componente_precio = coche.precio_base * Decimal('0.30')
+            componentes.append({
+                'nombre': componente.nombre,
+                'opcion': componente.opcion,
+                'precio': componente_precio
+            })
+    context = {'componentes': componentes}
+    add_user_groups_to_context(request, context)
+    return render(request, 'website/inventory.html', context)

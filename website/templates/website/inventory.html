@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Inventario de Componentes</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Opción</th>
+            <th>Precio</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for componente in componentes %}
+        <tr>
+            <td>{{ componente.nombre }}</td>
+            <td>{{ componente.opcion }}</td>
+            <td>{{ componente.precio|floatformat:2 }} €</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %} 

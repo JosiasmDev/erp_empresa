@@ -12,4 +12,5 @@ urlpatterns = [
     path('perfil/', views.perfil_usuario, name='perfil_usuario'),
     path('arrow-config/', views.arrow_config, name='arrow_config'),
     path('eclipse-config/', views.eclipse_config, name='eclipse_config'),
+    path('inventory/', views.inventory, name='inventory'),
 ]

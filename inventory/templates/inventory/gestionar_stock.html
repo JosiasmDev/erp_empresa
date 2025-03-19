@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load inventory_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Gestión de Stock</h2>
+    
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#solicitudStockModal">
+        Solicitar Stock a Proveedor
+    </button>
+
+    <!-- Ruedas -->
+    <h3>Ruedas</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Componente</th>
+                    <th>Stock Actual</th>
+                    <th>Stock Mínimo</th>
+                    <th>Precio Compra</th>
+                    <th>Precio Venta</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for componente in ruedas %}
+                <tr>
+                    <td>{{ componente.get_tipo_display }}</td>
+                    <td>{{ componente.stock_actual }}</td>
+                    <td>{{ componente.stock_minimo }}</td>
+                    <td>{{ componente.precio_compra }}€</td>
+                    <td>{{ componente.precio_venta }}€</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="abrirModalSolicitud('{{ componente.id }}', '{{ componente.get_tipo_display }}')">
+                            Solicitar Stock
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Motores -->
+    <h3>Motores</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Componente</th>
+                    <th>Stock Actual</th>
+                    <th>Stock Mínimo</th>
+                    <th>Precio Compra</th>
+                    <th>Precio Venta</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for componente in motores %}
+                <tr>
+                    <td>{{ componente.get_tipo_display }}</td>
+                    <td>{{ componente.stock_actual }}</td>
+                    <td>{{ componente.stock_minimo }}</td>
+                    <td>{{ componente.precio_compra }}€</td>
+                    <td>{{ componente.precio_venta }}€</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="abrirModalSolicitud('{{ componente.id }}', '{{ componente.get_tipo_display }}')">
+                            Solicitar Stock
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tapicerías -->
+    <h3>Tapicerías</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Componente</th>
+                    <th>Stock Actual</th>
+                    <th>Stock Mínimo</th>
+                    <th>Precio Compra</th>
+                    <th>Precio Venta</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for componente in tapicerias %}
+                <tr>
+                    <td>{{ componente.get_tipo_display }}</td>
+                    <td>{{ componente.stock_actual }}</td>
+                    <td>{{ componente.stock_minimo }}</td>
+                    <td>{{ componente.precio_compra }}€</td>
+                    <td>{{ componente.precio_venta }}€</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="abrirModalSolicitud('{{ componente.id }}', '{{ componente.get_tipo_display }}')">
+                            Solicitar Stock
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Extras -->
+    <h3>Extras</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Componente</th>
+                    <th>Stock Actual</th>
+                    <th>Stock Mínimo</th>
+                    <th>Precio Compra</th>
+                    <th>Precio Venta</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for componente in extras %}
+                <tr>
+                    <td>{{ componente.get_tipo_display }}</td>
+                    <td>{{ componente.stock_actual }}</td>
+                    <td>{{ componente.stock_minimo }}</td>
+                    <td>{{ componente.precio_compra }}€</td>
+                    <td>{{ componente.precio_venta }}€</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="abrirModalSolicitud('{{ componente.id }}', '{{ componente.get_tipo_display }}')">
+                            Solicitar Stock
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal de Solicitud de Stock -->
+    <div class="modal fade" id="solicitudStockModal" tabindex="-1" aria-labelledby="solicitudStockModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="solicitudStockModalLabel">Solicitar Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="solicitudStockForm">
+                        <input type="hidden" id="componenteId" name="componenteId">
+                        <div class="mb-3">
+                            <label for="componenteNombre" class="form-label">Componente</label>
+                            <input type="text" class="form-control" id="componenteNombre" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="proveedor" class="form-label">Proveedor</label>
+                            <select class="form-select" id="proveedor" name="proveedor" required>
+                                <option value="">Seleccione un proveedor</option>
+                                {% for proveedor in proveedores %}
+                                <option value="{{ proveedor.id }}">{{ proveedor.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="enviarSolicitud()">Enviar Solicitud</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function abrirModalSolicitud(componenteId, componenteNombre) {
+    document.getElementById('componenteId').value = componenteId;
+    document.getElementById('componenteNombre').value = componenteNombre;
+    var modal = new bootstrap.Modal(document.getElementById('solicitudStockModal'));
+    modal.show();
+}
+
+function enviarSolicitud() {
+    var formData = {
+        componenteId: document.getElementById('componenteId').value,
+        proveedorId: document.getElementById('proveedor').value,
+        cantidad: document.getElementById('cantidad').value
+    };
+    
+    console.log('Datos de la solicitud:', formData);
+    document.getElementById('solicitudStockForm').reset();
+    var modal = bootstrap.Modal.getInstance(document.getElementById('solicitudStockModal'));
+    modal.hide();
+}
+</script>
+{% endblock %} 

@@ -27,6 +27,7 @@ class Componente(models.Model):
     tipo = models.CharField(max_length=50, choices=TIPOS, default='ruedas_19')
     descripcion = models.TextField()
     stock_minimo = models.IntegerField(default=0)
+    stock_actual = models.IntegerField(default=0)
     precio_compra = models.DecimalField(max_digits=10, decimal_places=2)
     
     def __str__(self):

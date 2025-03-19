@@ -1,17 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import MovimientoStock
-from .forms import MovimientoStockForm
 from django.contrib import messages
-from accounts.decorators import role_required
 from django.contrib.auth.decorators import login_required
-from .models import Stock, Componente
-from .forms import StockForm
-from purchase.models import Proveedor
+from django.http import JsonResponse
+from accounts.decorators import role_required
 from decimal import Decimal
+
+from .models import MovimientoStock, Stock
+from .forms import MovimientoStockForm, StockForm
+from manufacturing.models import Componente
+from purchase.models import Proveedor
 
 @role_required(['inventory'])
 def inventory_stock(request):
-    from inventory.models import MovimientoStock
     movimientos = MovimientoStock.objects.all()
     return render(request, 'inventory/stock.html', {'movimientos': movimientos})
 
@@ -19,51 +19,96 @@ def stock(request):
     movimientos = MovimientoStock.objects.all()
     return render(request, 'inventory/stock.html', {'movimientos': movimientos})
 
+@login_required
 def crear_movimiento(request):
     if request.method == 'POST':
         form = MovimientoStockForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Movimiento registrado.')
-            return redirect('inventory_stock')
+            movimiento = form.save(commit=False)
+            movimiento.usuario = request.user
+            
+            # Calcular el costo unitario como 30% del precio de venta
+            componente = movimiento.componente
+            movimiento.costo_unitario = Decimal(str(float(componente.precio_compra) * 0.3))
+            
+            # Calcular el precio total
+            cantidad = Decimal(str(movimiento.cantidad))
+            movimiento.precio_total = movimiento.costo_unitario * cantidad
+            
+            movimiento.save()
+            
+            # Actualizar el stock
+            stock, created = Stock.objects.get_or_create(componente=componente)
+            if movimiento.tipo == 'entrada':
+                stock.cantidad += movimiento.cantidad
+            elif movimiento.tipo == 'salida':
+                stock.cantidad -= movimiento.cantidad
+            stock.save()
+            
+            messages.success(request, f'Movimiento registrado exitosamente. Precio total: {movimiento.precio_total}€')
+            return redirect('inventory:inventory_stock')
     else:
         form = MovimientoStockForm()
     return render(request, 'inventory/crear_movimiento.html', {'form': form})
 
 @login_required
 def gestionar_stock(request):
-    stocks = Stock.objects.all()
-    componentes = Componente.objects.all()
+    from manufacturing.models import Componente
+    from .models import Stock, MovimientoStock
+    
+    # Obtener todos los componentes con su stock
+    stocks = Stock.objects.all().select_related('componente')
+    
+    # Obtener los últimos movimientos
+    ultimos_movimientos = MovimientoStock.objects.all().select_related('componente')[:10]
+    
+    # Obtener componentes por categoría
+    ruedas = Componente.objects.filter(tipo__startswith='ruedas_')
+    motores = Componente.objects.filter(tipo__startswith='motor_')
+    tapicerias = Componente.objects.filter(tipo__startswith='tapiceria_')
+    extras = Componente.objects.filter(tipo__startswith='extra_')
+    
+    # Obtener todos los proveedores
     proveedores = Proveedor.objects.all()
     
-    # Calcular precios de compra (30% del precio de venta)
-    for componente in componentes:
-        componente.precio_compra = Decimal('0.30') * componente.precio_venta
+    # Calcular alertas de stock bajo
+    alertas_stock = []
+    for stock in stocks:
+        if stock.cantidad <= stock.stock_minimo:
+            alertas_stock.append({
+                'componente': stock.componente,
+                'stock_actual': stock.cantidad,
+                'stock_minimo': stock.stock_minimo,
+                'diferencia': stock.stock_minimo - stock.cantidad
+            })
     
     context = {
         'stocks': stocks,
-        'componentes': componentes,
+        'ultimos_movimientos': ultimos_movimientos,
+        'ruedas': ruedas,
+        'motores': motores,
+        'tapicerias': tapicerias,
+        'extras': extras,
         'proveedores': proveedores,
+        'alertas_stock': alertas_stock,
     }
     return render(request, 'inventory/gestionar_stock.html', context)
 
 @login_required
-def editar_stock(request, stock_id):
-    stock = get_object_or_404(Stock, id=stock_id)
-    
+def editar_stock(request):
     if request.method == 'POST':
-        form = StockForm(request.POST, instance=stock)
-        if form.is_valid():
-            stock = form.save()
-            messages.success(request, 'Stock actualizado correctamente')
-            return redirect('inventory:gestionar_stock')
-    else:
-        form = StockForm(instance=stock)
-    
-    return render(request, 'inventory/editar_stock.html', {
-        'form': form,
-        'stock': stock
-    })
+        stock_id = request.POST.get('stock_id')
+        try:
+            stock = Stock.objects.get(id=stock_id)
+            stock.stock_minimo = request.POST.get('stock_minimo')
+            stock.stock_maximo = request.POST.get('stock_maximo')
+            stock.ubicacion = request.POST.get('ubicacion')
+            stock.notas = request.POST.get('notas')
+            stock.save()
+            messages.success(request, 'Stock actualizado exitosamente.')
+        except Stock.DoesNotExist:
+            messages.error(request, 'No se encontró el stock especificado.')
+    return redirect('inventory_stock')
 
 @login_required
 def verificar_stock(request, orden_fabricacion_id):
@@ -92,3 +137,8 @@ def verificar_stock(request, orden_fabricacion_id):
     
     messages.success(request, 'Stock suficiente para la orden de fabricación.')
     return redirect('manufacturing:detalle_orden_fabricacion', orden.id)
+
+@login_required
+def get_proveedores(request):
+    proveedores = Proveedor.objects.all()
+    return JsonResponse([{'id': p.id, 'nombre': p.nombre} for p in proveedores], safe=False)
