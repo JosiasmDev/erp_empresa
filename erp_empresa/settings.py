@@ -133,3 +133,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Configuración de tareas periódicas
+CELERY_BEAT_SCHEDULE = {
+    'procesar-sueldos': {
+        'task': 'core.tasks.procesar_sueldos',
+        'schedule': 60.0,  # Cada minuto
+    },
+    'generar-compras-aleatorias': {
+        'task': 'core.tasks.generar_compras_aleatorias',
+        'schedule': 60.0,  # Cada minuto
+    },
+}

@@ -1,26 +1,58 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
-    <h1>Empleados</h1>
-    <a href="{% url 'hr_crear_empleado' %}" class="btn">Crear Empleado</a>
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Cargo</th>
-                <th>Salario</th>
-                <th>Fecha Contratación</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for empleado in empleados %}
+<div class="container mt-4">
+    <h2>Gestión de Empleados</h2>
+    
+    <div class="mb-3">
+        <a href="{% url 'human_resources:crear_empleado' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nuevo Empleado
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cargo</th>
+                    <th>Sueldo Base</th>
+                    <th>Fecha Contratación</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for empleado in empleados %}
                 <tr>
                     <td>{{ empleado.nombre }}</td>
                     <td>{{ empleado.cargo }}</td>
-                    <td>${{ empleado.salario }}</td>
-                    <td>{{ empleado.fecha_contratacion }}</td>
+                    <td>{{ empleado.sueldo_base }}€</td>
+                    <td>{{ empleado.fecha_contratacion|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if empleado.activo %}
+                        <span class="badge bg-success">Activo</span>
+                        {% else %}
+                        <span class="badge bg-danger">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'human_resources:editar_empleado' empleado.id %}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'human_resources:eliminar_empleado' empleado.id %}" class="btn btn-sm btn-danger">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No hay empleados registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

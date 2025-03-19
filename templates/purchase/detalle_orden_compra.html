@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Orden de Compra #{{ orden.id }}</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-sm-6">
+                            <h6 class="mb-3">Proveedor:</h6>
+                            <div>
+                                <strong>{{ orden.proveedor.nombre }}</strong>
+                            </div>
+                            <div>{{ orden.proveedor.direccion }}</div>
+                            <div>Email: {{ orden.proveedor.email }}</div>
+                            <div>Tel: {{ orden.proveedor.telefono }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <h6 class="mb-3">Detalles de la Orden:</h6>
+                            <div>Fecha: {{ orden.fecha|date:"d/m/Y H:i" }}</div>
+                            <div>Estado: 
+                                <span class="badge {% if orden.estado == 'pendiente' %}bg-warning
+                                                  {% elif orden.estado == 'aprobada' %}bg-success
+                                                  {% elif orden.estado == 'rechazada' %}bg-danger
+                                                  {% else %}bg-secondary{% endif %}">
+                                    {{ orden.get_estado_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Componente</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unitario</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detalle in detalles %}
+                                <tr>
+                                    <td>{{ detalle.componente.nombre }}</td>
+                                    <td>{{ detalle.cantidad }}</td>
+                                    <td>{{ detalle.precio_unitario }}€</td>
+                                    <td>{{ detalle.subtotal }}€</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                    <td><strong>{{ orden.total }}€</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 text-end">
+                            {% if orden.estado == 'pendiente' %}
+                            <form method="post" action="{% url 'purchase:aprobar_orden' orden.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">Aprobar Orden</button>
+                            </form>
+                            <form method="post" action="{% url 'purchase:rechazar_orden' orden.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Rechazar Orden</button>
+                            </form>
+                            {% endif %}
+                            <a href="{% url 'purchase:ordenes_compra' %}" class="btn btn-secondary">Volver a la Lista</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

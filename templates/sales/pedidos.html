@@ -1,28 +1,46 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
-    <h1>Pedidos</h1>
-    <a href="{% url 'sales_crear_pedido' %}" class="btn">Crear Pedido</a>
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Total</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pedido in pedidos %}
+<div class="container mt-4">
+    <h2>Pedidos de Clientes</h2>
+    
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td>{{ pedido.id }}</td>
-                    <td>{{ pedido.cliente.nombre }}</td>
-                    <td>${{ pedido.total }}</td>
-                    <td>{{ pedido.estado }}</td>
-                    <td><a href="{% url 'sales_agregar_item' pedido.id %}">Añadir Ítem</a></td>
+                    <th>Número de Pedido</th>
+                    <th>Cliente</th>
+                    <th>Coche</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Precio Total</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for pedido in pedidos %}
+                <tr>
+                    <td>{{ pedido.numero_pedido }}</td>
+                    <td>{{ pedido.cliente.nombre }}</td>
+                    <td>{{ pedido.coche.nombre }}</td>
+                    <td>{{ pedido.fecha_pedido|date:"d/m/Y" }}</td>
+                    <td>
+                        <span class="badge {% if pedido.estado == 'pendiente' %}bg-warning
+                                          {% elif pedido.estado == 'en_proceso' %}bg-info
+                                          {% elif pedido.estado == 'completado' %}bg-success
+                                          {% else %}bg-danger{% endif %}">
+                            {{ pedido.get_estado_display }}
+                        </span>
+                    </td>
+                    <td>{{ pedido.precio_total }}€</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No hay pedidos registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

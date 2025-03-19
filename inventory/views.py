@@ -6,6 +6,8 @@ from accounts.decorators import role_required
 from django.contrib.auth.decorators import login_required
 from .models import Stock, Componente
 from .forms import StockForm
+from purchase.models import Proveedor
+from decimal import Decimal
 
 @role_required(['inventory'])
 def inventory_stock(request):
@@ -30,8 +32,20 @@ def crear_movimiento(request):
 
 @login_required
 def gestionar_stock(request):
-    stocks = Stock.objects.all().select_related('componente')
-    return render(request, 'inventory/gestionar_stock.html', {'stocks': stocks})
+    stocks = Stock.objects.all()
+    componentes = Componente.objects.all()
+    proveedores = Proveedor.objects.all()
+    
+    # Calcular precios de compra (30% del precio de venta)
+    for componente in componentes:
+        componente.precio_compra = Decimal('0.30') * componente.precio_venta
+    
+    context = {
+        'stocks': stocks,
+        'componentes': componentes,
+        'proveedores': proveedores,
+    }
+    return render(request, 'inventory/gestionar_stock.html', context)
 
 @login_required
 def editar_stock(request, stock_id):

@@ -77,3 +77,33 @@ def contabilidad(request):
         }
     }
     return render(request, 'accounting/contabilidad.html', context)
+
+@login_required
+@role_required(['Contabilidad'])
+def dashboard(request):
+    return render(request, 'accounting/dashboard.html')
+
+@login_required
+@role_required(['Contabilidad'])
+def ingresos(request):
+    return render(request, 'accounting/ingresos.html')
+
+@login_required
+@role_required(['Contabilidad'])
+def gastos(request):
+    return render(request, 'accounting/gastos.html')
+
+@login_required
+@role_required(['Contabilidad'])
+def balance(request):
+    return render(request, 'accounting/balance.html')
+
+@login_required
+@role_required(['Contabilidad'])
+def facturas(request):
+    return render(request, 'accounting/facturas.html')
+
+@login_required
+@role_required(['Contabilidad'])
+def crear_factura(request):
+    return render(request, 'accounting/crear_factura.html')

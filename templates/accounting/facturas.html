@@ -1,42 +1,33 @@
-{% extends 'base.html' %}
+{% extends 'accounting/base_accounting.html' %}
 
-{% block content %}
-<h1>Cuentas</h1>
-
-<div class="mb-3">
-    <a href="{% url 'accounting_crear_factura' %}" class="btn btn-primary">Crear Cuenta</a>
+{% block accounting_content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2>Facturas</h2>
+        <a href="{% url 'accounting:crear_factura' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nueva Factura
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" class="text-center">No hay facturas registradas</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Descripción</th>
-            <th>Monto</th>
-            <th>Pedido</th>
-            <th>Empleado</th>
-            <th>Orden Compra</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for cuenta in cuentas %}
-        <tr>
-            <td>{{ cuenta.id }}</td>
-            <td>{{ cuenta.fecha|date:"d/m/Y H:i" }}</td>
-            <td>{{ cuenta.get_tipo_display }}</td>
-            <td>{{ cuenta.descripcion }}</td>
-            <td>${{ cuenta.monto }}</td>
-            <td>{{ cuenta.pedido.id|default:"-" }}</td>
-            <td>{{ cuenta.empleado.username|default:"-" }}</td>
-            <td>{{ cuenta.orden_compra.numero_orden|default:"-" }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="8">No hay cuentas disponibles.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 {% endblock %}

@@ -1,15 +1,22 @@
 # erp_empresa/urls.py
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('website.urls')),
-    path('', include('core.urls')),
+    path('', RedirectView.as_view(url='/ecommerce/', permanent=True), name='index'),
+    path('contacto/', include('website.urls')),
+    path('coches/', include('website.urls')),
+    path('coche/<int:coche_id>/', include('website.urls')),
+    path('perfil/', include('accounts.urls')),
+    path('arrow-config/', include('website.urls')),
+    path('eclipse-config/', include('website.urls')),
     path('accounts/', include('accounts.urls')),
-    path('ecommerce/', include('ecommerce.urls', namespace='ecommerce')),
+    path('ecommerce/', include('ecommerce.urls')),
     path('crm/', include('crm.urls')),
     path('sales/', include('sales.urls')),
+    path('purchase/', RedirectView.as_view(url='/purchase/ordenes-compra/', permanent=True)),
     path('purchase/', include('purchase.urls')),
     path('manufacturing/', include('manufacturing.urls')),
     path('inventory/', include('inventory.urls')),

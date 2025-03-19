@@ -57,14 +57,27 @@
         }
     },
     {
+        "model": "purchase.proveedor",
+        "pk": 1,
+        "fields": {
+            "nombre": "Proveedor de Componentes",
+            "direccion": "Calle Principal 123",
+            "telefono": "987654321",
+            "email": "proveedor@example.com",
+            "fecha_registro": "2024-01-01T00:00:00Z",
+            "activo": true
+        }
+    },
+    {
         "model": "purchase.ordencompra",
         "pk": 1,
         "fields": {
             "numero_orden": "OC-001",
-            "fecha_orden": "2024-01-01T00:00:00Z",
+            "fecha": "2024-01-01T00:00:00Z",
             "fecha_entrega_esperada": "2024-01-15T00:00:00Z",
             "estado": "pendiente",
-            "total": "10000.00"
+            "total": "10000.00",
+            "proveedor": 1
         }
     },
     {
@@ -110,13 +123,29 @@
         }
     },
     {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "username": "maria.garcia",
+            "first_name": "María",
+            "last_name": "García",
+            "email": "maria.garcia@example.com",
+            "password": "pbkdf2_sha256$600000$salt$hashedpassword",
+            "is_active": true,
+            "is_staff": true,
+            "date_joined": "2024-01-01T00:00:00Z"
+        }
+    },
+    {
         "model": "human_resources.empleado",
         "pk": 1,
         "fields": {
+            "usuario": 1,
             "nombre": "María García",
             "cargo": "Gerente de Producción",
-            "salario": "3000.00",
-            "fecha_contratacion": "2024-01-01T00:00:00Z"
+            "sueldo_base": "3000.00",
+            "fecha_contratacion": "2024-01-01T00:00:00Z",
+            "activo": true
         }
     },
     {

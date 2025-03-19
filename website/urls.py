@@ -10,4 +10,6 @@ urlpatterns = [
     path('coches/', views.coche_list, name='coche_list'),  # Nueva vista para listar coches
     path('coche/<int:coche_id>/', views.coche_detalle, name='coche_detalle'),  # Detalle de un coche
     path('perfil/', views.perfil_usuario, name='perfil_usuario'),
+    path('arrow-config/', views.arrow_config, name='arrow_config'),
+    path('eclipse-config/', views.eclipse_config, name='eclipse_config'),
 ]

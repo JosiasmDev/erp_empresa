@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from decimal import Decimal
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from ecommerce.models import Pedido
+from purchase.models import OrdenCompra
 
 class Cuenta(models.Model):
     TIPOS = [
@@ -15,11 +19,11 @@ class Cuenta(models.Model):
     
     fecha = models.DateTimeField(auto_now_add=True)
     tipo = models.CharField(max_length=10, choices=TIPOS)
-    descripcion = models.TextField()
+    concepto = models.CharField(max_length=200)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
-    pedido = models.ForeignKey('ecommerce.Pedido', on_delete=models.SET_NULL, null=True, blank=True)
+    pedido = models.ForeignKey(Pedido, on_delete=models.SET_NULL, null=True, blank=True)
     empleado = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    orden_compra = models.ForeignKey('purchase.OrdenCompra', on_delete=models.SET_NULL, null=True, blank=True)
+    orden_compra = models.ForeignKey(OrdenCompra, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         ordering = ['-fecha']
@@ -27,7 +31,7 @@ class Cuenta(models.Model):
         verbose_name_plural = "Cuentas"
 
     def __str__(self):
-        return f"{self.get_tipo_display()} - {self.monto}€ - {self.fecha.strftime('%Y-%m-%d')}"
+        return f"{self.get_tipo_display()} - {self.concepto} - {self.monto}€"
 
     @classmethod
     def get_balance_total(cls):
@@ -40,7 +44,6 @@ class Cuenta(models.Model):
     def get_ingresos_mes(cls):
         """Calcula los ingresos del mes actual"""
         from django.utils import timezone
-        from datetime import datetime
         inicio_mes = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         return cls.objects.filter(
             tipo__in=['ingreso', 'venta'],
@@ -51,7 +54,6 @@ class Cuenta(models.Model):
     def get_gastos_mes(cls):
         """Calcula los gastos del mes actual"""
         from django.utils import timezone
-        from datetime import datetime
         inicio_mes = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         return cls.objects.filter(
             tipo__in=['gasto', 'salario', 'compra', 'stock'],
@@ -60,20 +62,52 @@ class Cuenta(models.Model):
 
 class Balance(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
-    ingresos_totales = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    gastos_totales = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    salarios_totales = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    compras_totales = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    ventas_totales = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    balance_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    ingresos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    gastos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+    class Meta:
+        get_latest_by = 'fecha'
     
     def __str__(self):
-        return f"Balance {self.fecha.strftime('%Y-%m-%d')} - {self.balance_total}€"
-    
-    def calcular_totales(self):
-        self.ingresos_totales = Cuenta.objects.filter(tipo='ingreso').aggregate(total=models.Sum('monto'))['total'] or 0
-        self.gastos_totales = Cuenta.objects.filter(tipo='gasto').aggregate(total=models.Sum('monto'))['total'] or 0
-        self.salarios_totales = Cuenta.objects.filter(tipo='salario').aggregate(total=models.Sum('monto'))['total'] or 0
-        self.compras_totales = Cuenta.objects.filter(tipo='compra').aggregate(total=models.Sum('monto'))['total'] or 0
-        self.ventas_totales = Cuenta.objects.filter(tipo='venta').aggregate(total=models.Sum('monto'))['total'] or 0
-        self.balance_total = self.ingresos_totales + self.ventas_totales - self.gastos_totales - self.salarios_totales - self.compras_totales
+        return f"Balance {self.fecha.strftime('%d/%m/%Y')} - Saldo: {self.saldo}€"
+
+    def actualizar_saldo(self):
+        self.saldo = self.ingresos - self.gastos
+        self.save()
+
+@receiver(post_save, sender=Pedido)
+def registrar_ingreso_pedido(sender, instance, created, **kwargs):
+    if instance.estado == 'completado':
+        Cuenta.objects.create(
+            tipo='venta',
+            concepto=f'Venta de coche - Pedido #{instance.numero_pedido}',
+            monto=instance.precio_total,
+            pedido=instance
+        )
+        
+        try:
+            balance = Balance.objects.latest()
+        except Balance.DoesNotExist:
+            balance = Balance.objects.create()
+        
+        balance.ingresos += instance.precio_total
+        balance.actualizar_saldo()
+
+@receiver(post_save, sender=OrdenCompra)
+def registrar_gasto_compra(sender, instance, created, **kwargs):
+    if instance.estado == 'aprobada':
+        Cuenta.objects.create(
+            tipo='compra',
+            concepto=f'Compra de componentes - Orden #{instance.numero_orden}',
+            monto=instance.total,
+            orden_compra=instance
+        )
+        
+        try:
+            balance = Balance.objects.latest()
+        except Balance.DoesNotExist:
+            balance = Balance.objects.create()
+        
+        balance.gastos += instance.total
+        balance.actualizar_saldo()

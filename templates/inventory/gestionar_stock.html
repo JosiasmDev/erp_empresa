@@ -5,47 +5,110 @@
 <div class="container mt-4">
     <h2>Gestión de Stock</h2>
     
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Componente</th>
-                            <th>Cantidad Actual</th>
-                            <th>Stock Mínimo</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for stock in stocks %}
-                        <tr>
-                            <td>{{ stock.componente.nombre }}</td>
-                            <td>{{ stock.cantidad }}</td>
-                            <td>{{ stock.componente.stock_minimo }}</td>
-                            <td>
-                                {% if stock.cantidad <= stock.componente.stock_minimo %}
-                                    <span class="badge bg-danger">Stock Bajo</span>
-                                {% else %}
-                                    <span class="badge bg-success">Stock Normal</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <a href="{% url 'inventory:editar_stock' stock.id %}" class="btn btn-sm btn-primary">
-                                    Editar
-                                </a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" class="text-center">No hay stock registrado</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <div class="mb-3">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pedirStockModal">
+            <i class="fas fa-plus"></i> Pedir Stock a Proveedor
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Componente</th>
+                    <th>Stock Actual</th>
+                    <th>Stock Mínimo</th>
+                    <th>Precio Compra</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in stocks %}
+                <tr>
+                    <td>{{ stock.componente.get_tipo_display }} - {{ stock.componente.nombre }}</td>
+                    <td>{{ stock.cantidad }}</td>
+                    <td>{{ stock.componente.stock_minimo }}</td>
+                    <td>{{ stock.componente.precio_compra }}€</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-warning" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#pedirStockModal"
+                                data-componente-id="{{ stock.componente.id }}"
+                                data-componente-nombre="{{ stock.componente.get_tipo_display }} - {{ stock.componente.nombre }}"
+                                data-stock-minimo="{{ stock.componente.stock_minimo }}"
+                                data-precio="{{ stock.componente.precio_compra }}">
+                            <i class="fas fa-shopping-cart"></i> Pedir Stock
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay stock registrado</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal para pedir stock -->
+<div class="modal fade" id="pedirStockModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Pedir Stock</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="pedirStockForm" method="post" action="{% url 'purchase:crear_orden_compra' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Componente</label>
+                        <select class="form-select" name="componente_id" required>
+                            <option value="">Seleccione un componente</option>
+                            {% for componente in componentes %}
+                            <option value="{{ componente.id }}" data-precio="{{ componente.precio_compra }}">
+                                {{ componente.get_tipo_display }} - {{ componente.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cantidad</label>
+                        <input type="number" class="form-control" name="cantidad" required min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Precio Unitario</label>
+                        <input type="number" class="form-control" name="precio_unitario" id="precio_unitario" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Proveedor</label>
+                        <select class="form-select" name="proveedor_id" required>
+                            <option value="">Seleccione un proveedor</option>
+                            {% for proveedor in proveedores %}
+                            <option value="{{ proveedor.id }}">{{ proveedor.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Crear Orden de Compra</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const componenteSelect = document.querySelector('select[name="componente_id"]');
+    const precioInput = document.getElementById('precio_unitario');
+
+    componenteSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const precio = selectedOption.dataset.precio;
+        precioInput.value = precio;
+    });
+});
+</script>
+{% endblock %}
 {% endblock %} 

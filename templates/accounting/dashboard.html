@@ -1,0 +1,60 @@
+{% extends 'accounting/base_accounting.html' %}
+
+{% block accounting_content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Dashboard de Contabilidad</h2>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card bg-primary text-white mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Ingresos Totales</h5>
+                        <h2 class="card-text">0€</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-danger text-white mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Gastos Totales</h5>
+                        <h2 class="card-text">0€</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Balance</h5>
+                        <h2 class="card-text">0€</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Últimos Ingresos</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">No hay ingresos registrados</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Últimos Gastos</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">No hay gastos registrados</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

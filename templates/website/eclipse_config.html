@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Configuración de Eclipse</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="eclipse_size" class="form-label">Tamaño de Eclipse</label>
+                    <input type="number" class="form-control" id="eclipse_size" name="eclipse_size" min="1" max="100" value="50">
+                </div>
+                <div class="mb-3">
+                    <label for="eclipse_opacity" class="form-label">Opacidad de Eclipse</label>
+                    <input type="range" class="form-range" id="eclipse_opacity" name="eclipse_opacity" min="0" max="100" value="75">
+                </div>
+                <div class="mb-3">
+                    <label for="eclipse_color" class="form-label">Color de Eclipse</label>
+                    <select class="form-select" id="eclipse_color" name="eclipse_color">
+                        <option value="dark">Oscuro</option>
+                        <option value="light">Claro</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -3,6 +3,9 @@ from .models import Pedido, PedidoItem
 from .forms import PedidoForm, PedidoItemForm
 from django.contrib import messages
 from accounts.decorators import role_required
+from django.contrib.auth.decorators import login_required
+from ecommerce.models import Pedido as EcommercePedido
+from crm.models import Cliente
 
 @role_required(['sales'])
 def sales_pedidos(request):
@@ -10,10 +13,14 @@ def sales_pedidos(request):
     pedidos = Pedido.objects.all()
     return render(request, 'sales/pedidos.html', {'pedidos': pedidos})
 
+@login_required
+@role_required(['sales'])
 def pedidos(request):
-    pedidos = Pedido.objects.all()
+    pedidos = EcommercePedido.objects.all().select_related('cliente', 'coche').order_by('-fecha_pedido')
     return render(request, 'sales/pedidos.html', {'pedidos': pedidos})
 
+@login_required
+@role_required(['sales'])
 def crear_pedido(request):
     if request.method == 'POST':
         form = PedidoForm(request.POST)
@@ -25,6 +32,8 @@ def crear_pedido(request):
         form = PedidoForm()
     return render(request, 'sales/crear_pedido.html', {'form': form})
 
+@login_required
+@role_required(['sales'])
 def agregar_item(request, pedido_id):
     pedido = get_object_or_404(Pedido, id=pedido_id)
     if request.method == 'POST':

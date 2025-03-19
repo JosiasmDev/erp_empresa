@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Configuración de Arrow</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="arrow_speed" class="form-label">Velocidad de Arrow</label>
+                    <input type="number" class="form-control" id="arrow_speed" name="arrow_speed" min="1" max="10" value="5">
+                </div>
+                <div class="mb-3">
+                    <label for="arrow_color" class="form-label">Color de Arrow</label>
+                    <select class="form-select" id="arrow_color" name="arrow_color">
+                        <option value="red">Rojo</option>
+                        <option value="blue">Azul</option>
+                        <option value="green">Verde</option>
+                        <option value="yellow">Amarillo</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

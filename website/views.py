@@ -9,6 +9,7 @@ from decimal import Decimal
 from accounts.models import Profile
 from core.models import RelojSimulacion
 from django.utils import timezone
+from django.contrib import messages
 
 # Formulario dinámico para la personalización del coche
 class PersonalizarCocheForm(forms.Form):
@@ -150,3 +151,11 @@ def perfil_usuario(request):
         'usuario': request.user,
     }
     return render(request, 'website/perfil_usuario.html', context)
+
+@login_required
+def arrow_config(request):
+    return render(request, 'website/arrow_config.html')
+
+@login_required
+def eclipse_config(request):
+    return render(request, 'website/eclipse_config.html')

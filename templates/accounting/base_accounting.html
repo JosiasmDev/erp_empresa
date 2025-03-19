@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Menú Contabilidad</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'accounting:dashboard' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                    <a href="{% url 'accounting:ingresos' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'ingresos' %}active{% endif %}">
+                        <i class="bi bi-cash-stack"></i> Ingresos
+                    </a>
+                    <a href="{% url 'accounting:gastos' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">
+                        <i class="bi bi-cash"></i> Gastos
+                    </a>
+                    <a href="{% url 'accounting:balance' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'balance' %}active{% endif %}">
+                        <i class="bi bi-graph-up"></i> Balance
+                    </a>
+                    <a href="{% url 'accounting:facturas' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'facturas' %}active{% endif %}">
+                        <i class="bi bi-file-earmark-text"></i> Facturas
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            {% block accounting_content %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

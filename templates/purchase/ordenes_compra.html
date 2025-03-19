@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Órdenes de Compra</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Proveedor</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for orden in ordenes %}
+                        <tr>
+                            <td>#{{ orden.id }}</td>
+                            <td>{{ orden.proveedor.nombre }}</td>
+                            <td>{{ orden.fecha|date:"d/m/Y H:i" }}</td>
+                            <td>{{ orden.total }}€</td>
+                            <td>
+                                <span class="badge {% if orden.estado == 'pendiente' %}bg-warning
+                                                  {% elif orden.estado == 'aprobada' %}bg-success
+                                                  {% elif orden.estado == 'rechazada' %}bg-danger
+                                                  {% else %}bg-secondary{% endif %}">
+                                    {{ orden.get_estado_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'purchase:detalle_orden_compra' orden.id %}" 
+                                   class="btn btn-sm btn-primary">
+                                    Ver Detalle
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">No hay órdenes de compra</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
