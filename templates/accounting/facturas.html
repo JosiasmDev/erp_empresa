@@ -21,7 +21,7 @@
                 <tr>
                     <td>{{ factura.pedido.id }}</td>
                     <td>${{ factura.monto }}</td>
-                    <td>{{ factura.fecha|date:"d/m/Y H:i" }}</td>
+                    <td>{{ factura.fecha_emision|date:"d/m/Y H:i" }}</td>
                     <td>{{ factura.pagada|yesno:"Sí,No" }}</td>
                 </tr>
             {% empty %}

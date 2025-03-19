@@ -1,3 +1,4 @@
+# purchase/models.py
 from django.db import models
 from ecommerce.models import Coche
 from crm.models import Cliente
