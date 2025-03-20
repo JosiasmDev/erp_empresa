@@ -151,7 +151,7 @@
                         </div>
                     {% else %}
                         <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-sm">Iniciar Sesión</a>
-                        <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-sm">Registrarse</a>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">Registrarse</a>
                     {% endif %}
                 </div>
 
@@ -162,24 +162,26 @@
                 </div>
 
                 <div class="right-section">
-                    {% if user.is_authenticated %}
                     <div class="dropdown">
                         <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
                             Menú Principal
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            {% if user.is_staff or 'website' in user_roles %}
+                            <!-- Website siempre visible -->
                             <li class="dropdown-submenu">Website
                                 <ul>
                                     <li><a class="dropdown-item" href="{% url 'website:index' %}">Inicio</a></li>
                                     <li><a class="dropdown-item" href="{% url 'website:contacto' %}">Contacto</a></li>
+                                    {% if user.is_authenticated %}
                                     <li><a class="dropdown-item" href="{% url 'website:perfil_usuario' %}">Mi Perfil</a></li>
+                                    {% endif %}
                                     <li><a class="dropdown-item" href="{% url 'website:coche_detalle' 2 %}">Arrow</a></li>
                                     <li><a class="dropdown-item" href="{% url 'website:coche_detalle' 1 %}">Eclipse</a></li>
                                 </ul>
                             </li>
-                            {% endif %}
                             
+                            {% if user.is_authenticated %}
+                            <!-- Resto de menús solo para usuarios autenticados -->
                             {% if user.is_staff or 'ventas' in user_roles %}
                             <li class="dropdown-submenu">Ventas
                                 <ul>
@@ -188,6 +190,7 @@
                             </li>
                             {% endif %}
 
+                            <!-- CRM -->
                             {% if user.is_staff or 'crm' in user_roles %}
                             <li class="dropdown-submenu">CRM
                                 <ul>
@@ -197,6 +200,7 @@
                             </li>
                             {% endif %}
 
+                            <!-- Compras -->
                             {% if user.is_staff or 'compras' in user_roles %}
                             <li class="dropdown-submenu">Compras
                                 <ul>
@@ -205,6 +209,7 @@
                             </li>
                             {% endif %}
 
+                            <!-- Producción -->
                             {% if user.is_staff or 'produccion' in user_roles %}
                             <li class="dropdown-submenu">Órdenes de Producción
                                 <ul>
@@ -213,6 +218,7 @@
                             </li>
                             {% endif %}
 
+                            <!-- Inventario -->
                             {% if user.is_staff or 'inventario' in user_roles %}
                             <li class="dropdown-submenu">Inventario
                                 <ul>
@@ -221,6 +227,7 @@
                             </li>
                             {% endif %}
 
+                            <!-- RRHH -->
                             {% if user.is_staff or 'rrhh' in user_roles %}
                             <li class="dropdown-submenu">RRHH
                                 <ul>
@@ -230,6 +237,7 @@
                             </li>
                             {% endif %}
 
+                            <!-- Marketing -->
                             {% if user.is_staff or 'marketing' in user_roles %}
                             <li class="dropdown-submenu">Marketing
                                 <ul>
@@ -240,6 +248,7 @@
                             </li>
                             {% endif %}
 
+                            <!-- Contabilidad -->
                             {% if user.is_staff or 'contabilidad' in user_roles %}
                             <li class="dropdown-submenu">Contabilidad
                                 <ul>
@@ -251,9 +260,9 @@
                                 </ul>
                             </li>
                             {% endif %}
+                            {% endif %}
                         </ul>
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </nav>

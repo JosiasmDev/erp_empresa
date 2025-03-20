@@ -50,12 +50,17 @@ class PersonalizarCocheForm(forms.Form):
 def add_user_groups_to_context(request, context):
     """Función auxiliar para agregar variables de grupos al contexto"""
     if request.user.is_authenticated:
+        user_roles = []
+        for group in request.user.groups.all():
+            user_roles.append(group.name.lower())
+        
         context.update({
             'is_gerencia_or_admin': request.user.groups.filter(name__in=['Gerencia', 'Administrador']).exists() or request.user.is_superuser,
             'is_cliente': request.user.groups.filter(name='Clientes').exists(),
             'is_rrhh': request.user.groups.filter(name='RRHH').exists(),
             'is_compras': request.user.groups.filter(name='Compras').exists(),
             'is_logistica': request.user.groups.filter(name='Logistica').exists(),
+            'user_roles': user_roles,  # Lista de roles del usuario
         })
     return context
 
@@ -73,20 +78,17 @@ def index(request):
     add_user_groups_to_context(request, context)
     return render(request, 'website/index.html', context)
 
-@role_required(['website'])
 def contacto(request):
     context = {}
     add_user_groups_to_context(request, context)
     return render(request, 'website/contacto.html', context)
 
-@role_required(['website'])
 def coche_list(request):
     coches = Coche.objects.all()
     context = {'coches': coches}
     add_user_groups_to_context(request, context)
     return render(request, 'website/coche_list.html', context)
 
-@login_required
 def coche_detalle(request, coche_id):
     coche = get_object_or_404(Coche, id=coche_id)
     model_filename = f"{coche.nombre.lower()}.glb"
@@ -100,6 +102,10 @@ def coche_detalle(request, coche_id):
     }
 
     if request.method == 'POST':
+        if not request.user.is_authenticated:
+            messages.warning(request, 'Debe iniciar sesión para personalizar el coche.')
+            return redirect('accounts:login')
+            
         personalizar_form = PersonalizarCocheForm(request.POST)
         if personalizar_form.is_valid():
             rueda = personalizar_form.cleaned_data['rueda']
@@ -181,11 +187,9 @@ def perfil_usuario(request):
     }
     return render(request, 'website/perfil_usuario.html', context)
 
-@login_required
 def arrow_config(request):
     return redirect('website:coche_detalle', coche_id=1)
 
-@login_required
 def eclipse_config(request):
     return redirect('website:coche_detalle', coche_id=2)
 

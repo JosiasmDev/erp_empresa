@@ -113,3 +113,42 @@ def perfil(request):
         **get_user_roles(request.user)
     }
     return render(request, 'accounts/perfil.html', context)
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'¡Bienvenido, {user.username}!')
+                next_url = request.GET.get('next', '/')
+                return redirect(next_url)
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'accounts/login.html', {
+        'form': form,
+        'error': form.errors.get('__all__') if request.method == 'POST' else None
+    })
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Asignar el grupo de Cliente por defecto
+            cliente_group = Group.objects.get_or_create(name='Clientes')[0]
+            user.groups.add(cliente_group)
+            # Crear el perfil del usuario solo si no existe
+            Profile.objects.get_or_create(user=user, defaults={'role': 'cliente'})
+            login(request, user)
+            messages.success(request, '¡Registro exitoso! Bienvenido a nuestra plataforma.')
+            return redirect('website:index')
+        else:
+            messages.error(request, 'Por favor, corrija los errores en el formulario.')
+    else:
+        form = UserCreationForm()
+    return render(request, 'accounts/register.html', {'form': form})
