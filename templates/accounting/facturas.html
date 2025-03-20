@@ -15,16 +15,46 @@
                     <tr>
                         <th>Número</th>
                         <th>Fecha</th>
-                        <th>Cliente</th>
-                        <th>Monto</th>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                        <th>Subtotal</th>
+                        <th>IVA</th>
+                        <th>Total</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for factura in facturas %}
                     <tr>
-                        <td colspan="6" class="text-center">No hay facturas registradas</td>
+                        <td>{{ factura.numero }}</td>
+                        <td>{{ factura.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>{{ factura.get_tipo_display }}</td>
+                        <td>{{ factura.descripcion }}</td>
+                        <td>{{ factura.subtotal }}€</td>
+                        <td>{{ factura.iva }}€</td>
+                        <td>{{ factura.total }}€</td>
+                        <td>
+                            <span class="badge {% if factura.estado == 'pendiente' %}bg-warning
+                                              {% elif factura.estado == 'pagada' %}bg-success
+                                              {% else %}bg-danger{% endif %}">
+                                {{ factura.get_estado_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if factura.orden_compra %}
+                            <a href="{% url 'purchase:detalle_orden_compra' factura.orden_compra.id %}" 
+                               class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i> Ver Orden
+                            </a>
+                            {% endif %}
+                        </td>
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center">No hay facturas registradas</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

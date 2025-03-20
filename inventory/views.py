@@ -4,11 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from accounts.decorators import role_required
 from decimal import Decimal
+from django.db import transaction
 
 from .models import MovimientoStock, Stock
-from .forms import MovimientoStockForm, StockForm
-from manufacturing.models import Componente
-from purchase.models import Proveedor
+from .forms import MovimientoStockForm
+from purchase.models import Proveedor, OrdenCompra, DetalleOrdenCompra
+from accounting.models import Cuenta, Factura, Balance
 
 @role_required(['inventory'])
 def inventory_stock(request):
@@ -24,29 +25,71 @@ def crear_movimiento(request):
     if request.method == 'POST':
         form = MovimientoStockForm(request.POST)
         if form.is_valid():
-            movimiento = form.save(commit=False)
-            movimiento.usuario = request.user
-            
-            # Calcular el costo unitario como 30% del precio de venta
-            componente = movimiento.componente
-            movimiento.costo_unitario = Decimal(str(float(componente.precio_compra) * 0.3))
-            
-            # Calcular el precio total
-            cantidad = Decimal(str(movimiento.cantidad))
-            movimiento.precio_total = movimiento.costo_unitario * cantidad
-            
-            movimiento.save()
-            
-            # Actualizar el stock
-            stock, created = Stock.objects.get_or_create(componente=componente)
-            if movimiento.tipo == 'entrada':
-                stock.cantidad += movimiento.cantidad
-            elif movimiento.tipo == 'salida':
-                stock.cantidad -= movimiento.cantidad
-            stock.save()
-            
-            messages.success(request, f'Movimiento registrado exitosamente. Precio total: {movimiento.precio_total}€')
-            return redirect('inventory:inventory_stock')
+            with transaction.atomic():
+                movimiento = form.save(commit=False)
+                movimiento.usuario = request.user
+                
+                # Calcular el costo unitario como 30% del precio de venta
+                componente = movimiento.componente
+                movimiento.costo_unitario = Decimal(str(float(componente.precio_compra) * 0.3))
+                
+                # Calcular el precio total
+                cantidad = Decimal(str(movimiento.cantidad))
+                movimiento.precio_total = movimiento.costo_unitario * cantidad
+                
+                # Crear orden de compra
+                orden_compra = OrdenCompra.objects.create(
+                    proveedor=Proveedor.objects.first(),  # Deberías seleccionar el proveedor adecuado
+                    estado='pendiente',
+                    total=movimiento.precio_total
+                )
+                
+                # Crear detalle de orden de compra
+                DetalleOrdenCompra.objects.create(
+                    orden=orden_compra,
+                    componente=componente,
+                    cantidad=cantidad,
+                    precio_unitario=movimiento.costo_unitario
+                )
+                
+                # Crear registro contable
+                cuenta = Cuenta.objects.create(
+                    tipo='compra',
+                    descripcion=f'Compra de {cantidad} unidades de {componente.nombre}',
+                    monto=movimiento.precio_total,
+                    orden_compra=orden_compra
+                )
+                
+                # Crear factura
+                factura = Factura.objects.create(
+                    tipo='compra',
+                    descripcion=f'Compra de {cantidad} unidades de {componente.nombre}',
+                    subtotal=movimiento.precio_total / Decimal('1.21'),  # Precio sin IVA
+                    orden_compra=orden_compra,
+                    cuenta=cuenta
+                )
+                
+                # Actualizar balance
+                balance = Balance.objects.create()
+                balance.calcular_totales()
+                balance.save()
+                
+                movimiento.save()
+                
+                # Actualizar el stock
+                stock, created = Stock.objects.get_or_create(componente=componente)
+                if movimiento.tipo == 'entrada':
+                    stock.cantidad += movimiento.cantidad
+                elif movimiento.tipo == 'salida':
+                    stock.cantidad -= movimiento.cantidad
+                stock.save()
+                
+                messages.success(
+                    request, 
+                    f'Movimiento registrado exitosamente. Precio total: {movimiento.precio_total}€. '
+                    f'Se ha generado la orden de compra #{orden_compra.id} y la factura #{factura.numero}'
+                )
+                return redirect('purchase:detalle_orden_compra', orden_compra.id)
     else:
         form = MovimientoStockForm()
     return render(request, 'inventory/crear_movimiento.html', {'form': form})
@@ -79,11 +122,26 @@ def gestionar_stock(request):
                 'componente': stock.componente,
                 'stock_actual': stock.cantidad,
                 'stock_minimo': stock.stock_minimo,
-                'diferencia': stock.stock_minimo - stock.cantidad
+                'diferencia': stock.stock_minimo - stock.cantidad,
+                'precio_venta': stock.componente.precio_compra  # Este es realmente el precio de venta
             })
     
+    # Preparar el contexto con los precios de venta
+    stocks_con_precios = []
+    for stock in stocks:
+        stocks_con_precios.append({
+            'id': stock.id,
+            'componente': stock.componente,
+            'cantidad': stock.cantidad,
+            'stock_minimo': stock.stock_minimo,
+            'stock_maximo': stock.stock_maximo,
+            'ubicacion': stock.ubicacion,
+            'notas': stock.notas,
+            'precio_venta': stock.componente.precio_compra  # Este es realmente el precio de venta
+        })
+    
     context = {
-        'stocks': stocks,
+        'stocks': stocks_con_precios,
         'ultimos_movimientos': ultimos_movimientos,
         'ruedas': ruedas,
         'motores': motores,

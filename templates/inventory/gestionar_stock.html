@@ -69,6 +69,7 @@
                             <th>Stock Actual</th>
                             <th>Stock Mínimo</th>
                             <th>Stock Máximo</th>
+                            <th>Precio Venta</th>
                             <th>Ubicación</th>
                             <th>Acciones</th>
                         </tr>
@@ -80,6 +81,7 @@
                             <td>{{ stock.cantidad }}</td>
                             <td>{{ stock.stock_minimo }}</td>
                             <td>{{ stock.stock_maximo }}</td>
+                            <td>{{ stock.precio_venta }}€</td>
                             <td>{{ stock.ubicacion|default:"-" }}</td>
                             <td>
                                 <div class="btn-group">
@@ -87,7 +89,7 @@
                                             data-bs-toggle="modal" 
                                             data-bs-target="#pedirStockModal"
                                             data-componente-id="{{ stock.componente.id }}"
-                                            data-componente-nombre="{{ stock.componente.nombre }}"
+                                            data-componente-nombre="{{ stock.componente.get_tipo_display }} - {{ stock.componente.nombre }}"
                                             data-precio-venta="{{ stock.precio_venta }}"
                                             title="Pedir Stock">
                                         <i class="fas fa-shopping-cart"></i> Pedir
@@ -108,7 +110,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center">No hay registros de stock</td>
+                            <td colspan="7" class="text-center">No hay registros de stock</td>
                         </tr>
                         {% endfor %}
                     </tbody>

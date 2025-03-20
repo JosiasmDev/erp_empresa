@@ -1,7 +1,8 @@
 # purchase/models.py
 from django.db import models
 from django.utils import timezone
-from manufacturing.models import Componente
+from decimal import Decimal
+from inventory.models import Componente
 
 class Proveedor(models.Model):
     nombre = models.CharField(max_length=100)
@@ -19,18 +20,18 @@ class OrdenCompra(models.Model):
         ('pendiente', 'Pendiente'),
         ('aprobada', 'Aprobada'),
         ('rechazada', 'Rechazada'),
-        ('completada', 'Completada'),
+        ('cancelada', 'Cancelada')
     ]
     
-    numero_orden = models.CharField(max_length=20, unique=True, default='')
-    fecha = models.DateTimeField(default=timezone.now)
+    numero_orden = models.CharField(max_length=20, unique=True)
+    fecha = models.DateTimeField(auto_now_add=True)
     fecha_entrega_esperada = models.DateTimeField(null=True, blank=True)
     estado = models.CharField(max_length=20, choices=ESTADOS, default='pendiente')
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
     
     def __str__(self):
-        return f"Orden {self.numero_orden} - {self.proveedor.nombre}"
+        return f"OC-{self.numero_orden} - {self.proveedor.nombre}"
     
     def save(self, *args, **kwargs):
         if not self.numero_orden:
@@ -40,18 +41,14 @@ class OrdenCompra(models.Model):
         super().save(*args, **kwargs)
 
 class DetalleOrdenCompra(models.Model):
-    orden = models.ForeignKey(OrdenCompra, on_delete=models.CASCADE, related_name='detalles')
+    orden = models.ForeignKey(OrdenCompra, on_delete=models.CASCADE)
     componente = models.ForeignKey(Componente, on_delete=models.CASCADE)
-    cantidad = models.IntegerField(default=1)
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    cantidad = models.IntegerField()
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    @property
+    def subtotal(self):
+        return self.cantidad * self.precio_unitario
     
     def __str__(self):
-        return f"{self.componente.nombre} - {self.orden.numero_orden}"
-    
-    def save(self, *args, **kwargs):
-        self.subtotal = self.cantidad * self.precio_unitario
-        super().save(*args, **kwargs)
-        # Actualizar el total de la orden
-        self.orden.total = sum(detalle.subtotal for detalle in self.orden.detalles.all())
-        self.orden.save()
+        return f"{self.componente.nombre} - {self.cantidad} unidades"

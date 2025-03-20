@@ -51,7 +51,7 @@ class Pedido(models.Model):
     
     numero_pedido = models.CharField(max_length=20, unique=True)
     cliente = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    coche = models.ForeignKey(Coche, on_delete=models.CASCADE, related_name='pedidos_ecommerce')
+    coche = models.ForeignKey('ecommerce.Coche', on_delete=models.CASCADE, related_name='pedidos_ecommerce')
     fecha_pedido = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=20, choices=ESTADOS, default='pendiente')
     precio_total = models.DecimalField(max_digits=10, decimal_places=2)

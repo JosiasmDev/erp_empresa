@@ -2,12 +2,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from decimal import Decimal
 from .models import Coche, Pedido
 from .forms import PasarelaPagoForm
-from manufacturing.models import OrdenFabricacion
-from accounting.models import Cuenta
-from inventory.models import OrdenEntrega
-from decimal import Decimal
 
 @login_required
 def ecommerce_dashboard(request):
@@ -61,6 +58,7 @@ def pasarela_pago(request, coche_id):
                 )
 
                 # Crear orden de fabricación
+                from manufacturing.models import OrdenFabricacion
                 orden_fabricacion = OrdenFabricacion.objects.create(
                     pedido=pedido,
                     coche=coche,
@@ -68,12 +66,14 @@ def pasarela_pago(request, coche_id):
                 )
 
                 # Crear orden de entrega
+                from inventory.models import OrdenEntrega
                 orden_entrega = OrdenEntrega.objects.create(
                     pedido=pedido,
                     estado='pendiente'
                 )
 
                 # Registrar la venta en contabilidad
+                from accounting.models import Cuenta
                 Cuenta.objects.create(
                     tipo='venta',
                     descripcion=f'Venta del coche {coche.nombre} - Pedido {pedido.numero_pedido}',

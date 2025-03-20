@@ -2,13 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from .models import OrdenFabricacion, Componente, ComponenteOrden
-from .forms import OrdenFabricacionForm
-from accounts.decorators import role_required
 from django.utils import timezone
 from decimal import Decimal
-from accounting.models import Cuenta
 from datetime import datetime, timedelta
+from .models import OrdenFabricacion, ComponenteOrden
+from .forms import OrdenFabricacionForm
+from accounts.decorators import role_required
 
 @login_required
 @role_required(['Produccion'])
@@ -55,7 +54,7 @@ def ordenes_fabricacion(request):
 @login_required
 @role_required(['Produccion'])
 def detalle_orden(request, orden_id):
-    orden = OrdenFabricacion.objects.get(id=orden_id)
+    orden = get_object_or_404(OrdenFabricacion, id=orden_id)
     if not orden.fecha_inicio:
         orden.fecha_inicio = datetime.now()
         orden.fecha_fin = orden.fecha_inicio + timedelta(days=14)  # 2 semanas para la fabricación
@@ -76,37 +75,77 @@ def detalle_orden(request, orden_id):
             orden.save()
             
             # Actualizar el pedido
-            orden.pedido.estado = 'completado'
-            orden.pedido.save()
+            if orden.pedido:
+                orden.pedido.estado = 'completado'
+                orden.pedido.save()
             
             messages.success(request, 'Producción finalizada exitosamente.')
             
         elif accion == 'solicitar_componente':
-            componente_id = request.POST.get('componente_id')
-            componente = get_object_or_404(Componente, id=componente_id)
-            
-            # Calcular el costo (30% del precio de venta)
-            costo = orden.pedido.precio_total * Decimal('0.30')
-            
-            # Registrar el gasto en contabilidad
-            Cuenta.objects.create(
-                tipo='compra',
-                descripcion=f'Compra de componentes para orden {orden.numero_orden}',
-                monto=costo,
-                orden_compra=None
-            )
-            
-            # Marcar el componente como disponible
-            if componente.nombre == 'Ruedas':
-                orden.ruedas_disponibles = True
-            elif componente.nombre == 'Motorizacion':
-                orden.motorizacion_disponible = True
-            elif componente.nombre == 'Tapiceria':
-                orden.tapiceria_disponible = True
-            elif componente.nombre == 'Extras':
-                orden.extras_disponibles = True
-            
-            orden.save()
-            messages.success(request, f'Componente {componente.nombre} solicitado exitosamente.')
+            try:
+                componente_id = request.POST.get('componente_id')
+                if not componente_id:
+                    messages.error(request, 'No se especificó el componente a solicitar.')
+                    return redirect('manufacturing:detalle_orden', orden_id=orden_id)
+                
+                # Obtener el componente del stock
+                from inventory.models import Componente, Stock
+                from accounting.models import Cuenta
+                
+                componente = get_object_or_404(Componente, id=componente_id)
+                
+                # Verificar si hay stock disponible
+                stock = Stock.objects.filter(componente=componente).first()
+                if not stock or stock.cantidad < 1:
+                    messages.error(request, f'No hay stock disponible del componente {componente.nombre}')
+                    return redirect('manufacturing:detalle_orden', orden_id=orden_id)
+                
+                # Calcular el costo (30% del precio de venta)
+                costo = orden.pedido.precio_total * Decimal('0.30') if orden.pedido else Decimal('0')
+                
+                # Registrar el gasto en contabilidad
+                Cuenta.objects.create(
+                    tipo='compra',
+                    descripcion=f'Compra de {componente.get_tipo_display()} para orden {orden.numero_orden}',
+                    monto=costo,
+                    orden_compra=None
+                )
+                
+                # Descontar del stock
+                stock.cantidad -= 1
+                stock.save()
+                
+                # Marcar el componente como disponible según su tipo
+                if componente.tipo.startswith('ruedas_'):
+                    orden.ruedas_disponibles = True
+                    orden.ruedas_asignadas = componente
+                elif componente.tipo.startswith('motor_'):
+                    orden.motorizacion_disponible = True
+                    orden.motorizacion_asignada = componente
+                elif componente.tipo.startswith('tapiceria_'):
+                    orden.tapiceria_disponible = True
+                    orden.tapiceria_asignada = componente
+                elif componente.tipo.startswith('extra_'):
+                    orden.extras_disponibles = True
+                    orden.extras_asignados = componente
+                
+                orden.save()
+                messages.success(request, f'Componente {componente.get_tipo_display()} asignado exitosamente.')
+            except Exception as e:
+                messages.error(request, f'Error al solicitar el componente: {str(e)}')
+                print(f"Error detallado: {str(e)}")  # Para depuración
     
-    return render(request, 'manufacturing/detalle_orden.html', {'orden': orden})
+    # Obtener los componentes disponibles según el tipo de silla
+    from inventory.models import Componente
+    componentes_disponibles = {
+        'ruedas': Componente.objects.filter(tipo__startswith='ruedas_'),
+        'motor': Componente.objects.filter(tipo__startswith='motor_'),
+        'tapiceria': Componente.objects.filter(tipo__startswith='tapiceria_'),
+        'extras': Componente.objects.filter(tipo__startswith='extra_')
+    }
+    
+    return render(request, 'manufacturing/detalle_orden.html', {
+        'orden': orden,
+        'is_produccion': True,
+        'componentes_disponibles': componentes_disponibles
+    })

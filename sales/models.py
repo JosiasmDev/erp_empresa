@@ -1,9 +1,8 @@
 from django.db import models
-from ecommerce.models import Coche
 
 class Pedido(models.Model):
     cliente = models.ForeignKey('crm.Cliente', on_delete=models.CASCADE)
-    coche = models.ForeignKey(Coche, on_delete=models.CASCADE)
+    coche = models.ForeignKey('ecommerce.Coche', on_delete=models.CASCADE)
     color = models.CharField(max_length=50, choices=[
         ('Negro', 'Negro'),
         ('Rojo', 'Rojo'),
@@ -19,6 +18,7 @@ class Pedido(models.Model):
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def calcular_total(self):
+        from ecommerce.models import Coche
         self.total = self.coche.precio_base
         self.save()
 
@@ -27,7 +27,7 @@ class Pedido(models.Model):
 
 class PedidoItem(models.Model):
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    coche = models.ForeignKey(Coche, on_delete=models.CASCADE)
+    coche = models.ForeignKey('ecommerce.Coche', on_delete=models.CASCADE)
     cantidad = models.IntegerField(default=1)
 
     def __str__(self):

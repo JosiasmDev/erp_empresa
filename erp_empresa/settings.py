@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'erp_empresa.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'erp_empresa',           # Nombre de la base de datos que creaste
+        'NAME': 'erp_empresa_new',           # Nombre de la base de datos que creaste
         'USER': 'postgres',         # Usuario de PostgreSQL
         'PASSWORD': 'aaaaaa',     # Contraseña del usuario
         'HOST': 'localhost',             # O la dirección del servidor (por defecto 'localhost')

@@ -1,59 +1,71 @@
 {% extends 'accounting/base_accounting.html' %}
 
 {% block accounting_content %}
-<div class="card">
-    <div class="card-header">
-        <h2>Dashboard de Contabilidad</h2>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card bg-primary text-white mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Ingresos Totales</h5>
-                        <h2 class="card-text">0€</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card bg-danger text-white mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Gastos Totales</h5>
-                        <h2 class="card-text">0€</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card bg-success text-white mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Balance</h5>
-                        <h2 class="card-text">0€</h2>
-                    </div>
-                </div>
+<div class="row">
+    <!-- Resumen del Mes -->
+    <div class="col-md-4">
+        <div class="card bg-success text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Ingresos del Mes</h5>
+                <h3 class="mb-0">{{ ingresos_mes }}€</h3>
             </div>
         </div>
-        
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Últimos Ingresos</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted">No hay ingresos registrados</p>
-                    </div>
-                </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-danger text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Gastos del Mes</h5>
+                <h3 class="mb-0">{{ gastos_mes }}€</h3>
             </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Últimos Gastos</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted">No hay gastos registrados</p>
-                    </div>
-                </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card {% if balance_mes >= 0 %}bg-primary{% else %}bg-warning{% endif %} text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Balance del Mes</h5>
+                <h3 class="mb-0">{{ balance_mes }}€</h3>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Últimas Facturas -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Últimas Facturas</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for factura in ultimas_facturas %}
+                    <tr>
+                        <td>{{ factura.numero }}</td>
+                        <td>{{ factura.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <span class="badge {% if factura.tipo == 'compra' %}bg-danger{% else %}bg-success{% endif %}">
+                                {{ factura.get_tipo_display }}
+                            </span>
+                        </td>
+                        <td>{{ factura.descripcion }}</td>
+                        <td>{{ factura.total }}€</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay facturas registradas</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

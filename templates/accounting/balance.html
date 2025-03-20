@@ -80,4 +80,103 @@
         </div>
     </div>
 </div>
+
+<div class="container mt-4">
+    <h2>Balance General</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Ingresos Totales</h5>
+                    <h3 class="card-text">${{ total_ingresos|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Gastos Totales</h5>
+                    <h3 class="card-text">${{ total_gastos|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card {% if balance_actual >= 0 %}bg-primary{% else %}bg-danger{% endif %} text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Balance Actual</h5>
+                    <h3 class="card-text">${{ balance_actual|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Detalles de Gastos del Mes</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Descripción</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for gasto in gastos_detalle %}
+                        <tr>
+                            <td>{{ gasto.fecha|date:"d/m/Y" }}</td>
+                            <td>{{ gasto.get_tipo_display }}</td>
+                            <td>{{ gasto.descripcion }}</td>
+                            <td>${{ gasto.monto|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No hay gastos registrados este mes.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Facturas del Mes</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Número</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for factura in facturas_mes %}
+                        <tr>
+                            <td>{{ factura.fecha|date:"d/m/Y" }}</td>
+                            <td>{{ factura.get_tipo_display }}</td>
+                            <td>{{ factura.numero }}</td>
+                            <td>${{ factura.total|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No hay facturas registradas este mes.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %} 

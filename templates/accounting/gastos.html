@@ -1,29 +1,71 @@
 {% extends 'accounting/base_accounting.html' %}
 
 {% block accounting_content %}
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
+<div class="card mb-4">
+    <div class="card-header">
         <h2>Gastos</h2>
-        <button class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Nuevo Gasto
-        </button>
     </div>
     <div class="card-body">
+        <div class="alert alert-info">
+            <h4>Total de Gastos: {{ total_gastos }}€</h4>
+        </div>
+        
+        <h3 class="mb-3">Facturas de Compra</h3>
+        <div class="table-responsive mb-4">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th>Descripción</th>
+                        <th>Subtotal</th>
+                        <th>IVA</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for factura in facturas %}
+                    <tr>
+                        <td>{{ factura.numero }}</td>
+                        <td>{{ factura.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>{{ factura.descripcion }}</td>
+                        <td>{{ factura.subtotal }}€</td>
+                        <td>{{ factura.iva }}€</td>
+                        <td>{{ factura.total }}€</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No hay facturas de compra registradas</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <h3 class="mb-3">Otros Gastos</h3>
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Fecha</th>
+                        <th>Tipo</th>
                         <th>Descripción</th>
                         <th>Monto</th>
-                        <th>Categoría</th>
-                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for cuenta in cuentas %}
                     <tr>
-                        <td colspan="5" class="text-center">No hay gastos registrados</td>
+                        <td>{{ cuenta.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>{{ cuenta.get_tipo_display }}</td>
+                        <td>{{ cuenta.descripcion }}</td>
+                        <td>{{ cuenta.monto }}€</td>
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No hay otros gastos registrados</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

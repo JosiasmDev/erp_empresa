@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db import transaction
 from .models import OrdenCompra, DetalleOrdenCompra, Proveedor
-from manufacturing.models import Componente
 
 @login_required
 def listar_ordenes_compra(request):
@@ -24,6 +24,7 @@ def crear_orden_compra(request):
         precio_unitario = request.POST.get('precio_unitario')
         proveedor_id = request.POST.get('proveedor_id')
         
+        from manufacturing.models import Componente
         componente = get_object_or_404(Componente, id=componente_id)
         proveedor = get_object_or_404(Proveedor, id=proveedor_id)
         
@@ -64,12 +65,33 @@ def detalle_orden_compra(request, orden_id):
 @login_required
 def aprobar_orden(request, orden_id):
     if request.method == 'POST':
-        orden = get_object_or_404(OrdenCompra, id=orden_id)
-        if orden.estado == 'pendiente':
-            orden.estado = 'aprobada'
-            orden.save()
-            messages.success(request, 'Orden de compra aprobada correctamente.')
-        return redirect('purchase:detalle_orden_compra', orden.id)
+        with transaction.atomic():
+            orden = get_object_or_404(OrdenCompra, id=orden_id)
+            if orden.estado == 'pendiente':
+                # Actualizar estado de la orden
+                orden.estado = 'aprobada'
+                orden.save()
+                
+                # Actualizar factura asociada
+                from accounting.models import Factura, Cuenta, Balance
+                factura = Factura.objects.filter(orden_compra=orden).first()
+                if factura:
+                    factura.estado = 'pagada'
+                    factura.save()
+                
+                # Actualizar cuenta asociada
+                cuenta = Cuenta.objects.filter(orden_compra=orden).first()
+                if cuenta:
+                    cuenta.tipo = 'compra'  # Asegurarnos que es tipo compra
+                    cuenta.save()
+                
+                # Actualizar balance
+                balance = Balance.objects.create()
+                balance.calcular_totales()
+                balance.save()
+                
+                messages.success(request, 'Orden de compra aprobada y factura pagada correctamente.')
+            return redirect('purchase:detalle_orden_compra', orden.id)
     return redirect('purchase:ordenes_compra')
 
 @login_required
