@@ -1,182 +1,266 @@
 {% extends 'accounting/base_accounting.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+body {
+    background-color: #f8f9fa;
+}
+
+.dashboard-container {
+    padding: 2rem;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    margin-bottom: 1rem;
+}
+
+.metric-card {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 1rem 0;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    padding: 1rem;
+}
+
+.metric-positive {
+    color: #28a745;
+}
+
+.metric-negative {
+    color: #dc3545;
+}
+</style>
+{% endblock %}
 
 {% block accounting_content %}
-<div class="card">
-    <div class="card-header">
-        <h2>Balance General</h2>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>Activos</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Concepto</th>
-                                        <th>Monto</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="2" class="text-center">No hay activos registrados</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>Pasivos</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Concepto</th>
-                                        <th>Monto</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="2" class="text-center">No hay pasivos registrados</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <h5>Resumen</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <h6>Total Activos</h6>
-                        <h3>0€</h3>
-                    </div>
-                    <div class="col-md-4">
-                        <h6>Total Pasivos</h6>
-                        <h3>0€</h3>
-                    </div>
-                    <div class="col-md-4">
-                        <h6>Patrimonio Neto</h6>
-                        <h3>0€</h3>
-                    </div>
-                </div>
-            </div>
+<div class="dashboard-container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Panel Financiero</h2>
         </div>
     </div>
-</div>
 
-<div class="container mt-4">
-    <h2>Balance General</h2>
-    
+    <!-- Métricas Principales -->
     <div class="row mb-4">
         <div class="col-md-4">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Ingresos Totales</h5>
-                    <h3 class="card-text">${{ total_ingresos|floatformat:2 }}</h3>
+            <div class="card">
+                <div class="metric-card">
+                    <h5>Ingresos del Mes</h5>
+                    <div class="metric-value metric-positive">
+                        {{ ingresos_mes|floatformat:2 }}€
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card bg-danger text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Gastos Totales</h5>
-                    <h3 class="card-text">${{ total_gastos|floatformat:2 }}</h3>
+            <div class="card">
+                <div class="metric-card">
+                    <h5>Gastos del Mes</h5>
+                    <div class="metric-value metric-negative">
+                        {{ gastos_mes|floatformat:2 }}€
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card {% if balance_actual >= 0 %}bg-primary{% else %}bg-danger{% endif %} text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Balance Actual</h5>
-                    <h3 class="card-text">${{ balance_actual|floatformat:2 }}</h3>
+            <div class="card">
+                <div class="metric-card">
+                    <h5>Balance del Mes</h5>
+                    <div class="metric-value {% if balance_mes >= 0 %}metric-positive{% else %}metric-negative{% endif %}">
+                        {{ balance_mes|floatformat:2 }}€
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-header">
-            <h4>Detalles de Gastos del Mes</h4>
+    <!-- Gráficas -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Evolución Financiera</h5>
+                    <div class="chart-container">
+                        <canvas id="evolucionChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Tipo</th>
-                            <th>Descripción</th>
-                            <th>Monto</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for gasto in gastos_detalle %}
-                        <tr>
-                            <td>{{ gasto.fecha|date:"d/m/Y" }}</td>
-                            <td>{{ gasto.get_tipo_display }}</td>
-                            <td>{{ gasto.descripcion }}</td>
-                            <td>${{ gasto.monto|floatformat:2 }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center">No hay gastos registrados este mes.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Ratios Financieros</h5>
+                    <div class="metric-card">
+                        <h6>Ratio de Liquidez</h6>
+                        <div class="metric-value {% if ratio_liquidez >= 1 %}metric-positive{% else %}metric-negative{% endif %}">
+                            {{ ratio_liquidez|floatformat:2 }}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header">
-            <h4>Facturas del Mes</h4>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Distribución de Gastos</h5>
+                    <div class="chart-container">
+                        <canvas id="gastosChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Tipo</th>
-                            <th>Número</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for factura in facturas_mes %}
-                        <tr>
-                            <td>{{ factura.fecha|date:"d/m/Y" }}</td>
-                            <td>{{ factura.get_tipo_display }}</td>
-                            <td>{{ factura.numero }}</td>
-                            <td>${{ factura.total|floatformat:2 }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center">No hay facturas registradas este mes.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Distribución de Ingresos</h5>
+                    <div class="chart-container">
+                        <canvas id="ingresosChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const datos = {{ datos_graficas|safe }};
+    console.log('Datos de las gráficas:', datos);
+
+    // Gráfica de evolución
+    const ctxEvolucion = document.getElementById('evolucionChart');
+    if (ctxEvolucion) {
+        new Chart(ctxEvolucion, {
+            type: 'line',
+            data: {
+                labels: datos.meses,
+                datasets: [{
+                    label: 'Ingresos',
+                    data: datos.ingresos_mensuales,
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Gastos',
+                    data: datos.gastos_mensuales,
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => value + '€'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Gráfica de gastos
+    const ctxGastos = document.getElementById('gastosChart');
+    if (ctxGastos && datos.gastos_por_tipo.length > 0) {
+        new Chart(ctxGastos, {
+            type: 'doughnut',
+            data: {
+                labels: datos.gastos_por_tipo.map(item => {
+                    switch(item.tipo) {
+                        case 'gasto': return 'Gastos Generales';
+                        case 'compra': return 'Compras';
+                        case 'salario': return 'Salarios';
+                        default: return item.tipo;
+                    }
+                }),
+                datasets: [{
+                    data: datos.gastos_por_tipo.map(item => item.total),
+                    backgroundColor: [
+                        '#dc3545',
+                        '#007bff',
+                        '#ffc107'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    }
+
+    // Gráfica de ingresos
+    const ctxIngresos = document.getElementById('ingresosChart');
+    if (ctxIngresos && datos.ingresos_por_tipo.length > 0) {
+        new Chart(ctxIngresos, {
+            type: 'doughnut',
+            data: {
+                labels: datos.ingresos_por_tipo.map(item => {
+                    switch(item.tipo) {
+                        case 'ingreso': return 'Ingresos Generales';
+                        case 'venta': return 'Ventas';
+                        default: return item.tipo;
+                    }
+                }),
+                datasets: [{
+                    data: datos.ingresos_por_tipo.map(item => item.total),
+                    backgroundColor: [
+                        '#28a745',
+                        '#6f42c1'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
 {% endblock %} 

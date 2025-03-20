@@ -1,0 +1,312 @@
+{% extends 'accounting/base_accounting.html' %}
+{% load static %}
+
+{% block accounting_content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">Balance Financiero</h1>
+    <p class="mb-4">Vista general del estado financiero de la empresa</p>
+
+    <!-- Tarjetas de Métricas -->
+    <div class="row">
+        <!-- Ingresos Mensuales -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Ingresos Mensuales</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">€{{ ingresos_mes|floatformat:2 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gastos Mensuales (sin sueldos) -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Gastos Mensuales</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">€{{ gastos_mes|floatformat:2 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gastos en Sueldos -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Gastos en Sueldos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">€{{ sueldos_mes|floatformat:2 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Balance Mensual -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Balance Mensual</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">€{{ balance_mes|floatformat:2 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-balance-scale fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficas -->
+    <div class="row">
+        <!-- Evolución Financiera -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Evolución Financiera</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="financialEvolutionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Distribución de Gastos -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Distribución de Gastos</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie">
+                        <canvas id="expensesDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Distribución de Ingresos -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Distribución de Ingresos</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie">
+                        <canvas id="incomeDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Distribución de Sueldos por Cargo -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Sueldos por Cargo</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie">
+                        <canvas id="salariesByDepartmentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Datos para las gráficas
+    const datos = {{ datos_graficas|safe }};
+    
+    // Configuración de colores
+    const colors = {
+        primary: '#4e73df',
+        success: '#1cc88a',
+        danger: '#e74a3b',
+        warning: '#f6c23e',
+        secondary: '#858796',
+        info: '#36b9cc'
+    };
+
+    // Gráfica de Evolución Financiera
+    const evolutionCtx = document.getElementById('financialEvolutionChart');
+    new Chart(evolutionCtx, {
+        type: 'line',
+        data: {
+            labels: datos.meses,
+            datasets: [
+                {
+                    label: 'Ingresos',
+                    data: datos.ingresos_mensuales,
+                    borderColor: colors.success,
+                    backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                    fill: true
+                },
+                {
+                    label: 'Gastos (sin sueldos)',
+                    data: datos.gastos_mensuales,
+                    borderColor: colors.danger,
+                    backgroundColor: 'rgba(231, 74, 59, 0.1)',
+                    fill: true
+                },
+                {
+                    label: 'Sueldos',
+                    data: datos.gastos_sueldos,
+                    borderColor: colors.warning,
+                    backgroundColor: 'rgba(246, 194, 62, 0.1)',
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '€' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfica de Distribución de Gastos
+    const expensesCtx = document.getElementById('expensesDistributionChart');
+    new Chart(expensesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: datos.gastos_por_tipo.map(item => {
+                switch(item.tipo) {
+                    case 'gasto': return 'Gastos Generales';
+                    case 'compra': return 'Compras';
+                    case 'salario': return 'Sueldos';
+                    default: return item.tipo;
+                }
+            }),
+            datasets: [{
+                data: datos.gastos_por_tipo.map(item => item.total),
+                backgroundColor: [colors.danger, colors.info, colors.warning],
+                hoverBackgroundColor: [colors.danger, colors.info, colors.warning],
+                hoverBorderColor: "rgba(234, 236, 244, 1)"
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Gráfica de Distribución de Ingresos
+    const incomeCtx = document.getElementById('incomeDistributionChart');
+    new Chart(incomeCtx, {
+        type: 'doughnut',
+        data: {
+            labels: datos.ingresos_por_tipo.map(item => {
+                switch(item.tipo) {
+                    case 'ingreso': return 'Ingresos Generales';
+                    case 'venta': return 'Ventas';
+                    default: return item.tipo;
+                }
+            }),
+            datasets: [{
+                data: datos.ingresos_por_tipo.map(item => item.total),
+                backgroundColor: [colors.success, colors.primary],
+                hoverBackgroundColor: [colors.success, colors.primary],
+                hoverBorderColor: "rgba(234, 236, 244, 1)"
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Gráfica de Sueldos por Cargo
+    const salariesCtx = document.getElementById('salariesByDepartmentChart');
+    new Chart(salariesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: datos.sueldos_por_departamento.map(item => item.departamento),
+            datasets: [{
+                data: datos.sueldos_por_departamento.map(item => item.total),
+                backgroundColor: [
+                    colors.primary,
+                    colors.success,
+                    colors.info,
+                    colors.warning,
+                    colors.danger,
+                    colors.secondary
+                ],
+                hoverBackgroundColor: [
+                    colors.primary,
+                    colors.success,
+                    colors.info,
+                    colors.warning,
+                    colors.danger,
+                    colors.secondary
+                ],
+                hoverBorderColor: "rgba(234, 236, 244, 1)"
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %} 

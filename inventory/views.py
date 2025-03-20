@@ -37,9 +37,9 @@ def crear_movimiento(request):
                 movimiento = form.save(commit=False)
                 movimiento.usuario = request.user
                 
-                # Calcular el costo unitario como 30% del precio de venta
+                # Usar el precio de compra calculado automáticamente (30% del precio de venta)
                 componente = movimiento.componente
-                movimiento.precio_unitario = Decimal(str(float(componente.precio_compra) * 0.3))
+                movimiento.precio_unitario = componente.precio_compra
                 
                 # Calcular el precio total
                 cantidad = Decimal(str(movimiento.cantidad))

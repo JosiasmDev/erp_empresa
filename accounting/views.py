@@ -9,6 +9,10 @@ from django.db.models import Sum, Q
 from decimal import Decimal
 from django.utils import timezone
 from datetime import datetime, timedelta
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+from django.utils.safestring import mark_safe
+from human_resources.models import Empleado
 
 @role_required(['accounting'])
 def accounting_facturas(request):
@@ -162,53 +166,123 @@ def gastos(request):
 @login_required
 @role_required(['Contabilidad', 'Administrador'])
 def balance(request):
-    # Obtener el último balance
-    ultimo_balance = Balance.objects.order_by('-fecha').first()
-    if not ultimo_balance:
-        ultimo_balance = Balance.objects.create()
-    
-    # Calcular totales de facturas
-    facturas_ingresos = Factura.objects.filter(tipo='venta', estado='pagada').aggregate(total=Sum('total'))['total'] or Decimal('0')
-    facturas_gastos = Factura.objects.filter(tipo='compra', estado='pagada').aggregate(total=Sum('total'))['total'] or Decimal('0')
-    
-    # Calcular totales de cuentas
-    cuentas_ingresos = Cuenta.objects.filter(tipo__in=['ingreso', 'venta']).aggregate(total=Sum('monto'))['total'] or Decimal('0')
-    cuentas_gastos = Cuenta.objects.filter(tipo__in=['gasto', 'compra', 'salario']).aggregate(total=Sum('monto'))['total'] or Decimal('0')
-    
-    # Totales combinados
-    total_ingresos = facturas_ingresos + cuentas_ingresos
-    total_gastos = facturas_gastos + cuentas_gastos
-    balance_actual = total_ingresos - total_gastos
-    
-    # Actualizar balance si es necesario
-    if balance_actual != ultimo_balance.balance_total:
-        ultimo_balance.ingresos_totales = total_ingresos
-        ultimo_balance.gastos_totales = total_gastos
-        ultimo_balance.balance_total = balance_actual
-        ultimo_balance.save()
-    
-    # Obtener facturas del mes actual
+    # Obtener datos del mes actual
     inicio_mes = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    facturas_mes = Factura.objects.filter(fecha__gte=inicio_mes, estado='pagada')
-    cuentas_mes = Cuenta.objects.filter(fecha__gte=inicio_mes)
+    fin_mes = (inicio_mes + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
     
-    # Obtener detalles de gastos
-    gastos_detalle = Cuenta.objects.filter(
-        tipo__in=['gasto', 'compra', 'salario'],
-        fecha__gte=inicio_mes
-    ).order_by('-fecha')
+    # Obtener datos de los últimos 6 meses para gráficas
+    meses = []
+    ingresos_mensuales = []
+    gastos_mensuales = []
+    gastos_sueldos = []
+    
+    for i in range(5, -1, -1):
+        fecha = inicio_mes - timedelta(days=30*i)
+        mes_inicio = fecha.replace(day=1)
+        mes_fin = (mes_inicio + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
+        
+        meses.append(fecha.strftime('%B %Y'))
+        
+        # Calcular ingresos del mes
+        ingresos = Cuenta.objects.filter(
+            tipo__in=['ingreso', 'venta'],
+            fecha__range=(mes_inicio, mes_fin)
+        ).aggregate(total=Sum('monto'))['total'] or Decimal('0')
+        ingresos_mensuales.append(float(ingresos))
+        
+        # Calcular gastos del mes (excluyendo sueldos)
+        gastos = Cuenta.objects.filter(
+            tipo__in=['gasto', 'compra'],
+            fecha__range=(mes_inicio, mes_fin)
+        ).aggregate(total=Sum('monto'))['total'] or Decimal('0')
+        gastos_mensuales.append(float(gastos))
+        
+        # Calcular gastos de sueldos del mes
+        sueldos = Cuenta.objects.filter(
+            tipo='salario',
+            fecha__range=(mes_inicio, mes_fin)
+        ).aggregate(total=Sum('monto'))['total'] or Decimal('0')
+        gastos_sueldos.append(float(sueldos))
+    
+    # Obtener datos del mes actual
+    cuentas_mes = Cuenta.objects.filter(fecha__range=(inicio_mes, fin_mes))
+    ingresos_mes = cuentas_mes.filter(tipo__in=['ingreso', 'venta']).aggregate(total=Sum('monto'))['total'] or Decimal('0')
+    gastos_mes = cuentas_mes.filter(tipo__in=['gasto', 'compra']).aggregate(total=Sum('monto'))['total'] or Decimal('0')
+    sueldos_mes = cuentas_mes.filter(tipo='salario').aggregate(total=Sum('monto'))['total'] or Decimal('0')
+    
+    # Obtener distribución de gastos por tipo
+    gastos_por_tipo = []
+    for tipo in ['gasto', 'compra']:
+        total = cuentas_mes.filter(tipo=tipo).aggregate(total=Sum('monto'))['total'] or Decimal('0')
+        if total > 0:
+            gastos_por_tipo.append({
+                'tipo': tipo,
+                'total': float(total)
+            })
+    
+    # Agregar sueldos a la distribución de gastos
+    if sueldos_mes > 0:
+        gastos_por_tipo.append({
+            'tipo': 'salario',
+            'total': float(sueldos_mes)
+        })
+    
+    # Obtener distribución de ingresos por tipo
+    ingresos_por_tipo = []
+    for tipo in ['ingreso', 'venta']:
+        total = cuentas_mes.filter(tipo=tipo).aggregate(total=Sum('monto'))['total'] or Decimal('0')
+        if total > 0:
+            ingresos_por_tipo.append({
+                'tipo': tipo,
+                'total': float(total)
+            })
+    
+    # Obtener desglose de sueldos por cargo
+    sueldos_por_departamento = []
+    cargos = Empleado.objects.values('cargo').distinct()
+    for cargo in cargos:
+        # Primero obtenemos los empleados con este cargo
+        empleados_cargo = Empleado.objects.filter(cargo=cargo['cargo']).values_list('id', flat=True)
+        # Luego sumamos los sueldos de las cuentas asociadas a estos empleados
+        total_cargo = Cuenta.objects.filter(
+            tipo='salario',
+            fecha__range=(inicio_mes, fin_mes),
+            empleado_id__in=empleados_cargo
+        ).aggregate(total=Sum('monto'))['total'] or Decimal('0')
+        
+        if total_cargo > 0:
+            sueldos_por_departamento.append({
+                'departamento': cargo['cargo'],  # Usamos el cargo como "departamento" para mantener la estructura
+                'total': float(total_cargo)
+            })
+    
+    # Calcular ratios financieros
+    total_gastos_mes = gastos_mes + sueldos_mes
+    ratio_liquidez = float(ingresos_mes) / float(total_gastos_mes) if total_gastos_mes > 0 else 0
+    
+    # Serializar datos para JavaScript
+    datos_js = {
+        'meses': meses,
+        'ingresos_mensuales': ingresos_mensuales,
+        'gastos_mensuales': gastos_mensuales,
+        'gastos_sueldos': gastos_sueldos,
+        'gastos_por_tipo': gastos_por_tipo,
+        'ingresos_por_tipo': ingresos_por_tipo,
+        'sueldos_por_departamento': sueldos_por_departamento
+    }
     
     context = {
-        'balance': ultimo_balance,
-        'facturas_mes': facturas_mes,
-        'cuentas_mes': cuentas_mes,
-        'gastos_detalle': gastos_detalle,
-        'total_ingresos': total_ingresos,
-        'total_gastos': total_gastos,
-        'balance_actual': balance_actual,
+        'datos_graficas': mark_safe(json.dumps(datos_js)),
+        'ingresos_mes': ingresos_mes,
+        'gastos_mes': gastos_mes,
+        'sueldos_mes': sueldos_mes,
+        'total_gastos_mes': total_gastos_mes,
+        'balance_mes': ingresos_mes - total_gastos_mes,
+        'ratio_liquidez': ratio_liquidez,
         'is_contabilidad': True,
     }
-    return render(request, 'accounting/balance.html', context)
+    
+    return render(request, 'accounting/balance_temp.html', context)
 
 @login_required
 @role_required(['Contabilidad', 'Administrador'])
