@@ -202,7 +202,7 @@
                             {% if user.is_staff or 'produccion' in user_roles %}
                             <li class="dropdown-submenu">Producción
                                 <ul>
-                                    <li><a class="dropdown-item" href="{% url 'manufacturing:ordenes_fabricacion' %}">Órdenes de Fabricación</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'manufacturing:lista_ordenes' %}">Órdenes de Fabricación</a></li>
                                     <li><a class="dropdown-item" href="{% url 'manufacturing:crear_orden' %}">Nueva Orden</a></li>
                                 </ul>
                             </li>

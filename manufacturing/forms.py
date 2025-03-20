@@ -11,8 +11,8 @@ class OrdenFabricacionForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Filtrar solo los pedidos pendientes
         self.fields['pedido'].queryset = Pedido.objects.filter(estado='pendiente')
-        # Filtrar solo los coches disponibles
-        self.fields['coche'].queryset = Coche.objects.filter(disponible=True)
+        # Mostrar todos los coches disponibles
+        self.fields['coche'].queryset = Coche.objects.all()
 
 class ComponenteOrdenForm(forms.ModelForm):
     class Meta:
