@@ -8,6 +8,8 @@ from accounting.models import Cuenta
 from .models import Profile
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from sales.models import Pedido
+from inventory.models import OrdenEntrega
 
 def is_admin(user):
     return user.groups.filter(name='Administrador').exists()
@@ -95,3 +97,19 @@ def facturas_view(request):
 def create_user_profile(sender, instance, created, **kwargs):
     if created and not hasattr(instance, 'profile'):
         Profile.objects.create(user=instance, role='administrador')
+
+@login_required
+def perfil(request):
+    # Obtener los pedidos entregados del cliente
+    pedidos_entregados = []
+    if request.user.groups.filter(name='Clientes').exists():
+        pedidos_entregados = Pedido.objects.filter(
+            cliente__user=request.user,
+            estado='entregado'
+        ).select_related('coche')
+    
+    context = {
+        'pedidos_entregados': pedidos_entregados,
+        **get_user_roles(request.user)
+    }
+    return render(request, 'accounts/perfil.html', context)

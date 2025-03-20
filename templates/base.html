@@ -183,9 +183,9 @@
                             {% if user.is_staff or 'ventas' in user_roles %}
                             <li class="dropdown-submenu">Ventas
                                 <ul>
-                                    <li><a class="dropdown-item" href="/sales/">Pedidos</a></li>
-                                    <li><a class="dropdown-item" href="/crm/">Clientes</a></li>
-                                    <li><a class="dropdown-item" href="/sales/crear/">Nueva Venta</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'sales:pedidos' %}">Pedidos</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'crm:clientes' %}">Clientes</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'sales:crear_pedido' %}">Nueva Venta</a></li>
                                 </ul>
                             </li>
                             {% endif %}
@@ -193,8 +193,8 @@
                             {% if user.is_staff or 'compras' in user_roles %}
                             <li class="dropdown-submenu">Compras
                                 <ul>
-                                    <li><a class="dropdown-item" href="/purchase/">Órdenes de Compra</a></li>
-                                    <li><a class="dropdown-item" href="/purchase/crear/">Nueva Compra</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'purchase:ordenes_compra' %}">Órdenes de Compra</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'purchase:crear_orden_compra' %}">Nueva Compra</a></li>
                                 </ul>
                             </li>
                             {% endif %}
@@ -211,7 +211,7 @@
                             {% if user.is_staff or 'inventario' in user_roles %}
                             <li class="dropdown-submenu">Inventario
                                 <ul>
-                                    <li><a class="dropdown-item" href="/inventory/">Stock</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'inventory:stock' %}">Stock</a></li>
                                 </ul>
                             </li>
                             {% endif %}
@@ -219,8 +219,8 @@
                             {% if user.is_staff or 'rrhh' in user_roles %}
                             <li class="dropdown-submenu">RRHH
                                 <ul>
-                                    <li><a class="dropdown-item" href="/human_resources/">Empleados</a></li>
-                                    <li><a class="dropdown-item" href="/human_resources/crear/">Nuevo Empleado</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'human_resources:empleados' %}">Empleados</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'human_resources:crear_empleado' %}">Nuevo Empleado</a></li>
                                 </ul>
                             </li>
                             {% endif %}
@@ -228,8 +228,9 @@
                             {% if user.is_staff or 'marketing' in user_roles %}
                             <li class="dropdown-submenu">Marketing
                                 <ul>
-                                    <li><a class="dropdown-item" href="/marketing_automation/">Campañas</a></li>
-                                    <li><a class="dropdown-item" href="/marketing_automation/crear/">Nueva Campaña</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'marketing_automation:campanas' %}">Campañas</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'marketing_automation:crear_campana' %}">Nueva Campaña</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'marketing_automation:editar_todos_coches' %}">Editar Coches</a></li>
                                 </ul>
                             </li>
                             {% endif %}

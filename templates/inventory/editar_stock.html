@@ -3,32 +3,52 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Editar Stock - {{ stock.componente.nombre }}</h5>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="{{ form.cantidad.id_for_label }}" class="form-label">Cantidad</label>
-                            {{ form.cantidad }}
-                            {% if form.cantidad.errors %}
-                            <div class="alert alert-danger">
-                                {{ form.cantidad.errors }}
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                            <a href="{% url 'inventory:gestionar_stock' %}" class="btn btn-secondary">Cancelar</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <h2>Editar Stock</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Información del Componente</h5>
+            <p><strong>Nombre:</strong> {{ stock.componente.nombre }}</p>
+            <p><strong>Tipo:</strong> {{ stock.componente.tipo }}</p>
+            <p><strong>Descripción:</strong> {{ stock.componente.descripcion }}</p>
         </div>
     </div>
+    
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.cantidad_actual.id_for_label }}">Cantidad Actual</label>
+            {{ form.cantidad_actual }}
+            {% if form.cantidad_actual.errors %}
+            <div class="alert alert-danger">
+                {{ form.cantidad_actual.errors }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.ubicacion.id_for_label }}">Ubicación</label>
+            {{ form.ubicacion }}
+            {% if form.ubicacion.errors %}
+            <div class="alert alert-danger">
+                {{ form.ubicacion.errors }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.notas.id_for_label }}">Notas</label>
+            {{ form.notas }}
+            {% if form.notas.errors %}
+            <div class="alert alert-danger">
+                {{ form.notas.errors }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <a href="{% url 'inventory:stock_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
 </div>
 {% endblock %} 

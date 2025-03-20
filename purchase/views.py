@@ -46,12 +46,12 @@ def crear_orden_compra(request):
         messages.success(request, 'Orden de compra creada correctamente.')
         return redirect('purchase:detalle_orden_compra', orden_compra.id)
     
-    return redirect('inventory:gestionar_stock')
+    return redirect('inventory:inventory_stock')
 
 @login_required
 def detalle_orden_compra(request, orden_id):
     orden = get_object_or_404(OrdenCompra, id=orden_id)
-    detalles = orden.detalles.all()
+    detalles = orden.detalleordencompra_set.all()
     return render(request, 'purchase/detalle_orden_compra.html', {
         'orden': orden,
         'detalles': detalles,
@@ -91,7 +91,7 @@ def aprobar_orden(request, orden_id):
                 balance.save()
                 
                 messages.success(request, 'Orden de compra aprobada y factura pagada correctamente.')
-            return redirect('purchase:detalle_orden_compra', orden.id)
+            return redirect('inventory:stock')
     return redirect('purchase:ordenes_compra')
 
 @login_required

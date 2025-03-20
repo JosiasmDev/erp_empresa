@@ -23,13 +23,14 @@ def clientes(request):
     clientes = Cliente.objects.all().prefetch_related('pedido_set')
     return render(request, 'crm/clientes.html', {'clientes': clientes})
 
+@login_required
 def crear_cliente(request):
     if request.method == 'POST':
         form = ClienteForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Cliente creado.')
-            return redirect('crm_clientes')
+            return redirect('crm:clientes')
     else:
         form = ClienteForm()
     context = {

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Mi Perfil</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Usuario:</strong> {{ user.username }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Roles:</strong></p>
+                    <ul>
+                        {% for role in roles %}
+                            <li>{{ role }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            {% if 'Clientes' in roles %}
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Mis Vehículos Entregados</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if pedidos_entregados %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Pedido</th>
+                                            <th>Vehículo</th>
+                                            <th>Color</th>
+                                            <th>Ruedas</th>
+                                            <th>Fecha de Entrega</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for pedido in pedidos_entregados %}
+                                            <tr>
+                                                <td>#{{ pedido.id }}</td>
+                                                <td>{{ pedido.coche.nombre }}</td>
+                                                <td>{{ pedido.color }}</td>
+                                                <td>{{ pedido.rueda }}</td>
+                                                <td>{{ pedido.fecha|date:"d/m/Y" }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> No tienes vehículos entregados aún.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

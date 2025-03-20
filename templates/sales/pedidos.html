@@ -15,34 +15,39 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Número de Pedido</th>
+                    <th>ID</th>
                     <th>Cliente</th>
                     <th>Coche</th>
+                    <th>Color</th>
+                    <th>Ruedas</th>
                     <th>Fecha</th>
                     <th>Estado</th>
-                    <th>Precio Total</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody>
                 {% for pedido in pedidos %}
                 <tr>
-                    <td>{{ pedido.numero_pedido }}</td>
+                    <td>{{ pedido.id }}</td>
                     <td>{{ pedido.cliente.nombre }}</td>
                     <td>{{ pedido.coche.nombre }}</td>
-                    <td>{{ pedido.fecha_pedido|date:"d/m/Y" }}</td>
+                    <td>{{ pedido.color }}</td>
+                    <td>{{ pedido.rueda }}</td>
+                    <td>{{ pedido.fecha|date:"d/m/Y" }}</td>
                     <td>
                         <span class="badge {% if pedido.estado == 'pendiente' %}bg-warning
                                           {% elif pedido.estado == 'en_proceso' %}bg-info
                                           {% elif pedido.estado == 'completado' %}bg-success
+                                          {% elif pedido.estado == 'entregado' %}bg-primary
                                           {% else %}bg-danger{% endif %}">
                             {{ pedido.get_estado_display }}
                         </span>
                     </td>
-                    <td>{{ pedido.precio_total }}€</td>
+                    <td>{{ pedido.total }}€</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center">No hay pedidos registrados</td>
+                    <td colspan="8" class="text-center">No hay pedidos registrados</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -1,6 +1,14 @@
 from django.db import models
 
 class Pedido(models.Model):
+    ESTADO_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('en_proceso', 'En Proceso'),
+        ('completado', 'Completado'),
+        ('entregado', 'Entregado'),
+        ('cancelado', 'Cancelado'),
+    ]
+    
     cliente = models.ForeignKey('crm.Cliente', on_delete=models.CASCADE)
     coche = models.ForeignKey('ecommerce.Coche', on_delete=models.CASCADE)
     color = models.CharField(max_length=50, choices=[
@@ -16,6 +24,7 @@ class Pedido(models.Model):
     ], default='19"')
     fecha = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
 
     def calcular_total(self):
         from ecommerce.models import Coche

@@ -5,6 +5,8 @@ from django.contrib import messages
 from decimal import Decimal
 from .models import Coche, Pedido
 from .forms import PasarelaPagoForm
+from sales.models import Pedido as SalesPedido
+from crm.models import Cliente
 
 @login_required
 def ecommerce_dashboard(request):
@@ -46,8 +48,19 @@ def pasarela_pago(request, coche_id):
             aceptar_contrato = form.cleaned_data['aceptar_contrato']
 
             if aceptar_contrato:
-                # Crear el pedido
-                pedido = Pedido.objects.create(
+                # Crear o obtener el cliente
+                cliente, created = Cliente.objects.get_or_create(
+                    usuario=request.user,
+                    defaults={
+                        'nombre': nombre_completo,
+                        'email': email,
+                        'telefono': '',  # Se puede actualizar después
+                        'direccion': '',  # Se puede actualizar después
+                    }
+                )
+
+                # Crear el pedido en ecommerce
+                pedido_ecommerce = Pedido.objects.create(
                     cliente=request.user,
                     coche=coche,
                     precio_total=precio_total,
@@ -57,10 +70,19 @@ def pasarela_pago(request, coche_id):
                     extras_seleccionados=extras
                 )
 
+                # Crear el pedido en sales
+                pedido_sales = SalesPedido.objects.create(
+                    cliente=cliente,
+                    coche=coche,
+                    color=coche.color,
+                    rueda=rueda,
+                    total=precio_total
+                )
+
                 # Crear orden de fabricación
                 from manufacturing.models import OrdenFabricacion
                 orden_fabricacion = OrdenFabricacion.objects.create(
-                    pedido=pedido,
+                    pedido=pedido_sales,
                     coche=coche,
                     estado='pendiente'
                 )
@@ -68,7 +90,7 @@ def pasarela_pago(request, coche_id):
                 # Crear orden de entrega
                 from inventory.models import OrdenEntrega
                 orden_entrega = OrdenEntrega.objects.create(
-                    pedido=pedido,
+                    pedido=pedido_sales,
                     estado='pendiente'
                 )
 
@@ -76,9 +98,9 @@ def pasarela_pago(request, coche_id):
                 from accounting.models import Cuenta
                 Cuenta.objects.create(
                     tipo='venta',
-                    descripcion=f'Venta del coche {coche.nombre} - Pedido {pedido.numero_pedido}',
+                    descripcion=f'Venta del coche {coche.nombre} - Pedido {pedido_ecommerce.numero_pedido}',
                     monto=precio_total,
-                    pedido=pedido
+                    pedido=pedido_ecommerce
                 )
 
                 # Limpiar la sesión
@@ -93,7 +115,7 @@ def pasarela_pago(request, coche_id):
                     'coche': coche,
                     'nombre_completo': nombre_completo,
                     'precio_total': precio_total,
-                    'numero_pedido': pedido.numero_pedido,
+                    'numero_pedido': pedido_ecommerce.numero_pedido,
                     'orden_fabricacion': orden_fabricacion,
                     'orden_entrega': orden_entrega
                 })

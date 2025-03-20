@@ -6,8 +6,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('website/', include('website.urls')),
-    path('', include('website.urls')),
+    path('website/', include('website.urls', namespace='website_ns')),
+    path('', include('website.urls', namespace='website_root')),
     path('accounts/', include('accounts.urls')),
     path('ecommerce/', include('ecommerce.urls')),
     path('crm/', include('crm.urls')),
@@ -17,4 +17,5 @@ urlpatterns = [
     path('inventory/', include('inventory.urls')),
     path('accounting/', include('accounting.urls')),
     path('human_resources/', include('human_resources.urls')),
+    path('marketing_automation/', include('marketing_automation.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,7 +1,10 @@
 from django.urls import path
 from . import views
 
+app_name = 'crm'
+
 urlpatterns = [
-    path('', views.clientes, name='crm_clientes'),
-    path('crear/', views.crear_cliente, name='crm_crear_cliente'),
+    path('', views.clientes, name='clientes'),
+    path('crear/', views.crear_cliente, name='crear_cliente'),
+    path('editar/<int:cliente_id>/', views.editar_cliente, name='editar_cliente'),
 ]

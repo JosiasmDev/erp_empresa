@@ -1,5 +1,6 @@
 from django.db import models
 from decimal import Decimal
+from django.contrib.auth.models import User
 
 class Componente(models.Model):
     TIPOS = [
@@ -29,12 +30,17 @@ class Componente(models.Model):
     
     def __str__(self):
         return f"{self.get_tipo_display()}"
+    
+    def save(self, *args, **kwargs):
+        # Calcular el precio de compra como 30% del precio de venta
+        self.precio_compra = self.precio_venta * Decimal('0.3')
+        super().save(*args, **kwargs)
 
 class Stock(models.Model):
     componente = models.OneToOneField('inventory.Componente', on_delete=models.CASCADE)
     cantidad = models.IntegerField(default=0)
     stock_minimo = models.IntegerField(default=5)
-    stock_maximo = models.IntegerField(default=20)
+    stock_maximo = models.IntegerField(default=200)
     ubicacion = models.CharField(max_length=100, blank=True, null=True)
     notas = models.TextField(blank=True, null=True)
     
@@ -57,6 +63,7 @@ class MovimientoStock(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     precio_total = models.DecimalField(max_digits=10, decimal_places=2)
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     
     def __str__(self):
         return f"{self.get_tipo_display()} de {self.componente.nombre} - {self.cantidad} unidades"

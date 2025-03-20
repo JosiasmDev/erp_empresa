@@ -1,10 +1,75 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
-    <h1>Registrar Movimiento</h1>
-    <form method="post">
+<div class="container mt-4">
+    <h2>Registrar Movimiento de Stock</h2>
+    
+    {% if componente %}
+    <div class="alert alert-info">
+        <strong>Componente seleccionado:</strong> {{ componente.nombre }}
+    </div>
+    {% endif %}
+    
+    <form method="post" class="mt-4">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Guardar</button>
+        
+        {% if componente %}
+        <input type="hidden" name="componente" value="{{ componente.id }}">
+        {% else %}
+        <div class="form-group">
+            <label for="{{ form.componente.id_for_label }}">Componente</label>
+            {{ form.componente }}
+            {% if form.componente.errors %}
+            <div class="alert alert-danger">
+                {{ form.componente.errors }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="{{ form.cantidad.id_for_label }}">Cantidad</label>
+            {{ form.cantidad }}
+            {% if form.cantidad.errors %}
+            <div class="alert alert-danger">
+                {{ form.cantidad.errors }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.tipo_movimiento.id_for_label }}">Tipo de Movimiento</label>
+            {{ form.tipo_movimiento }}
+            {% if form.tipo_movimiento.errors %}
+            <div class="alert alert-danger">
+                {{ form.tipo_movimiento.errors }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.ubicacion.id_for_label }}">Ubicación</label>
+            {{ form.ubicacion }}
+            {% if form.ubicacion.errors %}
+            <div class="alert alert-danger">
+                {{ form.ubicacion.errors }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.notas.id_for_label }}">Notas</label>
+            {{ form.notas }}
+            {% if form.notas.errors %}
+            <div class="alert alert-danger">
+                {{ form.notas.errors }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Registrar Movimiento</button>
+        <a href="{% url 'inventory:stock_list' %}" class="btn btn-secondary">Cancelar</a>
     </form>
+</div>
 {% endblock %}

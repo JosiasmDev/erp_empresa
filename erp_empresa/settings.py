@@ -87,11 +87,11 @@ WSGI_APPLICATION = 'erp_empresa.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'erp_empresa_new',           # Nombre de la base de datos que creaste
-        'USER': 'postgres',         # Usuario de PostgreSQL
-        'PASSWORD': 'aaaaaa',     # Contraseña del usuario
-        'HOST': 'localhost',             # O la dirección del servidor (por defecto 'localhost')
-        'PORT': '5432',                  # Puerto por defecto de PostgreSQL
+        'NAME': 'erp_empresa',
+        'USER': 'postgres',
+        'PASSWORD': 'aaaaaa',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -115,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 LANGUAGE_CODE = 'es-es'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Madrid'
 USE_I18N = True
 USE_TZ = True
 

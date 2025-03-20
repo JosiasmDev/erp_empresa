@@ -17,8 +17,13 @@
                     <p><strong>Fecha Fin:</strong> {{ orden.fecha_fin|date:"d/m/Y" }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong>Pedido:</strong> {% if orden.pedido %}{{ orden.pedido.numero_pedido }}{% else %}N/A{% endif %}</p>
+                    <p><strong>Pedido:</strong> {% if orden.pedido %}#{{ orden.pedido.id }}{% else %}N/A{% endif %}</p>
                     <p><strong>Cliente:</strong> {% if orden.pedido and orden.pedido.cliente %}{{ orden.pedido.cliente.nombre }}{% else %}N/A{% endif %}</p>
+                    {% if pedido_info %}
+                        <p><strong>Coche:</strong> {{ pedido_info.coche }}</p>
+                        <p><strong>Color:</strong> {{ pedido_info.color }}</p>
+                        <p><strong>Ruedas:</strong> {{ pedido_info.rueda }}</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -37,16 +42,14 @@
                             <strong>Asignado:</strong> {{ orden.ruedas_asignadas.nombre }}
                         </div>
                     {% else %}
-                        <form method="post" class="mt-2">
-                            {% csrf_token %}
-                            <input type="hidden" name="accion" value="solicitar_componente">
-                            <select name="componente_id" class="form-select mb-2">
-                                {% for componente in componentes_disponibles.ruedas %}
-                                    <option value="{{ componente.id }}">{{ componente.nombre }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn btn-primary">Asignar</button>
-                        </form>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i> 
+                            {% if pedido_info %}
+                                Pendiente de asignación ({{ pedido_info.rueda }})
+                            {% else %}
+                                Pendiente de asignación
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
                 <div class="col-md-3">
@@ -56,16 +59,9 @@
                             <strong>Asignado:</strong> {{ orden.motorizacion_asignada.nombre }}
                         </div>
                     {% else %}
-                        <form method="post" class="mt-2">
-                            {% csrf_token %}
-                            <input type="hidden" name="accion" value="solicitar_componente">
-                            <select name="componente_id" class="form-select mb-2">
-                                {% for componente in componentes_disponibles.motor %}
-                                    <option value="{{ componente.id }}">{{ componente.nombre }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn btn-primary">Asignar</button>
-                        </form>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i> Pendiente de asignación
+                        </div>
                     {% endif %}
                 </div>
                 <div class="col-md-3">
@@ -75,16 +71,14 @@
                             <strong>Asignado:</strong> {{ orden.tapiceria_asignada.nombre }}
                         </div>
                     {% else %}
-                        <form method="post" class="mt-2">
-                            {% csrf_token %}
-                            <input type="hidden" name="accion" value="solicitar_componente">
-                            <select name="componente_id" class="form-select mb-2">
-                                {% for componente in componentes_disponibles.tapiceria %}
-                                    <option value="{{ componente.id }}">{{ componente.nombre }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn btn-primary">Asignar</button>
-                        </form>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i> 
+                            {% if pedido_info %}
+                                Pendiente de asignación ({{ pedido_info.color }})
+                            {% else %}
+                                Pendiente de asignación
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
                 <div class="col-md-3">
@@ -94,16 +88,9 @@
                             <strong>Asignado:</strong> {{ orden.extras_asignados.nombre }}
                         </div>
                     {% else %}
-                        <form method="post" class="mt-2">
-                            {% csrf_token %}
-                            <input type="hidden" name="accion" value="solicitar_componente">
-                            <select name="componente_id" class="form-select mb-2">
-                                {% for componente in componentes_disponibles.extras %}
-                                    <option value="{{ componente.id }}">{{ componente.nombre }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn btn-primary">Asignar</button>
-                        </form>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i> Pendiente de asignación
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -115,27 +102,46 @@
             <h4>Acciones</h4>
         </div>
         <div class="card-body">
-            {% if orden.estado == 'pendiente' and orden.verificar_componentes %}
+            {% if orden.estado == 'pendiente' and todos_componentes_asignados %}
                 <form method="post" class="d-inline">
                     {% csrf_token %}
                     <input type="hidden" name="accion" value="iniciar_produccion">
-                    <button type="submit" class="btn btn-success">Iniciar Fabricación</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-gear"></i> Iniciar Fabricación
+                    </button>
                 </form>
             {% elif orden.estado == 'en_proceso' %}
                 <form method="post" class="d-inline">
                     {% csrf_token %}
                     <input type="hidden" name="accion" value="finalizar_produccion">
-                    <button type="submit" class="btn btn-primary">Finalizar Fabricación</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Finalizar Fabricación
+                    </button>
                 </form>
             {% elif orden.estado == 'completada' %}
                 <div class="alert alert-success">
                     <i class="bi bi-check-circle"></i> Fabricación completada
                 </div>
-                {% if orden.pedido %}
-                    <a href="{% url 'sales:entregar_pedido' orden.pedido.id %}" class="btn btn-success">
-                        <i class="bi bi-truck"></i> Entregar al Cliente
-                    </a>
+                {% if orden.pedido and orden.pedido.estado != 'entregado' %}
+                <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="accion" value="entregar_vehiculo">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-truck"></i> Entregar Vehículo al Cliente
+                    </button>
+                </form>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Vehículo ya entregado al cliente
+                </div>
                 {% endif %}
+            {% endif %}
+            
+            {% if orden.estado == 'pendiente' and not todos_componentes_asignados %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> 
+                    No se puede iniciar la fabricación hasta que todos los componentes estén asignados.
+                </div>
             {% endif %}
         </div>
     </div>

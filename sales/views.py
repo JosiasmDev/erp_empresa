@@ -16,7 +16,7 @@ def sales_pedidos(request):
 @login_required
 @role_required(['sales'])
 def pedidos(request):
-    pedidos = EcommercePedido.objects.all().select_related('cliente', 'coche').order_by('-fecha_pedido')
+    pedidos = Pedido.objects.all().select_related('cliente', 'coche').order_by('-fecha')
     return render(request, 'sales/pedidos.html', {'pedidos': pedidos})
 
 @login_required
