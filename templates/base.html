@@ -184,8 +184,15 @@
                             <li class="dropdown-submenu">Ventas
                                 <ul>
                                     <li><a class="dropdown-item" href="{% url 'sales:pedidos' %}">Pedidos</a></li>
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            {% if user.is_staff or 'crm' in user_roles %}
+                            <li class="dropdown-submenu">CRM
+                                <ul>
                                     <li><a class="dropdown-item" href="{% url 'crm:clientes' %}">Clientes</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'sales:crear_pedido' %}">Nueva Venta</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'crm:crear_cliente' %}">Nuevo Cliente</a></li>
                                 </ul>
                             </li>
                             {% endif %}
@@ -194,16 +201,14 @@
                             <li class="dropdown-submenu">Compras
                                 <ul>
                                     <li><a class="dropdown-item" href="{% url 'purchase:ordenes_compra' %}">Órdenes de Compra</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'purchase:crear_orden_compra' %}">Nueva Compra</a></li>
                                 </ul>
                             </li>
                             {% endif %}
 
                             {% if user.is_staff or 'produccion' in user_roles %}
-                            <li class="dropdown-submenu">Producción
+                            <li class="dropdown-submenu">Órdenes de Producción
                                 <ul>
-                                    <li><a class="dropdown-item" href="{% url 'manufacturing:lista_ordenes' %}">Órdenes de Fabricación</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'manufacturing:crear_orden' %}">Nueva Orden</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'manufacturing:lista_ordenes' %}">Lista de Órdenes</a></li>
                                 </ul>
                             </li>
                             {% endif %}

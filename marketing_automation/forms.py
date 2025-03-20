@@ -6,6 +6,9 @@ class CampanaForm(forms.ModelForm):
     class Meta:
         model = Campana
         fields = ['nombre', 'objetivo', 'fecha_envio', 'estado']
+        widgets = {
+            'fecha_envio': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
 
 class CocheForm(forms.ModelForm):
     class Meta:

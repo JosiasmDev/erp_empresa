@@ -18,37 +18,17 @@
         {% csrf_token %}
         
         <div class="form-group">
-            <label for="{{ form.cantidad_actual.id_for_label }}">Cantidad Actual</label>
-            {{ form.cantidad_actual }}
-            {% if form.cantidad_actual.errors %}
+            <label for="{{ form.cantidad.id_for_label }}">Cantidad</label>
+            {{ form.cantidad }}
+            {% if form.cantidad.errors %}
             <div class="alert alert-danger">
-                {{ form.cantidad_actual.errors }}
-            </div>
-            {% endif %}
-        </div>
-        
-        <div class="form-group">
-            <label for="{{ form.ubicacion.id_for_label }}">Ubicación</label>
-            {{ form.ubicacion }}
-            {% if form.ubicacion.errors %}
-            <div class="alert alert-danger">
-                {{ form.ubicacion.errors }}
-            </div>
-            {% endif %}
-        </div>
-        
-        <div class="form-group">
-            <label for="{{ form.notas.id_for_label }}">Notas</label>
-            {{ form.notas }}
-            {% if form.notas.errors %}
-            <div class="alert alert-danger">
-                {{ form.notas.errors }}
+                {{ form.cantidad.errors }}
             </div>
             {% endif %}
         </div>
         
         <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-        <a href="{% url 'inventory:stock_list' %}" class="btn btn-secondary">Cancelar</a>
+        <a href="{% url 'inventory:stock' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %} 

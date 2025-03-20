@@ -32,6 +32,7 @@
                         <span class="badge {% if orden.estado == 'pendiente' %}bg-warning
                                          {% elif orden.estado == 'en_proceso' %}bg-primary
                                          {% elif orden.estado == 'completada' %}bg-success
+                                         {% elif orden.estado == 'entregado' %}bg-info
                                          {% else %}bg-danger{% endif %}">
                             {{ orden.get_estado_display }}
                         </span>

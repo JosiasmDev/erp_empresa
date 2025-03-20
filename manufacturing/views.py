@@ -112,6 +112,13 @@ def detalle_orden(request, orden_id):
             elif accion == 'iniciar_produccion':
                 if orden.ruedas_disponibles and orden.motorizacion_disponible and orden.tapiceria_disponible and orden.extras_disponibles:
                     orden.estado = 'en_proceso'
+                    orden.fecha_inicio = timezone.now()
+                    # Actualizar estado del pedido en ecommerce
+                    if orden.pedido:
+                        pedido_ecommerce = Pedido.objects.filter(coche=orden.coche, cliente=orden.pedido.cliente.usuario).first()
+                        if pedido_ecommerce:
+                            pedido_ecommerce.estado = 'en_produccion'
+                            pedido_ecommerce.save()
                     messages.success(request, 'Se ha iniciado la fabricación del vehículo')
                 else:
                     messages.error(request, 'No se puede iniciar la fabricación hasta que todos los componentes estén asignados')
@@ -122,7 +129,7 @@ def detalle_orden(request, orden_id):
                 messages.success(request, 'Se ha finalizado la fabricación del vehículo')
             
             elif accion == 'entregar_vehiculo':
-                if orden.estado == 'completada':
+                if orden.estado in ['en_proceso', 'completada']:
                     if not OrdenEntrega.objects.filter(pedido=orden.pedido).exists():
                         orden_entrega = OrdenEntrega.objects.create(
                             pedido=orden.pedido,
@@ -131,14 +138,26 @@ def detalle_orden(request, orden_id):
                         if orden.pedido:
                             orden.pedido.estado = 'entregado'
                             orden.pedido.save()
+                            # Actualizar estado del pedido en ecommerce
+                            pedido_ecommerce = Pedido.objects.filter(coche=orden.coche, cliente=orden.pedido.cliente.usuario).first()
+                            if pedido_ecommerce:
+                                pedido_ecommerce.estado = 'completado'
+                                pedido_ecommerce.save()
                         messages.success(request, 'Vehículo entregado al cliente exitosamente.')
+                        orden.estado = 'entregado'
                     else:
                         if orden.pedido:
                             orden.pedido.estado = 'entregado'
                             orden.pedido.save()
+                            # Actualizar estado del pedido en ecommerce
+                            pedido_ecommerce = Pedido.objects.filter(coche=orden.coche, cliente=orden.pedido.cliente.usuario).first()
+                            if pedido_ecommerce:
+                                pedido_ecommerce.estado = 'completado'
+                                pedido_ecommerce.save()
                         messages.success(request, 'Vehículo entregado al cliente exitosamente.')
+                        orden.estado = 'entregado'
                 else:
-                    messages.error(request, 'El vehículo debe estar completado antes de entregarlo.')
+                    messages.error(request, 'El vehículo debe estar en proceso o completado antes de entregarlo.')
             
             orden.save()
             

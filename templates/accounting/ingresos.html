@@ -9,6 +9,10 @@
         </button>
     </div>
     <div class="card-body">
+        <div class="alert alert-info">
+            <h4>Total de Ingresos: {{ total_ingresos|floatformat:2 }}€</h4>
+        </div>
+        
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
@@ -16,14 +20,32 @@
                         <th>Fecha</th>
                         <th>Descripción</th>
                         <th>Monto</th>
-                        <th>Categoría</th>
+                        <th>Tipo</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for cuenta in cuentas %}
+                    <tr>
+                        <td>{{ cuenta.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                        <td>{{ cuenta.descripcion }}</td>
+                        <td class="text-success">{{ cuenta.monto|floatformat:2 }}€</td>
+                        <td>
+                            <span class="badge {% if cuenta.tipo == 'venta' %}bg-primary{% else %}bg-success{% endif %}">
+                                {{ cuenta.get_tipo_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i> Ver
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
                     <tr>
                         <td colspan="5" class="text-center">No hay ingresos registrados</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

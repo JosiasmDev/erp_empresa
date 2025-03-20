@@ -115,15 +115,15 @@ def gestionar_stock(request):
     return render(request, 'inventory/gestionar_stock.html', {'stocks': stocks})
 
 @login_required
-def editar_stock(request, pk):
-    stock = get_object_or_404(Stock, pk=pk)
+def editar_stock(request, stock_id):
+    stock = get_object_or_404(Stock, pk=stock_id)
     
     if request.method == 'POST':
         form = StockForm(request.POST, instance=stock)
         if form.is_valid():
             stock = form.save()
             messages.success(request, 'Stock actualizado exitosamente.')
-            return redirect('inventory:stock_list')
+            return redirect('inventory:stock')
     else:
         form = StockForm(instance=stock)
     
