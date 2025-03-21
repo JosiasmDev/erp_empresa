@@ -201,9 +201,9 @@
                     {% endif %}
                 </div>
 
-                <div class="center-section">
-                    <a class="navbar-brand" href="{% url 'website:index' %}">
-                        <img src="{% static 'images/sag_logo.jpg' %}" alt="Logo" class="header-logo">
+                <div class="center-section" style="height: auto; padding-top: 1px; overflow: visible;">
+                    <a class="navbar-brand" href="{% url 'website:index' %}" style="height: auto; display: block;">
+                        <img src="{% static 'images/sag_logo.jpg' %}" alt="Logo" class="header-logo" style="transform: scale(2); transform-origin: top center; display: block;">
                     </a>
                 </div>
 
@@ -216,7 +216,7 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <!-- Website -->
                                 <li class="dropdown-submenu">
-                                    <span class="dropdown-item-text">
+                                    <span class="dropdown-item-text" style="color: #f8f9fa;">
                                         <i class="bi bi-globe"></i> Website
                                     </span>
                                     <ul>
@@ -235,7 +235,7 @@
                                 <!-- Ventas -->
                                 {% if user.is_staff or 'ventas' in user_roles %}
                                 <li class="dropdown-submenu">
-                                    <span class="dropdown-item-text">
+                                    <span class="dropdown-item-text" style="color: #f8f9fa;">
                                         <i class="bi bi-cart-fill"></i> Ventas
                                     </span>
                                     <ul>
@@ -252,7 +252,7 @@
                                 <!-- CRM -->
                                 {% if user.is_staff or 'crm' in user_roles %}
                                 <li class="dropdown-submenu">
-                                    <span class="dropdown-item-text">
+                                    <span class="dropdown-item-text" style="color: #f8f9fa;">
                                         <i class="bi bi-people-fill"></i> CRM
                                     </span>
                                     <ul>
@@ -269,7 +269,7 @@
                                 <!-- Producción -->
                                 {% if user.is_staff or 'produccion' in user_roles %}
                                 <li class="dropdown-submenu">
-                                    <span class="dropdown-item-text">
+                                    <span class="dropdown-item-text" style="color: #f8f9fa;">
                                         <i class="bi bi-gear-fill"></i> Producción
                                     </span>
                                     <ul>
@@ -286,7 +286,7 @@
                                 <!-- Inventario -->
                                 {% if user.is_staff or 'inventario' in user_roles %}
                                 <li class="dropdown-submenu">
-                                    <span class="dropdown-item-text">
+                                    <span class="dropdown-item-text" style="color: #f8f9fa;">
                                         <i class="bi bi-box-fill"></i> Inventario
                                     </span>
                                     <ul>
@@ -300,7 +300,7 @@
                                 <!-- RRHH -->
                                 {% if user.is_staff or 'rrhh' in user_roles %}
                                 <li class="dropdown-submenu">
-                                    <span class="dropdown-item-text">
+                                    <span class="dropdown-item-text" style="color: #f8f9fa;">
                                         <i class="bi bi-people"></i> RRHH
                                     </span>
                                     <ul>
@@ -317,7 +317,7 @@
                                 <!-- Contabilidad -->
                                 {% if user.is_staff or 'contabilidad' in user_roles %}
                                 <li class="dropdown-submenu">
-                                    <span class="dropdown-item-text">
+                                    <span class="dropdown-item-text" style="color: #f8f9fa;">
                                         <i class="bi bi-cash"></i> Contabilidad
                                     </span>
                                     <ul>
