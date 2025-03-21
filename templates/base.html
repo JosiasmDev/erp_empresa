@@ -16,6 +16,7 @@
         body {
             margin: 0;
             padding-top: 80px;
+            background-color: #1a1f3c; /* Fondo oscuro para el cuerpo */
         }
         header {
             background: linear-gradient(90deg, 
@@ -354,18 +355,18 @@
         </nav>
     </header>
 
-    <div class="content-wrapper">
+    <div class="content-wrapper" style="color: #ffffff; background-color: #1a1f3c;">
         {% if messages %}
-        <div class="container mt-3">
+        <div class="container mt-3" style="color: #ffffff; background-color: #1a1f3c;">
             {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
+            <div class="alert alert-{{ message.tags }}" style="color: #ffffff; background-color: #98475e;">
                 {{ message }}
             </div>
             {% endfor %}
         </div>
         {% endif %}
 
-        <main class="container">
+        <main class="container" style="color: #ffffff; background-color: #4b7975;">
             {% block content %}
             {% endblock %}
         </main>
