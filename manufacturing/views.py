@@ -44,7 +44,10 @@ def detalle_orden(request, orden_id):
             
             if accion == 'asignar_ruedas' and not orden.ruedas_disponibles:
                 try:
-                    ruedas = Componente.objects.get(tipo=f'ruedas_{orden.pedido.rueda.replace('"', "")}')
+                    # Usar filter().first() en lugar de get()
+                    ruedas = Componente.objects.filter(tipo=f'ruedas_{orden.pedido.rueda.replace('"', "")}').first()
+                    if not ruedas:
+                        raise Componente.DoesNotExist
                     stock_ruedas = Stock.objects.filter(componente=ruedas, cantidad__gt=0).first()
                     if stock_ruedas:
                         stock_ruedas.cantidad -= 1
@@ -59,7 +62,10 @@ def detalle_orden(request, orden_id):
             
             elif accion == 'asignar_motor' and not orden.motorizacion_disponible:
                 try:
-                    motor = Componente.objects.get(tipo='motor_v6')
+                    # Usar filter().first() en lugar de get()
+                    motor = Componente.objects.filter(tipo='motor_v6').first()
+                    if not motor:
+                        raise Componente.DoesNotExist
                     stock_motor = Stock.objects.filter(componente=motor, cantidad__gt=0).first()
                     if stock_motor:
                         stock_motor.cantidad -= 1
@@ -81,7 +87,10 @@ def detalle_orden(request, orden_id):
                         'Blanco': 'tapiceria_tela'
                     }
                     tipo_tapiceria = color_mapping.get(orden.pedido.color, 'tapiceria_tela')
-                    tapiceria = Componente.objects.get(tipo=tipo_tapiceria)
+                    # Usar filter().first() en lugar de get()
+                    tapiceria = Componente.objects.filter(tipo=tipo_tapiceria).first()
+                    if not tapiceria:
+                        raise Componente.DoesNotExist
                     stock_tapiceria = Stock.objects.filter(componente=tapiceria, cantidad__gt=0).first()
                     if stock_tapiceria:
                         stock_tapiceria.cantidad -= 1
@@ -96,7 +105,10 @@ def detalle_orden(request, orden_id):
             
             elif accion == 'asignar_extras' and not orden.extras_disponibles:
                 try:
-                    extras = Componente.objects.get(tipo='extra_techo')
+                    # Usar filter().first() en lugar de get()
+                    extras = Componente.objects.filter(tipo='extra_techo').first()
+                    if not extras:
+                        raise Componente.DoesNotExist
                     stock_extras = Stock.objects.filter(componente=extras, cantidad__gt=0).first()
                     if stock_extras:
                         stock_extras.cantidad -= 1
@@ -226,4 +238,4 @@ def eliminar_orden(request, orden_id):
     except ProtectedError:
         messages.error(request, 'No se puede eliminar esta orden porque tiene registros asociados.')
     
-    return redirect('manufacturing:lista_ordenes') 
+    return redirect('manufacturing:lista_ordenes')
