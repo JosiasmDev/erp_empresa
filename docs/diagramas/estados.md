@@ -2,49 +2,38 @@
 
 ```mermaid
 stateDiagram-v2
-    state "Inicio" as [*]
-    state "Fin" as [*]
+    [*] --> Nuevo
     
-    [*] --> Nuevo: Crear Pedido
-    
-    Nuevo --> EnProceso: Validar Pedido
-    Nuevo --> Cancelado: Cancelar Pedido
+    Nuevo --> EnProceso: Validar
+    Nuevo --> Cancelado: Cancelar
     
     EnProceso --> EnProduccion: Iniciar Producción
-    EnProceso --> Cancelado: Cancelar Pedido
+    EnProceso --> Cancelado: Cancelar
     
-    EnProduccion --> Fabricado: Completar Producción
-    EnProduccion --> Cancelado: Cancelar Producción
+    EnProduccion --> Fabricado: Completar
+    EnProduccion --> Cancelado: Cancelar
     
-    Fabricado --> EnviadoAlmacen: Enviar a Almacén
+    Fabricado --> EnviadoAlmacen: Enviar
     
-    EnviadoAlmacen --> ListoParaEnvio: Preparar Envío
+    EnviadoAlmacen --> ListoParaEnvio: Preparar
     
-    ListoParaEnvio --> EnTransito: Iniciar Envío
+    ListoParaEnvio --> EnTransito: Enviar
     
-    EnTransito --> Entregado: Confirmar Entrega
-    EnTransito --> Devuelto: Rechazar Entrega
+    EnTransito --> Entregado: Confirmar
+    EnTransito --> Devuelto: Rechazar
     
     Entregado --> [*]
     Cancelado --> [*]
     Devuelto --> [*]
 
-    note right of Nuevo: Se crea el pedido<br/>con datos básicos
-    note right of EnProceso: Validación de<br/>stock y recursos
-    note right of EnProduccion: Fabricación de<br/>productos solicitados
-    note right of Fabricado: Productos terminados<br/>y verificados
-    note right of EnviadoAlmacen: En almacén para<br/>preparación
-    note right of ListoParaEnvio: Empaquetado y<br/>listo para envío
-    note right of EnTransito: En proceso<br/>de entrega
-    note right of Entregado: Pedido entregado<br/>y confirmado
-
-    %% Estilos de estados
-    classDef default fill:#f9f,stroke:#333,stroke-width:2px
-    classDef success fill:#9f9,stroke:#333,stroke-width:2px
-    classDef danger fill:#f99,stroke:#333,stroke-width:2px
-    
-    class Entregado success
-    class Cancelado,Devuelto danger
+    note right of Nuevo: Se crea el pedido
+    note right of EnProceso: Validación de stock
+    note right of EnProduccion: En fabricación
+    note right of Fabricado: Productos terminados
+    note right of EnviadoAlmacen: En almacén
+    note right of ListoParaEnvio: Listo para envío
+    note right of EnTransito: En entrega
+    note right of Entregado: Entregado al cliente
 ```
 
 ## Descripción del Flujo de Estados
@@ -77,4 +66,4 @@ stateDiagram-v2
 ### Estados de Excepción
 - Cancelación en cualquier etapa
 - Devolución durante el envío
-``` 
+```
