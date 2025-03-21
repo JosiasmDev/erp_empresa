@@ -7,6 +7,7 @@
     <title>{% block title %}ERP Empresa{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/manufacturing.css' %}">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
@@ -14,17 +15,24 @@
     <style>
         body {
             margin: 0;
-            padding-top: 80px; /* Reducimos el padding ya que el header será más pequeño */
+            padding-top: 80px;
         }
         header {
-            background-color: #333333; /* Gris más claro */
+            background: linear-gradient(90deg, 
+                rgba(26,31,60,0.98) 0%, 
+                rgba(255,48,0,0.1) 50%, 
+                rgba(10,13,30,0.98) 100%
+            );
+            backdrop-filter: blur(10px);
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 80px; /* Altura más compacta */
+            height: 80px;
             z-index: 1000;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 
+                0 4px 20px rgba(255,48,0,0.3),
+                0 0 30px rgba(255,48,0,0.1);
         }
         .navbar {
             height: 100%;
@@ -61,58 +69,97 @@
             display: flex;
             align-items: center;
             padding: 5px 0;
+            position: relative;
+        }
+        .navbar-brand::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, 
+                var(--secondary-color) 0%, 
+                transparent 50%, 
+                var(--secondary-color) 100%
+            );
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+        .navbar-brand:hover::before {
+            opacity: 0.5;
+            animation: glow 2s infinite;
         }
         .navbar-brand img {
-            height: 70px; /* Altura específica para el logo */
-            width: auto;
-            object-fit: contain;
+            height: 70px;
+            filter: drop-shadow(0 0 10px rgba(255,48,0,0.5));
+            transition: all 0.3s ease;
+        }
+        .navbar-brand:hover img {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 15px rgba(255,48,0,0.8));
         }
         .time-info {
-            color: #fff;
-            font-size: 1rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
             white-space: nowrap;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
+            background: linear-gradient(90deg, 
+                rgba(255,48,0,0.1), 
+                transparent
+            );
+            padding: 10px;
+            border-radius: var(--border-radius);
+            border-left: 2px solid var(--secondary-color);
         }
         .dropdown-menu {
-            background-color: #1a1a1a;
-            border: 1px solid rgba(255,255,255,.1);
+            background: linear-gradient(135deg, 
+                rgba(26,31,60,0.98) 0%, 
+                rgba(10,13,30,0.98) 100%
+            );
+            border: 1px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(255,48,0,0.2);
+            backdrop-filter: blur(10px);
             padding: 0;
             max-height: 400px;
             overflow-y: auto;
         }
         .dropdown-item {
-            color: rgba(255,255,255,.8) !important;
+            color: var(--text-light) !important;
             padding: 8px 16px;
             font-size: 0.9rem;
-            border-bottom: 1px solid rgba(255,255,255,.1);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255,48,0,0.1);
         }
         .dropdown-item:hover {
-            background-color: rgba(255,255,255,.1);
-            color: #fff !important;
+            background-color: rgba(255,48,0,0.2);
+            transform: translateX(10px);
+            color: var(--secondary-color) !important;
         }
         .dropdown-submenu {
-            color: #fff;
+            color: var(--secondary-color);
             padding: 8px 16px;
-            background-color: rgba(255,255,255,.05);
+            background-color: rgba(255,255,255,0.05);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .dropdown-submenu ul {
-            list-style: none;
-            padding-left: 15px;
-            margin: 5px 0;
+        .btn-primary {
+            background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
+            border: none;
+            color: var(--text-light);
+            box-shadow: 0 4px 15px rgba(255,48,0,0.3);
+            transition: all 0.3s ease;
         }
-        .btn-dark {
-            background-color: transparent;
-            border: 1px solid rgba(255,255,255,.2);
-            color: #fff;
-        }
-        .dropdown-menu-end {
-            right: 0;
-            left: auto;
-        }
-        .content-wrapper {
-            margin-top: 2rem;
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(255,48,0,0.4);
         }
         @media (max-width: 991px) {
             header {
@@ -130,139 +177,178 @@
                 justify-content: center;
                 position: static;
                 transform: none;
-                
             }
             .navbar-brand img {
-                height: 150px;
+                height: 60px;
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-dark">
+        <nav class="navbar">
             <div class="container">
                 <div class="left-section">
                     {% if user.is_authenticated %}
-                        <a href="{% url 'accounts:logout' %}" class="btn btn-outline-light btn-sm">Cerrar Sesión</a>
-                        <div class="time-info">
-                            <span>Fecha: <span id="current-date"></span></span>
-                            <span>Hora: <span id="current-time"></span></span>
+                        <div class="user-info">
+                            <i class="bi bi-person-circle"></i>
+                            <span>{{ user.username }}</span>
                         </div>
-                    {% else %}
-                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-sm">Iniciar Sesión</a>
-                        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">Registrarse</a>
+                        <div class="time-info">
+                            <span><i class="bi bi-calendar3"></i> <span id="current-date"></span></span>
+                            <span><i class="bi bi-clock"></i> <span id="current-time"></span></span>
+                        </div>
                     {% endif %}
                 </div>
 
                 <div class="center-section">
                     <a class="navbar-brand" href="{% url 'website:index' %}">
-                        <img src="{% static 'images/sag_logo.jpg' %}" alt="Logo">
+                        <img src="{% static 'images/sag_logo.jpg' %}" alt="Logo" class="header-logo">
                     </a>
                 </div>
 
                 <div class="right-section">
-                    <div class="dropdown">
-                        <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            Menú Principal
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <!-- Website siempre visible -->
-                            <li class="dropdown-submenu">Website
-                                <ul>
-                                    <li><a class="dropdown-item" href="{% url 'website:index' %}">Inicio</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'website:contacto' %}">Contacto</a></li>
-                                    {% if user.is_authenticated %}
-                                    <li><a class="dropdown-item" href="{% url 'website:perfil_usuario' %}">Mi Perfil</a></li>
-                                    {% endif %}
-                                    <li><a class="dropdown-item" href="{% url 'website:coche_detalle' 2 %}">Arrow</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'website:coche_detalle' 1 %}">Eclipse</a></li>
-                                </ul>
-                            </li>
-                            
-                            {% if user.is_authenticated %}
-                            <!-- Resto de menús solo para usuarios autenticados -->
-                            {% if user.is_staff or 'ventas' in user_roles %}
-                            <li class="dropdown-submenu">Ventas
-                                <ul>
-                                    <li><a class="dropdown-item" href="{% url 'sales:pedidos' %}">Pedidos</a></li>
-                                </ul>
-                            </li>
-                            {% endif %}
+                    {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-grid-3x3-gap-fill"></i> Menú
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <!-- Website -->
+                                <li class="dropdown-submenu">
+                                    <span class="dropdown-item-text">
+                                        <i class="bi bi-globe"></i> Website
+                                    </span>
+                                    <ul>
+                                        <li><a class="dropdown-item" href="{% url 'website:index' %}">
+                                            <i class="bi bi-house-door"></i> Inicio
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'website:contacto' %}">
+                                            <i class="bi bi-envelope"></i> Contacto
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'website:perfil_usuario' %}">
+                                            <i class="bi bi-person"></i> Mi Perfil
+                                        </a></li>
+                                    </ul>
+                                </li>
 
-                            <!-- CRM -->
-                            {% if user.is_staff or 'crm' in user_roles %}
-                            <li class="dropdown-submenu">CRM
-                                <ul>
-                                    <li><a class="dropdown-item" href="{% url 'crm:clientes' %}">Clientes</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'crm:crear_cliente' %}">Nuevo Cliente</a></li>
-                                </ul>
-                            </li>
-                            {% endif %}
+                                <!-- Ventas -->
+                                {% if user.is_staff or 'ventas' in user_roles %}
+                                <li class="dropdown-submenu">
+                                    <span class="dropdown-item-text">
+                                        <i class="bi bi-cart-fill"></i> Ventas
+                                    </span>
+                                    <ul>
+                                        <li><a class="dropdown-item" href="{% url 'sales:pedidos' %}">
+                                            <i class="bi bi-list-check"></i> Pedidos
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'sales:crear_pedido' %}">
+                                            <i class="bi bi-plus-circle"></i> Nuevo Pedido
+                                        </a></li>
+                                    </ul>
+                                </li>
+                                {% endif %}
 
-                            <!-- Compras -->
-                            {% if user.is_staff or 'compras' in user_roles %}
-                            <li class="dropdown-submenu">Compras
-                                <ul>
-                                    <li><a class="dropdown-item" href="{% url 'purchase:ordenes_compra' %}">Órdenes de Compra</a></li>
-                                </ul>
-                            </li>
-                            {% endif %}
+                                <!-- CRM -->
+                                {% if user.is_staff or 'crm' in user_roles %}
+                                <li class="dropdown-submenu">
+                                    <span class="dropdown-item-text">
+                                        <i class="bi bi-people-fill"></i> CRM
+                                    </span>
+                                    <ul>
+                                        <li><a class="dropdown-item" href="{% url 'crm:clientes' %}">
+                                            <i class="bi bi-person-lines-fill"></i> Clientes
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'crm:crear_cliente' %}">
+                                            <i class="bi bi-person-plus-fill"></i> Nuevo Cliente
+                                        </a></li>
+                                    </ul>
+                                </li>
+                                {% endif %}
 
-                            <!-- Producción -->
-                            {% if user.is_staff or 'produccion' in user_roles %}
-                            <li class="dropdown-submenu">Órdenes de Producción
-                                <ul>
-                                    <li><a class="dropdown-item" href="{% url 'manufacturing:lista_ordenes' %}">Lista de Órdenes</a></li>
-                                </ul>
-                            </li>
-                            {% endif %}
+                                <!-- Producción -->
+                                {% if user.is_staff or 'produccion' in user_roles %}
+                                <li class="dropdown-submenu">
+                                    <span class="dropdown-item-text">
+                                        <i class="bi bi-gear-fill"></i> Producción
+                                    </span>
+                                    <ul>
+                                        <li><a class="dropdown-item" href="{% url 'manufacturing:lista_ordenes' %}">
+                                            <i class="bi bi-list-task"></i> Órdenes
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'manufacturing:crear_orden' %}">
+                                            <i class="bi bi-plus-circle"></i> Nueva Orden
+                                        </a></li>
+                                    </ul>
+                                </li>
+                                {% endif %}
 
-                            <!-- Inventario -->
-                            {% if user.is_staff or 'inventario' in user_roles %}
-                            <li class="dropdown-submenu">Inventario
-                                <ul>
-                                    <li><a class="dropdown-item" href="{% url 'inventory:stock' %}">Stock</a></li>
-                                </ul>
-                            </li>
-                            {% endif %}
+                                <!-- Inventario -->
+                                {% if user.is_staff or 'inventario' in user_roles %}
+                                <li class="dropdown-submenu">
+                                    <span class="dropdown-item-text">
+                                        <i class="bi bi-box-fill"></i> Inventario
+                                    </span>
+                                    <ul>
+                                        <li><a class="dropdown-item" href="{% url 'inventory:stock' %}">
+                                            <i class="bi bi-boxes"></i> Stock
+                                        </a></li>
+                                    </ul>
+                                </li>
+                                {% endif %}
 
-                            <!-- RRHH -->
-                            {% if user.is_staff or 'rrhh' in user_roles %}
-                            <li class="dropdown-submenu">RRHH
-                                <ul>
-                                    <li><a class="dropdown-item" href="{% url 'human_resources:empleados' %}">Empleados</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'human_resources:crear_empleado' %}">Nuevo Empleado</a></li>
-                                </ul>
-                            </li>
-                            {% endif %}
+                                <!-- RRHH -->
+                                {% if user.is_staff or 'rrhh' in user_roles %}
+                                <li class="dropdown-submenu">
+                                    <span class="dropdown-item-text">
+                                        <i class="bi bi-people"></i> RRHH
+                                    </span>
+                                    <ul>
+                                        <li><a class="dropdown-item" href="{% url 'human_resources:empleados' %}">
+                                            <i class="bi bi-person-badge"></i> Empleados
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'human_resources:crear_empleado' %}">
+                                            <i class="bi bi-person-plus"></i> Nuevo Empleado
+                                        </a></li>
+                                    </ul>
+                                </li>
+                                {% endif %}
 
-                            <!-- Marketing -->
-                            {% if user.is_staff or 'marketing' in user_roles %}
-                            <li class="dropdown-submenu">Marketing
-                                <ul>
-                                    <li><a class="dropdown-item" href="{% url 'marketing_automation:campanas' %}">Campañas</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'marketing_automation:crear_campana' %}">Nueva Campaña</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'marketing_automation:editar_todos_coches' %}">Editar Coches</a></li>
-                                </ul>
-                            </li>
-                            {% endif %}
+                                <!-- Contabilidad -->
+                                {% if user.is_staff or 'contabilidad' in user_roles %}
+                                <li class="dropdown-submenu">
+                                    <span class="dropdown-item-text">
+                                        <i class="bi bi-cash"></i> Contabilidad
+                                    </span>
+                                    <ul>
+                                        <li><a class="dropdown-item" href="{% url 'accounting:balance' %}">
+                                            <i class="bi bi-journal-text"></i> Balance
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'accounting:facturas' %}">
+                                            <i class="bi bi-receipt"></i> Facturas
+                                        </a></li>
+                                    </ul>
+                                </li>
+                                {% endif %}
 
-                            <!-- Contabilidad -->
-                            {% if user.is_staff or 'contabilidad' in user_roles %}
-                            <li class="dropdown-submenu">Contabilidad
-                                <ul>
-                                    <li><a class="dropdown-item" href="{% url 'accounting:dashboard' %}">Dashboard</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'accounting:ingresos' %}">Ingresos</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'accounting:gastos' %}">Gastos</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'accounting:balance' %}">Balance</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'accounting:facturas' %}">Facturas</a></li>
-                                </ul>
-                            </li>
-                            {% endif %}
-                            {% endif %}
-                        </ul>
-                    </div>
+                                <li class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">
+                                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <div class="auth-buttons">
+                            <a href="{% url 'accounts:login' %}" class="btn btn-primary">
+                                <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                            </a>
+                            <a href="{% url 'accounts:register' %}" class="btn btn-secondary">
+                                <i class="bi bi-person-plus"></i> Registrarse
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </nav>
@@ -286,108 +372,55 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            
+            document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', dateOptions);
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('es-ES', timeOptions);
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        $(document).ready(function() {
             // Inicializar DataTables
-            if (typeof $.fn.DataTable !== 'undefined') {
-                $('.data-table').DataTable({
-                    "language": {
-                        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
-                    },
-                    "paging": true,
-                    "lengthChange": true,
-                    "searching": true,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
-                    "responsive": true,
-                });
-            }
-
-            // Función para actualizar fecha y hora
-            function updateDateTime() {
-                const now = new Date();
-                
-                // Formatear fecha
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', options);
-                
-                // Formatear hora
-                const hours = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                const seconds = now.getSeconds().toString().padStart(2, '0');
-                document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds}`;
-
-                // Ejecutar tareas cada minuto
-                if (seconds === '00') {
-                    actualizarTareasPeriodicas();
+            $('.data-table').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json'
                 }
-            }
-
-            // Función para ejecutar tareas periódicas
-            async function actualizarTareasPeriodicas() {
-                try {
-                    const response = await fetch('/api/actualizar-tareas/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': getCookie('csrftoken')
-                        }
-                    });
-                    const data = await response.json();
-                    console.log('Tareas actualizadas:', data);
-                } catch (error) {
-                    console.error('Error al actualizar tareas:', error);
-                }
-            }
-
-            // Función para obtener el token CSRF
-            function getCookie(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
-            }
-
-            // Iniciar el reloj
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-
-            // Agregar funcionalidad para submenús en dispositivos móviles
-            document.querySelectorAll('.dropdown-submenu > a').forEach(function(element) {
-                element.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    var submenu = this.nextElementSibling;
-                    var allSubmenus = document.querySelectorAll('.dropdown-submenu .dropdown-menu');
-                    
-                    // Cerrar todos los otros submenús
-                    allSubmenus.forEach(function(menu) {
-                        if (menu !== submenu) {
-                            menu.style.display = 'none';
-                        }
-                    });
-
-                    // Alternar el submenú actual
-                    if (submenu.style.display === 'block') {
-                        submenu.style.display = 'none';
-                    } else {
-                        submenu.style.display = 'block';
-                    }
-                });
             });
+
+            // Tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            // Dropdown hover y efectos
+            $('.dropdown').hover(
+                function() {
+                    $(this).find('.dropdown-menu').stop(true, true).fadeIn(300);
+                },
+                function() {
+                    $(this).find('.dropdown-menu').stop(true, true).fadeOut(300);
+                }
+            );
+
+            // Efecto hover para los items del menú
+            $('.dropdown-item').hover(
+                function() {
+                    $(this).find('i').addClass('pulse');
+                },
+                function() {
+                    $(this).find('i').removeClass('pulse');
+                }
+            );
         });
     </script>
+
+    {% block extra_js %}
+    {% endblock %}
 </body>
 </html>

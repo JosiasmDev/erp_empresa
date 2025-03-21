@@ -2,112 +2,96 @@
 
 ```mermaid
 erDiagram
-    %% Entidades
     USUARIO ||--o{ PEDIDO : gestiona
+    CLIENTE ||--o{ PEDIDO : realiza
+    PEDIDO ||--|{ DETALLE_PEDIDO : tiene
+    DETALLE_PEDIDO }|--|| PRODUCTO : incluye
+    PEDIDO ||--|| ORDEN_FABRICACION : genera
+    ORDEN_FABRICACION ||--|{ DETALLE_FABRICACION : contiene
+    DETALLE_FABRICACION }|--|| PRODUCTO : utiliza
+    EMPLEADO ||--o{ ORDEN_FABRICACION : trabaja_en
+    BALANCE ||--o{ TRANSACCION : registra
+    TRANSACCION }|--|| PEDIDO : corresponde
+
     USUARIO {
-        int id PK
-        string username
+        string username PK
         string email
         string password
         string rol
-        datetime fecha_registro
         boolean activo
     }
 
-    CLIENTE ||--o{ PEDIDO : realiza
     CLIENTE {
-        int id PK
+        string id PK
         string nombre
-        string email
-        string telefono
         string direccion
-        datetime fecha_registro
-        string tipo_cliente
+        string telefono
+        string email
+        string nif
     }
 
-    PEDIDO ||--o{ DETALLE_PEDIDO : contiene
     PEDIDO {
-        int id PK
-        int cliente_id FK
-        int usuario_id FK
-        datetime fecha
+        string numero PK
+        date fecha
+        float total
         string estado
-        decimal total
-        string metodo_pago
+        string cliente_id FK
+    }
+
+    PRODUCTO {
+        string codigo PK
+        string nombre
+        float precio
+        integer stock
+        string categoria
+    }
+
+    ORDEN_FABRICACION {
+        string numero PK
+        date fecha_inicio
+        date fecha_fin
+        string estado
+        string pedido_id FK
     }
 
     DETALLE_PEDIDO {
-        int id PK
-        int pedido_id FK
-        int producto_id FK
-        int cantidad
-        decimal precio_unitario
-        decimal subtotal
-    }
-
-    PRODUCTO ||--o{ DETALLE_PEDIDO : tiene
-    PRODUCTO {
-        int id PK
-        string nombre
-        string descripcion
-        decimal precio
-        int stock
-        string categoria
-        boolean activo
-    }
-
-    ORDEN_FABRICACION ||--o{ DETALLE_FABRICACION : contiene
-    ORDEN_FABRICACION {
-        int id PK
-        int pedido_id FK
-        datetime fecha_inicio
-        datetime fecha_fin
-        string estado
-        string prioridad
+        integer id PK
+        string pedido_id FK
+        string producto_id FK
+        integer cantidad
+        float precio_unitario
     }
 
     DETALLE_FABRICACION {
-        int id PK
-        int orden_id FK
-        int producto_id FK
-        int cantidad
+        integer id PK
+        string orden_id FK
+        string producto_id FK
+        integer cantidad
         string estado
-        datetime fecha_completado
     }
 
-    EMPLEADO ||--o{ ORDEN_FABRICACION : trabaja
     EMPLEADO {
-        int id PK
+        string id PK
         string nombre
         string cargo
-        decimal salario
-        string departamento
-        datetime fecha_ingreso
-        boolean activo
+        float salario
+        date fecha_ingreso
     }
 
-    BALANCE ||--o{ TRANSACCION : registra
     BALANCE {
-        int id PK
-        datetime fecha
-        string tipo
-        decimal monto
-        string descripcion
-        int pedido_id FK
+        integer id PK
+        date fecha
+        float saldo_actual
     }
 
     TRANSACCION {
-        int id PK
-        int balance_id FK
-        datetime fecha
+        integer id PK
+        integer balance_id FK
+        string pedido_id FK
+        date fecha
+        float monto
         string tipo
-        decimal monto
-        string descripcion
     }
-
-    %% Estilos
-    classDef entity fill:#f9f,stroke:#333,stroke-width:2px;
-    class USUARIO,CLIENTE,PEDIDO,PRODUCTO,ORDEN_FABRICACION,EMPLEADO,BALANCE,TRANSACCION,DETALLE_PEDIDO,DETALLE_FABRICACION entity;
 ```
 
 ## Descripción de Entidades y Relaciones

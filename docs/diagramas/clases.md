@@ -2,95 +2,88 @@
 
 ```mermaid
 classDiagram
-    %% Clases Principales
     class Usuario {
-        -id: int
-        -username: string
-        -email: string
-        -password: string
-        -rol: string
-        +login()
-        +logout()
+        +String username
+        +String email
+        +String password
+        +String rol
+        +Boolean is_active
+        +autenticar()
         +cambiarPassword()
+        +gestionarPermisos()
     }
 
     class Cliente {
-        -id: int
-        -nombre: string
-        -email: string
-        -telefono: string
-        -direccion: string
+        +String nombre
+        +String direccion
+        +String telefono
+        +String email
+        +String nif
         +crearPedido()
-        +verHistorial()
         +actualizarDatos()
+        +verHistorial()
     }
 
     class Pedido {
-        -id: int
-        -fecha: datetime
-        -estado: string
-        -total: decimal
-        -cliente_id: int
+        +String numero
+        +Date fecha
+        +Float total
+        +String estado
         +calcularTotal()
-        +actualizarEstado()
         +generarFactura()
+        +actualizarEstado()
     }
 
     class Producto {
-        -id: int
-        -nombre: string
-        -descripcion: string
-        -precio: decimal
-        -stock: int
+        +String codigo
+        +String nombre
+        +Float precio
+        +Int stock
+        +String categoria
         +actualizarStock()
         +calcularPrecio()
-        +verificarStock()
+        +verificarDisponibilidad()
     }
 
     class OrdenFabricacion {
-        -id: int
-        -fecha: datetime
-        -estado: string
-        -pedido_id: int
-        +iniciarProduccion()
-        +actualizarProgreso()
-        +completarOrden()
+        +String numero
+        +Date fecha_inicio
+        +Date fecha_fin
+        +String estado
+        +planificarProduccion()
+        +asignarRecursos()
+        +actualizarEstado()
     }
 
     class Balance {
-        -id: int
-        -fecha: datetime
-        -tipo: string
-        -monto: decimal
-        -descripcion: string
-        +registrarTransaccion()
-        +generarReporte()
-        +calcularBalance()
+        +Date fecha
+        +Float monto
+        +String tipo
+        +String descripcion
+        +registrarMovimiento()
+        +calcularSaldo()
+        +generarInforme()
     }
 
     class Empleado {
-        -id: int
-        -nombre: string
-        -cargo: string
-        -salario: decimal
-        -departamento: string
+        +String nombre
+        +String cargo
+        +Float salario
+        +Date fecha_ingreso
         +registrarAsistencia()
         +calcularSalario()
-        +solicitarVacaciones()
+        +evaluarDesempeño()
     }
 
-    %% Relaciones
-    Usuario "1" -- "*" Pedido : gestiona
-    Cliente "1" -- "*" Pedido : realiza
-    Pedido "*" -- "*" Producto : contiene
-    Pedido "1" -- "1" OrdenFabricacion : genera
-    OrdenFabricacion "*" -- "*" Producto : produce
-    Balance "*" -- "1" Pedido : registra
-    Empleado "*" -- "1" OrdenFabricacion : trabaja
+    Usuario "1" --> "*" Pedido : gestiona
+    Cliente "1" --> "*" Pedido : crea
+    Pedido "*" --> "*" Producto : contiene
+    Pedido "1" --> "1" OrdenFabricacion : genera
+    OrdenFabricacion "*" --> "*" Producto : produce
+    Balance "1" --> "*" Pedido : registra
+    Empleado "1" --> "*" OrdenFabricacion : trabaja
 
-    %% Estilos
-    classDef class fill:#f9f,stroke:#333,stroke-width:2px;
-    class Usuario,Cliente,Pedido,Producto,OrdenFabricacion,Balance,Empleado class;
+    note "Sistema ERP - Diagrama de Clases"
 ```
 
 ## Descripción de Clases
