@@ -1,4 +1,4 @@
-# Sistema ERP Empresa
+# Sistema ERP Empresa.
 
 Sistema de Planificación de Recursos Empresariales (ERP) desarrollado con Django.
 
