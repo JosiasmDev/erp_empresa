@@ -10,7 +10,7 @@
                 <div class="card-header">
                     <h5>Mi Perfil</h5>
                 </div>
-                <div class="card-body">
+                <span class="dropdown-item-text" style="color: #31475e;">
                     <p><strong>Nombre:</strong> {{ request.user.get_full_name }}</p>
                     <p><strong>Email:</strong> {{ request.user.email }}</p>
                     <p><strong>Usuario:</strong> {{ request.user.username }}</p>
@@ -23,7 +23,7 @@
         </div>
 
         <!-- Historial de Pedidos -->
-        <div class="col-md-8">
+        <span class="dropdown-item-text" style="color: #1f3246;">
             <div class="card">
                 <div class="card-header">
                     <h5>Mis Pedidos</h5>

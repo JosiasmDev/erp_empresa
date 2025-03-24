@@ -332,6 +332,46 @@
                                 </li>
                                 {% endif %}
 
+                                <!-- Ecommerce -->
+                                {% if user.is_staff or 'ecommerce' in user_roles %}
+                                <li class="dropdown-submenu">
+                                    <span class="dropdown-item-text" style="color: #f8f9fa;">
+                                        <i class="bi bi-cart-fill"></i> Ecommerce
+                                    </span>
+                                    <ul>
+                                        <li><a class="dropdown-item" href="{% url 'ecommerce:ecommerce_dashboard' %}">
+                                            <i class="bi bi-house-door"></i> Dashboard
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'ecommerce:pasarela_pago' 0 %}">
+                                            <i class="bi bi-credit-card"></i> Pasarela de Pago
+                                        </a></li>
+                                    </ul>
+                                </li>
+                                {% endif %}
+
+                                <!-- Marketing Automation -->
+                                {% if user.is_staff or 'marketing_automation' in user_roles %}
+                                <li class="dropdown-submenu">
+                                    <span class="dropdown-item-text" style="color: #f8f9fa;">
+                                        <i class="bi bi-bullhorn"></i> Marketing Automation
+                                    </span>
+                                    <ul>
+                                        <li><a class="dropdown-item" href="{% url 'marketing_automation:campanas' %}">
+                                            <i class="bi bi-file-earmark-text"></i> Campañas
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'marketing_automation:crear_campana' %}">
+                                            <i class="bi bi-plus-circle"></i> Crear Campaña
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'marketing_automation:lista_coches' %}">
+                                            <i class="bi bi-car-front"></i> Lista de Coches
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'marketing_automation:editar_todos_coches' %}">
+                                            <i class="bi bi-pencil-square"></i> Editar Todos los Coches
+                                        </a></li>
+                                    </ul>
+                                </li>
+                                {% endif %}
+
                                 <li class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">
@@ -355,9 +395,9 @@
         </nav>
     </header>
 
-    <div class="content-wrapper" style="color: #ffffff; background-color: #1a1f3c;">
+    <div class="content-wrapper" style="color: #3a3f6e; background-color: #1a1f3c;">
         {% if messages %}
-        <div class="container mt-3" style="color: #ffffff; background-color: #1a1f3c;">
+        <div class="container mt-3" style="color: #5e5a97; background-color: #1a1f3c;">
             {% for message in messages %}
             <div class="alert alert-{{ message.tags }}" style="color: #ffffff; background-color: #98475e;">
                 {{ message }}

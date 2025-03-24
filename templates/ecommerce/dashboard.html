@@ -3,24 +3,25 @@
 {% load static %}
 {% block content %}
 <div class="container">
-    <h1>Catálogo de Coches</h1>
-    <table class="data-table">
+    <h1 class="text-light">Catálogo de Coches</h1>
+    <table class="data-table table table-striped table-dark">
         <thead>
             <tr>
-                <th>Nombre</th>
-                <th>Precio Base</th>
-                <th>Descripción</th>
-                <th>Potencia</th>
-                <th>Velocidad Máxima</th>
-                <th>Color</th>
-                <th>Rueda</th>
-                <th>Motorización</th>
-                <th>Tapicería</th>
-                <th>Extras</th>
+                <th class="text-dark text-center">Nombre</th>
+                <th class="text-dark text-center">Precio Base</th>
+                <th class="text-dark text-center">Descripción</th>
+                <th class="text-dark text-center">Potencia</th>
+                <th class="text-dark text-center">Velocidad Máxima</th>
+                <th class="text-dark text-center">Color</th>
+                <th class="text-dark text-center">Rueda</th>
+                <th class="text-dark text-center">Motorización</th>
+                <th class="text-dark text-center">Tapicería</th>
+                <th class="text-dark text-center">Extras</th>
                 {% if is_gerencia_or_admin or is_cliente %}
-                <th>Acciones</th>
+                <th class="text-dark text-center">Acciones</th>
                 {% endif %}
             </tr>
+            
         </thead>
         <tbody>
             {% for coche in coches %}

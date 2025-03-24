@@ -6,12 +6,12 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">
+                <div class="container mt-3" style="color: #ffffff; background-color: #1a1f3c;">
                     <h2>Orden de Compra #{{ orden.id }}</h2>
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">
-                        <div class="col-sm-6">
+                        <div class="container mt-3" style="color: #ffffff; background-color: #1a1f3c;">
                             <h6 class="mb-3">Proveedor:</h6>
                             <div>
                                 <strong>{{ orden.proveedor.nombre }}</strong>
@@ -20,7 +20,7 @@
                             <div>Email: {{ orden.proveedor.email }}</div>
                             <div>Tel: {{ orden.proveedor.telefono }}</div>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="container mt-3" style="color: #ffffff; background-color: #1a1f3c;">
                             <h6 class="mb-3">Detalles de la Orden:</h6>
                             <div>Fecha: {{ orden.fecha|date:"d/m/Y H:i" }}</div>
                             <div>Estado: 
