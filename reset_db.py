@@ -14,7 +14,7 @@ def reset_database():
     # Conectar a PostgreSQL
     try:
         conn = psycopg2.connect(
-            dbname='postgres',
+            dbname='erp_empresa',
             user='postgres',
             password='aaaaaa',
             host='localhost',
@@ -45,6 +45,7 @@ def reset_database():
             ENCODING = 'UTF8'
             LC_COLLATE = 'es-ES'
             LC_CTYPE = 'es-ES'
+            TEMPLATE = template0
             TABLESPACE = pg_default
             CONNECTION LIMIT = -1
         """)
@@ -116,4 +117,4 @@ def reset_database():
     print("   Contraseña: aaaaaa")
 
 if __name__ == '__main__':
-    reset_database() 
+    reset_database()
