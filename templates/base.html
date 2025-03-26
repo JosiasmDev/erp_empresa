@@ -322,6 +322,15 @@
                                         <i class="bi bi-cash"></i> Contabilidad
                                     </span>
                                     <ul>
+                                        <li><a class="dropdown-item" href="{% url 'accounting:dashboard' %}">
+                                            <i class="bi bi-speedometer2"></i> Dashboard
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'accounting:ingresos' %}">
+                                            <i class="bi bi-arrow-up-circle"></i> Ingresos
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="{% url 'accounting:gastos' %}">
+                                            <i class="bi bi-arrow-down-circle"></i> Gastos
+                                        </a></li>
                                         <li><a class="dropdown-item" href="{% url 'accounting:balance' %}">
                                             <i class="bi bi-journal-text"></i> Balance
                                         </a></li>

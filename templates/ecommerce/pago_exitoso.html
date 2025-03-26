@@ -11,13 +11,13 @@
                 <div class="col-md-6">
                     <div class="card mb-4">
                         <div class="card-header">
-                            <h5>Detalles del Pedido</h5>
+                            <h5><span class="dropdown-item-text" style="color: #6586a7;">Detalles del Pedido</span></h5>
                         </div>
                         <div class="card-body">
-                            <p><strong>Coche:</strong> {{ coche.nombre }}</p>
-                            <p><strong>Número de Pedido:</strong> {{ numero_pedido }}</p>
-                            <p><strong>Precio Total:</strong> {{ precio_total|floatformat:2 }}€</p>
-                            <p><strong>Cliente:</strong> {{ nombre_completo }}</p>
+                            <p><strong><span class="dropdown-item-text" style="color: #6586a7;">Coche:</span></strong> <span class="dropdown-item-text" style="color: #6586a7;">{{ coche.nombre }}</span></p>
+                            <p><strong><span class="dropdown-item-text" style="color: #6586a7;">Número de Pedido:</span></strong> <span class="dropdown-item-text" style="color: #6586a7;">{{ numero_pedido }}</span></p>
+                            <p><strong><span class="dropdown-item-text" style="color: #6586a7;">Precio Total:</span></strong> <span class="dropdown-item-text" style="color: #6586a7;">{{ precio_total|floatformat:2 }}€</span></p>
+                            <p><strong><span class="dropdown-item-text" style="color: #6586a7;">Cliente:</span></strong> <span class="dropdown-item-text" style="color: #6586a7;">{{ nombre_completo }}</span></p>
                         </div>
                     </div>
                 </div>
@@ -25,18 +25,19 @@
                 <div class="col-md-6">
                     <div class="card mb-4">
                         <div class="card-header">
-                            <h5>Estado de la Producción</h5>
+                            <h5><span class="dropdown-item-text" style="color: #6586a7;">Estado de la Producción</span></h5>
                         </div>
                         <div class="card-body">
-                            <p><strong>Orden de Fabricación:</strong> {{ orden_fabricacion.numero_orden }}</p>
-                            <p><strong>Estado:</strong> {{ orden_fabricacion.get_estado_display }}</p>
-                            <p><strong>Orden de Entrega:</strong> {{ orden_entrega.numero_orden }}</p>
-                            <p><strong>Estado:</strong> {{ orden_entrega.get_estado_display }}</p>
+                            <p><strong><span class="dropdown-item-text" style="color: #6586a7;">Orden de Fabricación:</span></strong> <span class="dropdown-item-text" style="color: #6586a7;">{{ orden_fabricacion.numero_orden }}</span></p>
+                            <p><strong><span class="dropdown-item-text" style="color: #6586a7;">Estado:</span></strong> <span class="dropdown-item-text" style="color: #6586a7;">{{ orden_fabricacion.get_estado_display }}</span></p>
+                            <p><strong><span class="dropdown-item-text" style="color: #6586a7;">Orden de Entrega:</span></strong> <span class="dropdown-item-text" style="color: #6586a7;">{{ orden_entrega.numero_orden }}</span></p>
+                            <p><strong><span class="dropdown-item-text" style="color: #6586a7;">Estado:</span></strong> <span class="dropdown-item-text" style="color: #6586a7;">{{ orden_entrega.get_estado_display }}</span></p>
                         </div>
                     </div>
                 </div>
             </div>
-
+            
+            
             <div class="mt-4">
                 <a href="{% url 'website:index' %}" class="btn btn-primary">Volver al Inicio</a>
                 <a href="{% url 'website:perfil_usuario' %}" class="btn btn-info">Ver Mi Perfil</a>

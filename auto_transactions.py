@@ -96,16 +96,22 @@ def pagar_sueldos():
 
 def main():
     print("Iniciando generación automática de transacciones...")
+    ultimo_pago_sueldos = None
     
     while True:
         try:
+            # Obtener la fecha y hora actual
+            ahora = datetime.now()
+            
+            # Verificar si es momento de pagar sueldos (cada minuto)
+            if ultimo_pago_sueldos is None or (ahora - ultimo_pago_sueldos).total_seconds() >= 60:
+                pagar_sueldos()
+                ultimo_pago_sueldos = ahora
+                print(f"Pagos de salarios ejecutados en: {ahora}")
+            
             # Generar compra cada 30 segundos
             generar_compra()
             time.sleep(30)
-            
-            # Pagar sueldos cada minuto
-            if datetime.now().second == 0:
-                pagar_sueldos()
             
         except KeyboardInterrupt:
             print("\nDeteniendo generación de transacciones...")
