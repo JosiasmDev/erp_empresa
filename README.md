@@ -1,137 +1,107 @@
-# Sistema ERP Empresa
+# ERP Empresa - Sistema de Gestión Empresarial
 
-Sistema de Planificación de Recursos Empresariales (ERP) desarrollado con Django.
+Sistema ERP para la gestión de una empresa de fabricación y venta de vehículos.
 
-## Estructura del Proyecto
+## Requisitos Previos
 
-```
-erp_empresa/
-├── apps/
-│   ├── sales/
-│   ├── inventory/
-│   ├── production/
-│   ├── accounting/
-│   ├── human_resources/
-│   └── marketing/
-├── docs/
-│   ├── diagramas/
-│   │   ├── casos_uso.md
-│   │   ├── clases.md
-│   │   ├── der.md
-│   │   ├── secuencia_venta.md
-│   │   ├── estados_pedido.md
-│   │   ├── componentes.md
-│   │   └── despliegue.md
-│   ├── documentacion_tecnica.md
-│   └── documentacion_funcional.md
-└── requirements.txt
-```
-
-## Requisitos
-
-- Python 3.8+
-- Django 4.2+
-- PostgreSQL
-- Redis
-- RabbitMQ
+- Python 3.12 o superior
+- pip (gestor de paquetes de Python)
+- Git (opcional, para clonar el repositorio)
 
 ## Instalación
 
-1. Clonar el repositorio:
+1. Clonar el repositorio (si no lo has descargado directamente):
 ```bash
-git clone [URL_DEL_REPOSITORIO]
+git clone [https://github.com/JosiasmDev/erp_empresa.git]
 cd erp_empresa
 ```
 
-2. Crear entorno virtual:
+2. Crear y activar un entorno virtual:
 ```bash
 python -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
+# En Windows:
+venv\Scripts\activate
+# En Linux/Mac:
+source venv/bin/activate
 ```
 
-3. Instalar dependencias:
+3. Instalar las dependencias:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Configurar variables de entorno:
+4. Configurar la base de datos:
 ```bash
-cp .env.example .env
-# Editar .env con tus configuraciones
-```
-
-5. Migrar base de datos:
-```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
 
-## Visualización de Diagramas
+5. Crear un superusuario:
+```bash
+python manage.py createsuperuser
+```
 
-Los diagramas están creados usando Mermaid y se encuentran en la carpeta `docs/diagramas/`. Para visualizarlos:
+## Configuración Inicial
 
-1. **Usando GitHub**: 
-   - Los archivos .md con diagramas Mermaid se renderizan automáticamente en GitHub
-   - Navega a la carpeta `docs/diagramas/` en el repositorio
-   - Abre cualquier archivo .md para ver el diagrama
+1. Ejecutar el script de reset para limpiar la base de datos:
+```bash
+python reset.py
+```
 
-2. **Usando VS Code**:
-   - Instala la extensión "Markdown Preview Mermaid Support"
-   - Abre el archivo .md
-   - Presiona Ctrl+Shift+V (o Cmd+Shift+V en Mac) para ver la vista previa
+Este script creará:
+- Coches (Arrow y Eclipse)
+- Componentes
+- Stock inicial
+- Usuarios y grupos
+- Empleados
+- Datos de ejemplo
 
-3. **Usando Mermaid Live Editor**:
-   - Ve a https://mermaid.live
-   - Copia el contenido del diagrama (código entre ```mermaid)
-   - Pega en el editor para visualizar
+## Iniciar el Sistema
 
-## Documentación
-
-- **Documentación Técnica**: `docs/documentacion_tecnica.md`
-  - Arquitectura del sistema
-  - Configuración técnica
-  - Guías de desarrollo
-
-- **Documentación Funcional**: `docs/documentacion_funcional.md`
-  - Manual de usuario
-  - Casos de uso
-  - Requisitos de seguridad
-  - Preguntas frecuentes
-
-## Diagramas Disponibles
-
-1. **Casos de Uso** (`casos_uso.md`)
-   - Muestra los actores y funcionalidades del sistema
-
-2. **Diagrama de Clases** (`clases.md`)
-   - Representa la estructura de clases del sistema
-
-3. **Diagrama Entidad-Relación** (`der.md`)
-   - Muestra el modelo de datos
-
-4. **Diagrama de Secuencia** (`secuencia_venta.md`)
-   - Proceso de venta detallado
-
-5. **Diagrama de Estados** (`estados_pedido.md`)
-   - Estados y transiciones de pedidos
-
-6. **Diagrama de Componentes** (`componentes.md`)
-   - Arquitectura del sistema
-
-7. **Diagrama de Despliegue** (`despliegue.md`)
-   - Infraestructura de producción
-
-## Desarrollo
-
-Para ejecutar el servidor de desarrollo:
+1. Iniciar el servidor de desarrollo:
 ```bash
 python manage.py runserver
 ```
 
-Para ejecutar las tareas programadas:
+2. En una nueva terminal, iniciar el script de transacciones automáticas:
 ```bash
-python ejecutar_tareas_script.py
+python auto_transactions.py
 ```
 
-## Licencia
+## Acceso al Sistema
 
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+- URL: http://127.0.0.1:8000
+- Credenciales de superusuario: Las que hayas creado en el paso 5 de instalación
+- Usuario de prueba: Josias (creado automáticamente)
+
+## Estructura del Proyecto
+
+- `erp_empresa/`: Configuración principal del proyecto
+- `ecommerce/`: Módulo de comercio electrónico
+- `inventory/`: Gestión de inventario
+- `manufacturing/`: Gestión de producción
+- `sales/`: Gestión de ventas
+- `human_resources/`: Gestión de recursos humanos
+- `accounting/`: Gestión contable
+- `crm/`: Gestión de relaciones con clientes
+- `website/`: Sitio web público
+
+## Scripts Importantes
+
+- `reset.py`: Limpia la base de datos y elimina todos los datos
+- `create_initial_data.py`: Crea datos iniciales para el sistema
+- `auto_transactions.py`: Genera transacciones automáticas (compras cada 30 segundos y sueldos cada minuto)
+
+## Mantenimiento
+
+Para reiniciar el sistema desde cero:
+1. Detener el servidor y el script de transacciones
+2. Ejecutar `python reset.py`
+3. Reiniciar el servidor y el script de transacciones
+
+## Notas Importantes
+
+- El script `auto_transactions.py` genera compras aleatorias cada 30 segundos
+- Los sueldos se pagan automáticamente cada minuto
+- Asegúrate de tener suficiente espacio en disco para la base de datos
+- Se recomienda hacer copias de seguridad antes de ejecutar reset.py

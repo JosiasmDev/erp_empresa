@@ -94,11 +94,33 @@ def reset_database():
     
     # Crear nuevas migraciones
     print("Creando nuevas migraciones...")
-    execute_from_command_line(['manage.py', 'makemigrations'])
+    execute_from_command_line(['manage.py', 'makemigrations', 'accounts'])
+    execute_from_command_line(['manage.py', 'makemigrations', 'website'])
+    execute_from_command_line(['manage.py', 'makemigrations', 'ecommerce'])
+    execute_from_command_line(['manage.py', 'makemigrations', 'crm'])
+    execute_from_command_line(['manage.py', 'makemigrations', 'sales'])
+    execute_from_command_line(['manage.py', 'makemigrations', 'inventory'])
+    execute_from_command_line(['manage.py', 'makemigrations', 'manufacturing'])
+    execute_from_command_line(['manage.py', 'makemigrations', 'purchase'])
+    execute_from_command_line(['manage.py', 'makemigrations', 'accounting'])
+    execute_from_command_line(['manage.py', 'makemigrations', 'human_resources'])
+    execute_from_command_line(['manage.py', 'makemigrations', 'marketing_automation'])
+    execute_from_command_line(['manage.py', 'makemigrations', 'core'])
     
     # Aplicar migraciones
     print("Aplicando migraciones...")
-    execute_from_command_line(['manage.py', 'migrate'])
+    execute_from_command_line(['manage.py', 'migrate', 'accounts'])
+    execute_from_command_line(['manage.py', 'migrate', 'website'])
+    execute_from_command_line(['manage.py', 'migrate', 'ecommerce'])
+    execute_from_command_line(['manage.py', 'migrate', 'crm'])
+    execute_from_command_line(['manage.py', 'migrate', 'sales'])
+    execute_from_command_line(['manage.py', 'migrate', 'inventory'])
+    execute_from_command_line(['manage.py', 'migrate', 'manufacturing'])
+    execute_from_command_line(['manage.py', 'migrate', 'purchase'])
+    execute_from_command_line(['manage.py', 'migrate', 'accounting'])
+    execute_from_command_line(['manage.py', 'migrate', 'human_resources'])
+    execute_from_command_line(['manage.py', 'migrate', 'marketing_automation'])
+    execute_from_command_line(['manage.py', 'migrate', 'core'])
     
     # Cargar datos del backup
     print("Cargando datos del backup...")

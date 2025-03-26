@@ -99,9 +99,9 @@ def main():
     
     while True:
         try:
-            # Generar compra cada 3 segundos
+            # Generar compra cada 30 segundos
             generar_compra()
-            time.sleep(3)
+            time.sleep(30)
             
             # Pagar sueldos cada minuto
             if datetime.now().second == 0:
